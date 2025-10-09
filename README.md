@@ -6,7 +6,6 @@
 
 - `admin-vue-skeleton`: 管理端前端骨架（Element Plus、Pinia、Vue Router、i18n）
 - `ExpressBackendSkeleton`: 后端骨架（JWT、RBAC 权限、Winston、Swagger、上传、分页中间件）
-- `sk-admin-frontend-skeleton`: 更完整的前端示例与文档站点（可作为约定与最佳实践参考）
 
 ### 核心功能
 

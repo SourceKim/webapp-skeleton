@@ -1,10 +1,9 @@
 ## 项目总览
 
-本仓库包含三个主要部分：
+本仓库包含两个主要部分：
 
 - admin-vue-skeleton：Vue 3 + TypeScript + Vite 管理端骨架（Element Plus、Pinia、Vue Router、i18n）。
 - ExpressBackendSkeleton：Express + TypeScript + TypeORM 后端骨架（JWT、RBAC 权限、Winston 日志、Swagger、上传、分页中间件）。
-- sk-admin-frontend-skeleton：更完整的前端示例与文档站点（可作为约定与最佳实践的参考实现）。
 
 ### 架构关系
 
