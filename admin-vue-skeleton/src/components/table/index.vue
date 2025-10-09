@@ -1,0 +1,172 @@
+<template>
+    <div :style="props.style" :class="warpperClass1">
+        <div :class="warpperClass2">
+            <TopFilter
+            v-if="props.isFilterTable && props.filterColumns"
+            class="top-filter"
+            :columns="props.filterColumns"
+            :param="pageQuery.param ?? []"
+            :loading="loadingRef"
+            :onSearch="fetchQuery"
+            />
+            <TableCore
+            :isFilterTable="props.isFilterTable"
+            :selection="props.selection ?? 'single'"
+            :data="pageData"
+            :sortedTableColumns="sortColumnsParams ?? []"
+            :tableParam="tableParam"
+            >
+            <template #left-action>
+                <slot name="left-action"></slot>    
+            </template>
+            <template #right-action>
+                <slot name="right-action"></slot>
+            </template>
+            <template #total-view v-if="pagination.layout.includes('total')">
+                <TotalView 
+                :total="Math.max(pagination.total ?? 0, pageData.length)"
+                :selection="props.selection" 
+                :selectionLimit="props.selectionLimit ?? 10" 
+                :selectedCount="selectionRows.length" /> 
+            </template>
+            <template #pagination>
+              <el-scrollbar :class="['table-scrollbar', 'pagination']" wrap-style="height: auto;">
+                <el-form :disabled="false">
+                                <el-pagination
+                v-bind="{...pagination}"
+                :disabled="loadingRef"
+                :total="Math.max(pagination.total ?? 0, pageData.length)"
+                :size="layoutStore.widthShrink ? 'small' : layoutStore.size"
+                :layout="pagination.layout.split(',').filter((i) => i !== 'total').join(',')"
+                :onCurrentChange="fetchQuery"
+                :onSizeChange="fetchQuery"
+                v-model:current-page="pageQuery.currentPage"
+                v-model:page-size="pageQuery.pageSize"
+              />
+                </el-form>
+              </el-scrollbar>
+            </template>
+            </TableCore>
+        </div>
+    </div>
+</template>
+
+<script lang="ts" setup generic="T extends object, F extends object">
+
+import { ElScrollbar, ElForm, ElPagination } from 'element-plus'
+import TopFilter from './TopFilter.vue'
+import TotalView from './TotalView.vue'
+import TableCore from './TableCore.vue'
+import { useTable } from './composables/useTable'
+import type { MTableProps } from '../interface/table'
+import type { PageQuery, PageResult, RestResponse } from './types'
+
+const props = withDefaults(defineProps<MTableProps<T, F>>(), {
+    layout: 'auto',
+    defaultQuery: true,
+    isSortColumn: true,
+    selectionLimit: 10,
+    isFilterTable: true,
+    selection: 'single',
+    isPage: true,
+    version: '0.1',
+    install: false,
+    showHeader: true,
+    width: '100%',
+    height: '100%',
+    fit: true,
+})
+
+const emit = defineEmits<{
+    (e: 'update:data', data: T[]): void
+    (e: 'selection-change', rows: T[]): void
+    (e: 'row-click', row: T, column: any, event: Event): void
+}>()
+
+// 使用组合式 API
+const {
+    // 状态
+    loadingRef,
+    layoutStore,
+    pageQuery,
+    pagination,
+    pageData,
+    selectionRows,
+    tableColumnsParams,
+    sortColumnsParams,
+    wrapperClass1,
+    wrapperClass2,
+    tableParam,
+    
+    // 方法
+    fetchQuery,
+    handleSelectionChange,
+    handleRowClick,
+    handleDataUpdate,
+    initTableColumnParamFun
+} = useTable(props, emit)
+
+// 向后兼容：保持原来的变量名
+const warpperClass1 = wrapperClass1
+const warpperClass2 = wrapperClass2
+
+// 暴露方法给父组件
+defineExpose({
+    fetchQuery
+})
+
+</script>
+
+<style scoped lang="scss">
+.m-table {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .top-filter {
+    border: var(--el-border);
+    border-color: rgba(0, 0, 0, 0);
+    margin-bottom: 10px;
+    border-radius: var(--el-border-radius-base);
+    flex-shrink: 0;
+  }
+
+  .table-view {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--el-bg-color);
+    flex-grow: 1;
+
+    .radio-selection {
+      :deep(.el-table-column--selection .el-checkbox) {
+        visibility: hidden;
+      }
+    }
+  }
+
+  :deep(.action-btn) {
+    padding: 0 4px;
+    margin-left: 3px;
+    margin-right: 0;
+
+    > span {
+      margin-left: 2px;
+    }
+  }
+
+  .pagination {
+    height: auto;
+    padding-top: 10px;
+  }
+}
+//定制高度
+.custom-height {
+  .table-view {
+    height: auto;
+
+    .table-form {
+      height: auto;
+    }
+  }
+}
+</style>

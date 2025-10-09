@@ -1,0 +1,134 @@
+export default {
+  system: {
+    user: {
+      role: '角色',
+    },
+    locale: {
+      switchLocaleError: '切换语言失败',
+    },
+    setting: {
+      layout: '布局设置',
+      theme: '主题',
+      size: {
+        label: '尺寸',
+        small: '小',
+        default: '默认',
+        large: '大',
+      },
+      tabStyle: {
+        label: '标签栏样式',
+        square: '方形',
+        mellow: '圆角',
+      },
+      showLogo: '显示Logo',
+      menuUnique: '菜单唯一',
+      showFooter: '显示页脚',
+      menuWidth: '菜单宽度',
+      showNavTabIcon: '显示标签图标',
+    },
+    login: {
+      inputUsername: '请输入账号',
+      inputPassword: '请输入密码',
+      login: '登录',
+      logoutSuccess: '退出登录成功',
+    },
+  },
+  layout: {
+    personalCenter: '个人中心',
+    switchRole: '切换角色',
+    logout: '退出登录',
+  },
+  common: {
+    confirm: '确定',
+    cancel: '取消',
+    save: '保存',
+    add: '新增',
+    edit: '编辑',
+    del: '删除',
+    detail: '详情',
+    clear: '清空',
+    confirmMsg: '确认是否继续此操作?',
+    loadingText: '操作中',
+    successMsg: '操作成功',
+    optFailed: '操作失败',
+    createdAt: '创建时间',
+    updatedAt: '更新时间',
+    id: 'ID',
+    status: '状态',
+    saveSuccess: '保存成功',
+    saveFailed: '保存失败',
+    confirmDelete: '确认删除选中项？'
+  },
+  comp: {
+    table: {
+      index: '序号',
+      total: '合计',
+      operation: '操作',
+      unit: '项',
+      selected: '已选',
+      colSort: '列排序',
+      allColSort: '所有列排序',
+      complexFilter: '复杂过滤',
+    },
+    topFilter: {
+      query: '查询',
+      search: '搜索',
+      reset: '重置',
+      expand: '展开',
+      collapse: '收起'
+    },
+    form: {
+      pleaseInput: '请输入',
+      pleaseSelect: '请选择',
+      refresh: '刷新',
+      rules: {
+        beEmpty: '{label}不能为空',
+        wrongFormat: '{label}格式不对',
+        min: '{label}最小值为{min}',
+        max: '{label}最大值为{max}',
+        maxlength: '{label}最大字符不超过{maxlength}',
+        minlength: '{label}不得少于{minlength}个字符',
+        valRestriction: '{label}的值只能为{enums}',
+        formatTip: '{label}格式为{format}'
+      }
+    },
+    operation: {
+      edit: '编辑',
+      delete: '删除',
+      add: '新增',
+      more: '更多',
+    },
+    upload: {
+      selectFromFile: '从本地目录中选择',
+      selectFromLib: '从文件库中选择',
+      imageCropper: '图片裁剪',
+    },
+  },
+  view: {
+    user: {
+      avatar: '头像',
+      password: '密码',
+      username: '用户名',
+      bio: '简介',
+      email: '邮箱',
+      nickname: '昵称',
+      phone: '手机号',
+      edit: '编辑',
+      detail: '详情',
+      del: '删除',
+      permission: '权限',
+      registerSuccess: '注册用户成功',
+      assignRolesSuccess: '分配角色成功',
+    },
+    role: {
+      permissions: '权限管理',
+      searchPermissions: '搜索权限...',
+      availablePermissions: '可用权限',
+      assignedPermissions: '已分配权限',
+      assign: '分配',
+      remove: '移除',
+      assignAll: '全部分配',
+      removeAll: '全部移除',
+    }
+  }
+}

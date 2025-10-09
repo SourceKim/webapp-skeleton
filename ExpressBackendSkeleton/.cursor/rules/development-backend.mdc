@@ -1,0 +1,37 @@
+---
+description: 后端开发习惯，开发 Express 后端，尤其是添加新的功能、模块的时候调用
+globs: 
+alwaysApply: false
+---
+# 描述
+
+# 后端命名规范
+
+1. 数据库字段命名用 _ 分隔 created_at
+2. 环境变量、静态变量使用全大写 MY_ENV_VAR
+
+# 目录结构
+
+# 业务新增流程
+
+### 1. 确认业务业务逻辑 & 业务接口
+
+### 2. 根据业务逻辑将需要的 api 定义到 @routes 目录之下
+
+#### API 实现注意事项
+
+1. API 遵循 RESTFul 的写法，注意定义 CRUD
+2. 区分  admin 的 api & 非 admin 的 api
+3. 注意权限管理，加入类似 auth 的中间件
+
+#### 示例
+
+### 3. 定义业务 model， 也就是 typeorm 的 Entity，放在 @models 目录下
+
+#### 注意事项
+
+1. id 主键使用 string 类型，实体类型为 uuid，由 nanoid 生成
+2. 使用 `class-validator` 添加类型验证
+3. 所有 Entity 都继承 BaseEntity，包含 `id` & `created_at` & `updated_at` & `deleted_at` 字段
+4. 将实体添加到 @database.config.ts 中
+5. 在 @migrations 中生成迁移文件，当 Entity 存在依赖关系时，注意**调整迁移文件的名字以保证被依赖的表先被创建**
