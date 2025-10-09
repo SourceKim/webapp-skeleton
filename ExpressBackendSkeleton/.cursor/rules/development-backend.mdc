@@ -1,37 +1,121 @@
----
 description: 后端开发习惯，开发 Express 后端，尤其是添加新的功能、模块的时候调用
-globs: 
+globs:
+  - "ExpressBackendSkeleton/**"
 alwaysApply: false
 ---
-# 描述
+## 描述 / 范围
 
-# 后端命名规范
+本规则基于当前项目实际实现（Express + TypeORM + JWT + Winston）。用于指导后端日常开发、新增业务模块、接口规范、权限与日志、错误处理、分页、实体与迁移、配置与部署。
 
-1. 数据库字段命名用 _ 分隔 created_at
-2. 环境变量、静态变量使用全大写 MY_ENV_VAR
+## 命名与基础规范
 
-# 目录结构
+- 数据库字段：使用下划线分隔，如 `created_at`、`updated_at`。
+- 环境变量与常量：全大写下划线风格，如 `MYSQL_HOST`、`JWT_SECRET`。
+- TypeScript：避免使用 `any`；导出类型/接口需明确；控制流尽量使用早返回。
 
-# 业务新增流程
+## 目录结构（关键目录）
 
-### 1. 确认业务业务逻辑 & 业务接口
+- `src/app.ts`：应用中间件装配（CORS、压缩、JSON 解析、请求追踪、HTTP 日志、静态资源、Swagger、错误处理、DTO 校验扩展）。
+- `src/server.ts`：数据源初始化与服务启动。
+- `src/configs/`：`env.config.ts`（多层 .env 加载）、`database.config.ts`（TypeORM DataSource 与实体注册）、`logger.config.ts`、`swagger.config.ts`。
+- `src/middlewares/`：`auth.middleware.ts`、`admin.middleware.ts`、`permission.middleware.ts`、`logger.middleware.ts`（请求追踪/HTTP 日志）、`error.middleware.ts`、`dto-validation.middleware.ts`、`paginationQuery.ts`、`paginationResponse.ts`。
+- `src/modules/*`：按领域模块划分（`auth`、`user`、`role`、`permission`、`material`）。每个模块含 controller/service/dto/model/routes。
+- `src/routes.ts`：集中注册路由，统一前缀 `\(API_VERSION = '/api/v1'\)`。
+- `src/docs/*`：Swagger 文档段落定义。
+- `src/modules/common/`：`base.model.ts`（`BaseEntity`）与通用 DTO、分页类型。
 
-### 2. 根据业务逻辑将需要的 api 定义到 @routes 目录之下
+## 动态配置（env）
 
-#### API 实现注意事项
+- 通过 `env.config.ts` 按优先级加载 `.env.${NODE_ENV}.local` → `.env.${NODE_ENV}` → `.env.local` → `.env`。
+- 关键变量：
+  - 服务器：`PORT`、`API_BASE_URL`、`CORS_ORIGINS`、`CORS_METHODS`、`CORS_HEADERS`。
+  - 日志：`LOG_LEVEL`。
+  - 数据库：`MYSQL_HOST`、`MYSQL_PORT`、`MYSQL_USER`、`MYSQL_PASSWORD`、`MYSQL_DATABASE`。
+  - 鉴权：`JWT_SECRET`（必配）。
+  - 静态与上传：`UPLOADS_PATH`、`PUBLIC_PATH`、`UPLOAD_DIR`、`MAX_FILE_SIZE`、`ALLOWED_MIME_TYPES`、`API_URL`。
 
-1. API 遵循 RESTFul 的写法，注意定义 CRUD
-2. 区分  admin 的 api & 非 admin 的 api
-3. 注意权限管理，加入类似 auth 的中间件
+## 日志与请求追踪
 
-#### 示例
+- 使用 Winston，输出到控制台与 `logs/app/combined.log`、`logs/app/error.log`。日志级别受 `LOG_LEVEL` 与环境控制。
+- `requestTracingMiddleware` 生成 `X-Request-ID` 并写入日志上下文；`httpLoggerMiddleware` 记录请求开始与完成（含耗时、状态码、用户ID、UA、IP）。
+- 统一使用 `utils/logger.ts` 的 `logInfo/logError/logWarn/logHttp/logDebug`，并支持按 `requestId` 追加上下文。
 
-### 3. 定义业务 model， 也就是 typeorm 的 Entity，放在 @models 目录下
+## 错误处理
 
-#### 注意事项
+- 统一抛出 `HttpException(status: number, message: string, error?: any)`。
+- `error.middleware.ts`：
+  - MySQL 唯一约束冲突（"Duplicate entry"）→ `409`，`message: '该邮箱或手机号已被使用'`。
+  - 其他 `HttpException` → 返回 `{ code: status, message, error? }`。
+  - 其他未知错误 → `500`，开发环境附带 `stack` 详情。
 
-1. id 主键使用 string 类型，实体类型为 uuid，由 nanoid 生成
-2. 使用 `class-validator` 添加类型验证
-3. 所有 Entity 都继承 BaseEntity，包含 `id` & `created_at` & `updated_at` & `deleted_at` 字段
-4. 将实体添加到 @database.config.ts 中
-5. 在 @migrations 中生成迁移文件，当 Entity 存在依赖关系时，注意**调整迁移文件的名字以保证被依赖的表先被创建**
+## 鉴权与权限
+
+- JWT：使用 `Authorization: Bearer <token>`；密钥 `JWT_SECRET` 必配。
+- `auth.middleware.ts`：校验 JWT，查询用户（含 `roles.permissions`），将用户挂载到 `req.user`。
+- 角色：`admin.middleware.ts` 要求 `role.name` 为 `admin` 或 `super_admin`。
+- 细粒度权限：`checkPermissions(['permission.name', ...])` 校验是否具备全部指定权限。
+
+## DTO 校验
+
+- 通过 `extendRequestValidate()` 扩展 `req.validate<T>(DtoClass, source)`，内部使用 `class-transformer` + `class-validator`，默认 `whitelist` 与 `forbidNonWhitelisted` 开启。
+- 控制器建议：在读取 `req.body/query/params` 时优先使用 `req.validate()` 进行解析与校验。
+
+## 路由与 API 设计
+
+- 统一前缀：`/api/v1`（见 `src/routes.ts`）。
+- 区分：`/admin` 路由需 `auth` + `admin`；普通路由需 `auth`（视需求）。
+- Swagger：已在 `swagger.config.ts` 配置 `BearerAuth`；在 `src/docs/*` 维护接口文档。
+- 认证接口（模块 `auth`）：
+  - `POST /api/v1/auth/register`
+  - `POST /api/v1/auth/login`
+  - `POST /api/v1/auth/token-login`
+  - `GET  /api/v1/auth/profile`（需 `auth`）
+
+### 分页与筛选
+
+- 入参中间件：`paginationQuery` 支持 `page`、`limit`（最大 100）、`sort_by`（默认 `created_at`）、`sort_order`（默认 `DESC`），以及对象型 `filters`（空值将被清理）。
+- 出参中间件：`paginationResponse` 统一响应结构：
+  - `data.items: T[]`
+  - `data.meta: { total, page, limit, pages, sort_by, sort_order }`
+- 查询构建：使用 `QueryFilterBuilder` 清理/构造筛选条件（见 `utils/query-filter.util.ts`）。
+
+### 统一响应结构
+
+- 成功：`{ code: 0, message?: string, data?: T }`。
+- 分页：使用 `res.pagination(items, total)` 自动包装为统一格式。
+- 失败：由 `error.middleware.ts` 统一返回（`code` 为 HTTP 状态码）。
+
+## 实体与数据库（TypeORM）
+
+- 基类：所有实体继承 `modules/common/base.model.ts` 的 `BaseEntity`，字段：`id`、`created_at`、`updated_at`、`deleted_at`（列名均使用下划线）。
+- 主键：`id` 为 `varchar(36)` 字符串；业务侧使用 `nanoid` 生成（当前实现使用 `customAlphabet('0-9a-z', 16)`）。
+- 校验：在模型字段上使用 `class-validator` 进行约束。
+- 注册：新实体需添加到 `configs/database.config.ts` 的 `entities` 列表。
+- 迁移：
+  - 所有结构变更通过 `migrations/*.ts` 管理，`synchronize=false`。
+  - 存在依赖关系时，调整迁移文件名以保证被依赖表先创建。
+
+## 静态资源与上传
+
+- 静态目录：`ENV.UPLOADS_PATH`、`ENV.PUBLIC_PATH` 对应 `uploads/` 与 `public/` 目录（在 `app.ts` 中通过 `express.static` 暴露）。
+
+## 新增业务流程（强制执行）
+
+1) 明确业务与接口：梳理模型关系、权限策略、分页/筛选需求。
+2) 定义路由：在对应模块的 `*.routes.ts` 中新增 RESTful API；注册在 `src/routes.ts`，区分 `/admin` 与普通接口，并正确组合中间件（`auth`→`admin`→`checkPermissions`）。
+3) DTO 与校验：在 `*.dto.ts` 定义请求/响应 DTO；控制器中通过 `req.validate()` 校验入参。
+4) Controller 与 Service：控制器仅做参数处理与响应包装，业务逻辑放入 Service，必要时记录 `requestId` 日志。
+5) 实体与迁移：创建/更新实体（继承 `BaseEntity`，字段命名下划线）；将实体加入 `database.config.ts`；生成迁移并按依赖排序。
+6) 分页规范：列表接口接入 `paginationQuery` 与 `paginationResponse`；服务层使用 `QueryFilterBuilder` 处理 `filters`。
+7) 权限：为管理员接口挂载 `admin.middleware`；细粒度操作加 `checkPermissions`，并在种子/角色配置中同步权限名。
+8) 文档：在 `src/docs/*` 中补充 Swagger 注释；必要时在 README 或 `docs/` 目录补充使用说明。
+9) 配置：如新增环境变量，更新 `.env.*` 样例与 `ENV` 导出；记得在服务端配置 `JWT_SECRET`。
+10) 质量：本地跑起服务确认无 TS/Lint 报错，接口经 Postman/单测验证；日志、错误码、响应结构保持一致。
+
+## 注意事项（落地自检）
+
+- API 返回一律包裹 `{ code, message, data }`；异常统一抛 `HttpException` 并交由错误中间件处理。
+- 任何需要登录的接口必须挂 `auth.middleware`；管理接口增加 `admin.middleware`；敏感操作结合 `checkPermissions`。
+- 分页列表必须接 `paginationQuery` 与 `paginationResponse`，确保统一的入参/出参体验。
+- 新实体务必加入 `database.config.ts`；`synchronize` 不可开启为 `true`。
+- JWT 校验依赖 `JWT_SECRET`；未配置将导致运行时错误。

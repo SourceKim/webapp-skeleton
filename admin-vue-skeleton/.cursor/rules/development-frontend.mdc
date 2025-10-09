@@ -1,0 +1,88 @@
+---
+description: 前端开发习惯（Vue3 + Vite + Pinia + Vue Router + Element Plus）
+globs:
+  - "admin-vue-skeleton/**"
+alwaysApply: false
+---
+## 描述 / 范围
+
+基于当前实现（Vue3 + TS + Vite + Pinia + Vue Router + Element Plus + vue-i18n），用于指导前端日常开发、路由/状态/请求规范、国际化、UI 组件与交互、环境变量与构建。
+
+## 目录与关键模块
+
+- `vite.config.ts`：别名 `@` 指向 `src`，`@i` 指向 `interface`；ESBuild JSX 注入配置。
+- `src/main.ts`：注册 Pinia、ElementPlus、Router、i18n，挂载 `#app`；全量注册 `@element-plus/icons-vue`。
+- `src/router/`：`index.ts` 使用 `createWebHashHistory`，`static.ts` 提供静态路由（登录、个人中心、404），根路由重定向到 `/login`。
+- `src/stores/`：Pinia 状态（如 `auth`）。
+- `src/api/`：REST API 封装，使用 `utils/request.ts` 统一拦截器与交互行为。
+- `src/i18n/`：国际化配置与语言包，支持 `zh-cn`、`en`。
+- `src/styles/`：全局样式 `index.scss`、`app.scss`。
+
+## 环境变量（Vite）
+
+- 前缀建议：`VITE_`。当前使用：
+  - `VITE_BASE_URL`：Axios 基础域（`utils/request.ts`）。
+  - `VITE_SYSTEM_BASE_URL`：API 基础前缀（`/api/v1` 缺省回退）。
+  - `VITE_SYS_TOKEN_KEY`：请求头中的 Token 键名（用于拦截器注入）。
+- 在 `.env.*` 中维护，注意区分开发与生产。
+
+## 请求规范（Axios 封装）
+
+- 统一由 `utils/request.ts` 导出的 `createAxios` 生成实例：
+  - 请求头：`Content-Type: application/json;charset=utf-8`。
+  - 可配置行为：`showLoading`、`showBeforeConfirm`、成功/错误提示等（默认从 i18n 文案获取）。
+  - Token 注入：从 `useAuthStore().token` 获取，并写入 `config.headers[VITE_SYS_TOKEN_KEY]`，值格式 `bearer <token>`。
+  - 错误提示：优先使用后端返回 `message` 或 `error` 字段，否则回退 HTTP 状态信息与默认文案。
+  - 返回值：直接返回 `res.data`。
+- API 写法：以 `apiBaseUrl = import.meta.env.VITE_SYSTEM_BASE_URL || '/api/v1'` 为前缀，例如：
+  - `POST ${apiBaseUrl}/auth/login`
+  - `POST ${apiBaseUrl}/auth/token-login`
+
+## 认证与状态管理（Pinia）
+
+- `stores/auth.ts`：
+  - `token` 使用 `useLocalStorage('token','')` 持久化。
+  - `login` 走 `api/auth.ts`；后端成功码与结构为 `{ code: 0, data: { access_token, user } }`，建议前端以 `code===0` 判断成功并写 `token=res.data.access_token`，与 `tokenLogin` 对齐。
+  - `tokenLogin` 使用 `tokenLoginApi`，以 `code===0` 判断成功，写入 `access_token` 与 `user`。
+  - `logout` 清空本地并跳转 `/login`。
+
+## 路由规范
+
+- 使用 Hash 路由（`createWebHashHistory`）。
+- 静态路由集中在 `router/static.ts`；`/login`、`/personal-center`、`404` 路由已定义。
+- 可扩展动态路由时建议统一在 `stores/router`（存在时）维护，并与服务端权限菜单对齐。
+
+## 国际化（vue-i18n）
+
+- 全局注入、`legacy: false`，`useLocalStorage('locale','zh-cn')` 作为当前语言。
+- 元素文案合并 ElementPlus 语言包；布局字号影响 `Locale.getCharWidth()`。
+- 交互默认文案从 i18n 读取（如请求确认、加载中、成功提示等）。
+
+## UI 与交互
+
+- 统一使用 Element Plus 组件与图标库（已全量注册）。
+- 成功/失败提示通过 `ElNotification`；确认对话用 `ElMessageBox.confirm`。
+- 加载态使用 `ElLoading.service`，注意在响应拦截器中关闭并清理引用。
+
+## 与后端对齐（重要）
+
+- 接口前缀：`/api/v1`；Token 放在请求头，键名为 `VITE_SYS_TOKEN_KEY` 配置的值，内容格式 `bearer <token)`。
+- 统一响应：后端成功 `{ code: 0, data }`；错误 `error.middleware` 返回 `{ code: httpStatus, message, error? }` → 前端优先显示 `message` 或 `error`。
+- 登录返回：后端 `login/token-login` 返回 `code:0` 与 `data.access_token` 与 `data.user`，前端应统一使用该结构，避免与旧结构（`code:200`, `data.token`）混用。
+
+## 新增页面/模块流程（建议）
+
+1) 定义路由：在 `router` 下新增静态或动态路由，统一元信息（`meta.title/icon/cache/componentName`）。
+2) 定义 API：在 `api` 下新增文件，复用 `createAxios`；与后端路径、前缀一致。
+3) 定义状态：在 `stores` 中建立对应模块状态，避免在组件内直接拉取与共享全局状态。
+4) 组件开发：拆分为可复用组件；样式写入 `styles/` 或按需局部样式。
+5) i18n：新增文案到语言包；避免在组件中硬编码文案。
+6) 校验：表单与交互校验与后端 DTO 对齐。
+7) 自测：在本地跑 `yarn dev` 并验证路由、鉴权、接口、文案、样式、交互。
+
+## 注意事项（落地自检）
+
+- 不直接使用裸 Axios，统一走 `createAxios`；所有新接口走 `apiBaseUrl`。
+- Token 变更应同步影响请求头（Pinia 的 `token` 已在请求拦截器中读取）。
+- 登录成功判断以 `code===0` 为准，并写 `token=res.data.access_token`。
+- 避免在组件中硬编码服务端地址，统一通过 `VITE_SYSTEM_BASE_URL`/`VITE_BASE_URL`。
