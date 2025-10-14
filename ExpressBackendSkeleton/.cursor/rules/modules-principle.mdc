@@ -1,0 +1,56 @@
+---
+description: 当创建模块的时候需要遵循的规范
+alwaysApply: false
+---
+
+## routes 规范
+
+- 统一前缀：`/api/v1/__kebabNamePlural__`；管理员接口挂在 `/admin` 下。
+- 中间件：管理员路由必须 `authMiddleware` → `adminMiddleware`；分页列表需 `paginationQuery()` 与 `paginationResponse`。
+- REST 约定：`GET /admin` 列表，`GET /admin/:id` 详情，`POST /admin` 新建，`PUT /admin/:id` 更新，`DELETE /admin/:id` 删除。
+- 路由文件：`src/modules/__kebabPath__/__kebabName__.routes.ts`（支持子路径，如 `mall/order`），在 `src/routes.ts` 使用 `${API_VERSION}/__kebabNamePlural__` 注册。
+## Controller 规范
+
+- 职责单一：只做入参校验、调用 Service、包装统一响应，不写业务逻辑。
+- 入参：使用 `req.validate(DtoClass, 'body'|'params'|'query')`。
+- 响应：统一 `{ code: 0, message, data }`；分页使用 `res.pagination(items, total)`。
+- 异常：抛出 `HttpException`，交由集中错误中间件处理。
+
+## Service 规范
+
+- 业务聚合：编排数据库操作、校验唯一性、封装查询（含筛选、分页、排序）。
+- 查询：使用 `QueryFilterBuilder` 解析 `query.filters`，结合 TypeORM QueryBuilder。
+- DTO 转换：用 `class-transformer` 将实体转为响应 DTO。
+
+## DTO 规范
+
+- 请求 DTO：`Create__PascalName__Dto`、`Update__PascalName__Dto`，使用 `class-validator` 注解；更新 DTO 字段全部 `@IsOptional()`。
+- 响应 DTO：`__PascalName__DTO` 继承 `BaseDTO`，用 `@Expose()` 标注可输出字段。
+
+## Model（Entity）规范
+
+- 实体继承 `BaseEntity`，列名下划线；主键使用项目默认生成策略；必要时加唯一索引。
+- 字段加 `class-validator` 约束；字符串字段设置合理 `length`；可空字段 `nullable: true`。
+- 新实体务必在 `configs/database.config.ts` 注册，并通过迁移文件落库（`synchronize=false`）。
+
+## 命名与目录
+
+- 目录：`src/modules/__kebabPath__/`，包含 `model/dto/service/controller/routes`；`__kebabPath__` 支持多级（如 `mall/order`、`mall/product`）。
+- 命名占位：
+  - `__kebabName__`：模块名（kebab-case），如 `product-category`
+  - `__kebabNamePlural__`：复数路由前缀，如 `product-categories`
+  - `__PascalName__`：PascalCase，如 `ProductCategory`
+  - `__kebabPath__`：模块相对路径（可多级），如 `mall/order`
+
+## 文档（Swagger）
+
+- 在 `src/docs/` 维护对应 `__kebabName__.docs.ts`，包含 DTO schema 与接口路径说明。
+- 已配置 `BearerAuth`；管理员接口需声明鉴权。
+
+## 集成步骤（落地）
+
+1. 从模板复制 `templates/express/modules/__kebabName__/` 至 `src/modules/<模块>/` 并替换占位符。
+2. 在 `configs/database.config.ts` 注册实体，在 `src/routes.ts` 注册路由前缀。
+3. 开发阶段：无需生成迁移，直接修改对应的 `number-CreateXXXTables.ts`；生产阶段：通过迁移管理结构变更（`synchronize=false`）。
+4. 根据需要在 `src/docs/` 引入文档文件。
+5. 本地启动确保无 TS/Lint 报错与运行时异常。

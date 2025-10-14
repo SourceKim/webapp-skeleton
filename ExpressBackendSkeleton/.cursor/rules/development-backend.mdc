@@ -102,7 +102,7 @@ alwaysApply: false
 ## 新增业务流程（强制执行）
 
 1) 明确业务与接口：梳理模型关系、权限策略、分页/筛选需求。
-2) 定义路由：在对应模块的 `*.routes.ts` 中新增 RESTful API；注册在 `src/routes.ts`，区分 `/admin` 与普通接口，并正确组合中间件（`auth`→`admin`→`checkPermissions`）。
+2) 定义路由：在对应模块的 `*.routes.ts` 中新增 RESTful API；注册在 `src/routes.ts`，区分 `/admin` 与普通接口，并正确组合中间件（`auth`→`admin`→`checkPermissions`），每个模块都需要包含 CRUD。
 3) DTO 与校验：在 `*.dto.ts` 定义请求/响应 DTO；控制器中通过 `req.validate()` 校验入参。
 4) Controller 与 Service：控制器仅做参数处理与响应包装，业务逻辑放入 Service，必要时记录 `requestId` 日志。
 5) 实体与迁移：创建/更新实体（继承 `BaseEntity`，字段命名下划线）；将实体加入 `database.config.ts`；生成迁移并按依赖排序。
@@ -110,7 +110,7 @@ alwaysApply: false
 7) 权限：为管理员接口挂载 `admin.middleware`；细粒度操作加 `checkPermissions`，并在种子/角色配置中同步权限名。
 8) 文档：在 `src/docs/*` 中补充 Swagger 注释；必要时在 README 或 `docs/` 目录补充使用说明。
 9) 配置：如新增环境变量，更新 `.env.*` 样例与 `ENV` 导出；记得在服务端配置 `JWT_SECRET`。
-10) 质量：本地跑起服务确认无 TS/Lint 报错，接口经 Postman/单测验证；日志、错误码、响应结构保持一致。
+10) 质量：本地跑起服务确认无 TS/Lint 报错
 
 ## 注意事项（落地自检）
 

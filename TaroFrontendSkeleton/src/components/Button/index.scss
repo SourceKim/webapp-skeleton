@@ -1,0 +1,84 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.button-block {
+  display: flex;
+  width: 100%;
+}
+
+.button-primary {
+  background-color: #1677ff;
+  color: #fff;
+  &:active {
+    background-color: #0958d9;
+  }
+}
+
+.button-default {
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #d9d9d9;
+  &:active {
+    background-color: #f5f5f5;
+  }
+}
+
+.button-danger {
+  background-color: #ff4d4f;
+  color: #fff;
+  &:active {
+    background-color: #cf1322;
+  }
+}
+
+.button-large {
+  height: 44px;
+  padding: 0 16px;
+  font-size: 16px;
+}
+
+.button-medium {
+  height: 36px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+
+.button-small {
+  height: 28px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  &:active {
+    opacity: 0.5;
+  }
+}
+
+.button-loading {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: button-loading 0.8s infinite linear;
+}
+
+@keyframes button-loading {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+} 
