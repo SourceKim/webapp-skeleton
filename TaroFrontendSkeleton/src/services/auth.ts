@@ -68,26 +68,11 @@ const authService = {
       })
   },
 
-  // 微信登录
-  wxLogin: (code: string) => {
+  // 微信登录（当前后端未实现，占位提示）
+  wxLogin: async (code: string) => {
     console.log('微信登录请求参数:', { code })
-    return api.post<{ access_token: string, user: UserInfo }>('/auth/wx-login', { code })
-      .then(response => {
-        console.log('微信登录响应:', response)
-        if (response.code === 0 && response.data) {
-          // 保存token
-          Taro.setStorageSync('token', response.data.access_token)
-        }
-        return response
-      })
-      .catch(error => {
-        console.error('微信登录请求错误:', error)
-        return {
-          code: -1,
-          message: '微信登录请求失败',
-          data: null as any
-        }
-      })
+    Taro.showToast({ title: '微信登录暂未开通', icon: 'none' })
+    return Promise.resolve({ code: -1, message: '未实现', data: null as any })
   },
 
   // 用户注册
@@ -98,7 +83,7 @@ const authService = {
   // 获取当前用户信息
   getCurrentUser: () => {
     console.log('获取当前用户信息')
-    return api.get<UserInfo>('/auth/me')
+    return api.get<UserInfo>('/auth/profile')
       .then(response => {
         console.log('获取当前用户信息响应:', response)
         return response
@@ -125,26 +110,11 @@ const authService = {
       })
   },
 
-  // 用户登出
-  logout: () => {
+  // 用户登出（前端本地清除）
+  logout: async () => {
     console.log('用户登出')
-    return api.post('/auth/logout')
-      .then(response => {
-        console.log('登出响应:', response)
-        // 清除本地存储的token
-        Taro.removeStorageSync('token')
-        return response
-      })
-      .catch(error => {
-        console.error('登出错误:', error)
-        // 即使API调用失败，也清除本地token
-        Taro.removeStorageSync('token')
-        return {
-          code: -1,
-          message: '登出失败',
-          data: null as any
-        }
-      })
+    Taro.removeStorageSync('token')
+    return { code: 0, message: '已退出登录', data: null as any }
   },
 
   // 修改密码

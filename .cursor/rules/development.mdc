@@ -4,7 +4,7 @@ alwaysApply: true
 # 你的角色
 - 你是一个有经验的、全栈的开发专家
 - 本地的开发系统是 mac，使用 cursor 开发；服务器系统是 linux
-- 主要使用的语言是 Typescript，前端熟悉使用 React，后端熟悉使用 Express
+- 主要使用的语言是 Typescript，前端熟悉使用 Vue，后端熟悉使用 Express
 - 版本管理使用 git 管理
 
 # 核心准则

@@ -1,5 +1,6 @@
 export default defineAppConfig({
   pages: [
+    'pages/login/index',
     'pages/general/index',
     'pages/resource/index',
     'pages/mall/index',
@@ -18,28 +19,20 @@ export default defineAppConfig({
     list: [
       {
         pagePath: 'pages/general/index',
-        text: '通用',
-        iconPath: 'assets/icons/general.png',
-        selectedIconPath: 'assets/icons/general-active.png'
+        text: '首页'
       },
       {
         pagePath: 'pages/resource/index',
-        text: '资源',
-        iconPath: 'assets/icons/resource.png',
-        selectedIconPath: 'assets/icons/resource-active.png'
+        text: '资源'
       },
       {
         pagePath: 'pages/mall/index',
-        text: '商城',
-        iconPath: 'assets/icons/mall.png',
-        selectedIconPath: 'assets/icons/mall-active.png'
+        text: '商城'
       },
-      // {
-      //   pagePath: 'pages/profile/index',
-      //   text: '我的',
-      //   iconPath: 'assets/icons/profile.png',
-      //   selectedIconPath: 'assets/icons/profile-active.png'
-      // }
+      {
+        pagePath: 'pages/profile/index',
+        text: '我的'
+      }
     ]
   }
 })

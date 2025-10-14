@@ -1,4 +1,4 @@
-import api from './api'
+import api, { BASE_URL } from './api'
 import Taro from '@tarojs/taro'
 
 // 素材类型
@@ -91,24 +91,26 @@ export interface BatchDeleteMaterialsParams {
 
 // 素材服务
 const materialService = {
-  // 获取素材列表
+  // 获取素材列表（管理员）
   getMaterials: (params?: GetMaterialsQueryParams) => {
-    return api.get<PaginatedMaterialsResponse>('/materials', params)
+    return api.get<PaginatedMaterialsResponse>('/materials/admin/', params)
   },
 
-  // 获取素材详情
+  // 获取素材详情（管理员）
   getMaterial: (id: string) => {
-    return api.get<Material>(`/materials/${id}`)
+    return api.get<Material>(`/materials/admin/${id}`)
   },
 
-  // 获取相关素材
-  getRelatedMaterials: (id: string) => {
-    return api.get<Material[]>(`/materials/${id}/related`)
+  // 获取相关素材（后端暂未实现，占位）
+  getRelatedMaterials: async (id: string) => {
+    Taro.showToast({ title: '相关素材未实现', icon: 'none' })
+    return { code: -1, message: '未实现', data: [] as Material[] }
   },
 
-  // 获取素材版本
-  getMaterialVersions: (id: string) => {
-    return api.get<Material[]>(`/materials/${id}/versions`)
+  // 获取素材版本（后端暂未实现，占位）
+  getMaterialVersions: async (id: string) => {
+    Taro.showToast({ title: '素材版本未实现', icon: 'none' })
+    return { code: -1, message: '未实现', data: [] as Material[] }
   },
 
   // 上传素材
@@ -117,7 +119,7 @@ const materialService = {
     
     return new Promise<Material>((resolve, reject) => {
       Taro.uploadFile({
-        url: 'http://localhost:3000/api/v1/materials',
+        url: `${BASE_URL}/materials/admin/upload`,
         filePath,
         name: 'file',
         header: {
@@ -153,9 +155,9 @@ const materialService = {
     const promises = filePaths.map(filePath => {
       return new Promise<Material>((resolve, reject) => {
         Taro.uploadFile({
-          url: 'http://localhost:3000/api/v1/materials/upload/batch',
+          url: `${BASE_URL}/materials/admin/upload`,
           filePath,
-          name: 'files',
+          name: 'file',
           header: {
             'Authorization': `Bearer ${token}`
           },
@@ -186,9 +188,10 @@ const materialService = {
     return Promise.all(promises)
   },
 
-  // 创建文本素材
-  createTextMaterial: (params: CreateTextMaterialParams) => {
-    return api.post<Material>('/materials/text', params)
+  // 创建文本素材（后端暂未实现，占位）
+  createTextMaterial: async (params: CreateTextMaterialParams) => {
+    Taro.showToast({ title: '文本素材未实现', icon: 'none' })
+    return { code: -1, message: '未实现', data: null as any }
   },
 
   // 更新素材（管理员）

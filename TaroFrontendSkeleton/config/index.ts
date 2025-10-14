@@ -4,7 +4,7 @@ import devConfig from './dev'
 import prodConfig from './prod'
 
 // https://taro-docs.jd.com/docs/next/config#defineconfig-辅助函数
-export default defineConfig<'vite'>(async (merge, { command, mode }) => {
+export default defineConfig<'vite'>(async (merge) => {
   const baseConfig: UserConfigExport<'vite'> = {
     projectName: 'taro-frontend-skeleton',
     date: '2025-3-10',
@@ -26,7 +26,7 @@ export default defineConfig<'vite'>(async (merge, { command, mode }) => {
       options: {
       }
     },
-    framework: 'react',
+    framework: 'vue3',
     compiler: 'vite',
     mini: {
       postcss: {

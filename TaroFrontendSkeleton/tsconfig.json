@@ -14,12 +14,10 @@
     "strictNullChecks": true,
     "sourceMap": true,
     "rootDir": ".",
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "allowJs": true,
     "resolveJsonModule": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
+    "types": [],
     "paths": {
       // TS5090 leading './'
       "@/*": ["./src/*"]

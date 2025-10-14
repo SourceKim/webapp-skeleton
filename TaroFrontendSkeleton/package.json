@@ -56,10 +56,9 @@
     "@tarojs/runtime": "4.0.9",
     "@tarojs/shared": "4.0.9",
     "@tarojs/taro": "4.0.9",
-    "@tarojs/plugin-framework-react": "4.0.9",
-    "@tarojs/react": "4.0.9",
-    "react-dom": "^18.0.0",
-    "react": "^18.0.0"
+    "@tarojs/plugin-framework-vue3": "4.0.9",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.4",
@@ -72,12 +71,8 @@
     "stylelint": "^16.4.0",
     "terser": "^5.30.4",
     "vite": "^4.2.0",
-    "@babel/preset-react": "^7.24.1",
-    "@types/react": "^18.0.0",
-    "@vitejs/plugin-react": "^4.3.0",
-    "eslint-plugin-react": "^7.34.1",
-    "eslint-plugin-react-hooks": "^4.4.0",
-    "react-refresh": "^0.14.0",
+    "@vitejs/plugin-vue": "^4.5.0",
+    "@vitejs/plugin-vue-jsx": "^3.1.0",
     "sass": "^1.75.0",
     "typescript": "^5.4.5",
     "postcss": "^8.4.38"
