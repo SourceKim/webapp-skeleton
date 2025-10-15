@@ -77,7 +77,11 @@
  *               id:
  *                 type: string
  *                 format: uuid
- *               name:
+ *               filename:
+ *                 type: string
+ *               file_path:
+ *                 type: string
+ *               type:
  *                 type: string
  *         created_at:
  *           type: string
@@ -154,7 +158,7 @@
  *           items:
  *             type: string
  *             format: uuid
- *           description: 材料ID列表
+ *           description: 素材ID列表（多对多关联 materials）
  *       required:
  *         - name
  *         - price
@@ -194,7 +198,7 @@
  *           items:
  *             type: string
  *             format: uuid
- *           description: 材料ID列表
+ *           description: 素材ID列表（多对多关联 materials）
  *
  *     ProductQueryDto:
  *       allOf:
@@ -220,7 +224,7 @@
  *               description: 最高价格
  *
  * paths:
- *   /user/products:
+ *   /products:
  *     get:
  *       tags:
  *         - 商品
@@ -292,7 +296,7 @@
  *                                 items:
  *                                   $ref: '#/components/schemas/Product'
  *
- *   /user/products/{id}:
+ *   /products/{id}:
  *     get:
  *       tags:
  *         - 商品

@@ -67,6 +67,27 @@ export const flatMenus: FlatMenu[] = [
         cache: true,
     },
     {
+        id: '20',
+        title: '商城管理',
+        name: 'mall-manager',
+        path: 'mall-manager',
+        type: 'dir',
+        icon: 'el|menu',
+        cache: true,
+    },
+    {
+        id: '21',
+        title: '商品管理',
+        name: 'product-manager',
+        path: 'product-manager',
+        type: 'menu',
+        icon: 'el|menu',
+        cache: true,
+        component: '/src/views/product/index.vue',
+        handleType: 'route',
+        parentId: '20'
+    },
+    {
         id: '11',
         title: '材料管理',
         name: '材料管理',

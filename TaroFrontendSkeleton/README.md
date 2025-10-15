@@ -4,7 +4,7 @@
 
 - 前端 Typescript
 - 打包 vite
-- 前端框架 React
+- 前端框架 Vue
 - 样式 scss
 - 布局 flexbox
 

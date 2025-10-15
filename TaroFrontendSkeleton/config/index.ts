@@ -1,4 +1,5 @@
 import { defineConfig, type UserConfigExport } from '@tarojs/cli'
+import vue from '@vitejs/plugin-vue'
 
 import devConfig from './dev'
 import prodConfig from './prod'
@@ -54,6 +55,17 @@ export default defineConfig<'vite'>(async (merge) => {
         filename: 'css/[name].[hash].css',
         chunkFilename: 'css/[name].[chunkhash].css'
       },
+      // 将 isCustomElement 放到 Vite 插件的编译期选项中
+      // @ts-expect-error: vitePlugins 为 Taro Vite Runner 的扩展字段，类型定义未覆盖
+      vitePlugins: [
+        vue({
+          template: {
+            compilerOptions: {
+              isCustomElement: (tag: string) => tag === 'view' || tag === 'text' || tag === 'image'
+            }
+          }
+        })
+      ],
       postcss: {
         autoprefixer: {
           enable: true,

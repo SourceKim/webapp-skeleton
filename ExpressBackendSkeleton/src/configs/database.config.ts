@@ -9,6 +9,7 @@ import { Role } from '@/modules/role/role.model';;
 import { Material } from '@/modules/material/material.model';
 import { MaterialCategory } from '@/modules/material/mateial-category/material-category.model';
 import { MaterialTag } from '@/modules/material/mateial-tag/material-tag.model';
+import { Product } from '@/modules/mall/product/product.model';
 
 export const AppDataSource = new DataSource({
     type: 'mysql',
@@ -29,7 +30,8 @@ export const AppDataSource = new DataSource({
         Role,
         Material,
         MaterialCategory,
-        MaterialTag
+        MaterialTag,
+        Product
     ],
     migrations: ['migrations/*.ts'],
     subscribers: [],

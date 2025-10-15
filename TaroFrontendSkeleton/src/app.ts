@@ -8,6 +8,8 @@ const App = createApp({
   }
 })
 
+// 由构建期在 config/index.ts 的 h5.vitePlugins 中设置 compilerOptions.isCustomElement
+
 App.use(createPinia())
 
 export default App

@@ -21,13 +21,19 @@
 
 ## 最小数据模型（建议字段）
 - Product（products）
-  - name, price, stock, status(active|inactive), description?, images?, created_at, updated_at
+  - name, price, stock, status(active|inactive), description?, materials(关联 `materials`，多对多), created_at, updated_at
 - CartItem（cart_items）
   - user_id, product_id, quantity, created_at, updated_at
 - Order（orders）
   - user_id, total_amount, status(pending|paid|shipped|completed|cancelled), address_json?, remark?, created_at, updated_at
 - OrderItem（order_items）
   - order_id, product_id, price, quantity, created_at, updated_at
+
+### 关系补充
+- Product ⇄ Material：多对多。
+  - 通过中间表 `product_material_relations(product_id, material_id)` 维护关联。
+  - 实体层建议在 `Product` 侧使用 `@ManyToMany(() => Material)` + `@JoinTable({ name: 'product_material_relations', joinColumn: { name: 'product_id' }, inverseJoinColumn: { name: 'material_id' } })`。
+  - 这样可替代原先的 `images` 字段，支持同一商品关联多种素材（图片、视频、文档等）。
 
 ## 规范与中间件
 - 管理端路由：`authMiddleware` → `adminMiddleware`，统一挂载在 `/admin` 下。
