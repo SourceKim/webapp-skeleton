@@ -65,6 +65,10 @@ const columns = computed((): CommonTableColumn<Product>[] => [
   { prop: 'price', label: '价格', width: 120 },
   { prop: 'stock', label: '库存', width: 100 },
   { prop: 'status', label: '状态', width: 100 },
+  { prop: 'materials', label: '资源', width: 220, formatter: (row) => {
+    const list = (row.materials || []).map(m => m.filename || (m as any).original_name || (m.file_path ? (m.file_path.split('/').pop() || m.id) : m.id))
+    return list.length ? list.join(', ') : '-'
+  } },
   { prop: 'created_at', label: '创建时间', width: 160 },
   { prop: 'updated_at', label: '更新时间', width: 160 },
   {

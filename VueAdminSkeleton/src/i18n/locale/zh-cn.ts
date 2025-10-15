@@ -57,7 +57,8 @@ export default {
     status: '状态',
     saveSuccess: '保存成功',
     saveFailed: '保存失败',
-    confirmDelete: '确认删除选中项？'
+    confirmDelete: '确认删除选中项？',
+    select: '选择',
   },
   comp: {
     table: {
