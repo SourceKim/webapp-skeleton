@@ -77,7 +77,8 @@ export class MaterialService {
             // 优先使用用户提供的filename，如果没有则使用multer生成的文件名
             const multerFilename = path.basename(file.path);
             const filename = options?.filename || multerFilename;
-            const relativePath = path.join(subDir, multerFilename).replace(/\\/g, '/');
+            // 以我们统一的子目录 + multer 存储文件名构造相对路径，避免中文被错误解释
+            const relativePath = `${subDir}/${multerFilename}`.replace(/\\/g, '/');
             
             // 计算文件哈希值
             const fileHash = await calculateFileHash(file.path);

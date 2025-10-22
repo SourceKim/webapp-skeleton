@@ -10,14 +10,16 @@ import { ENV } from '@/configs/env.config';
 import { MaterialDTO } from '@/modules/material/material.dto';
 
 import {
-    getFileTypeFromMime,
     parseTags,
     parseMetadata,
     createDirIfNotExists,
     deleteFileIfExists,
     isAllowedFileType,
-    generateUniqueFilename
+    generateUniqueFilename,
+    decodeLatin1ToUtf8,
+    getSubDirByType
 } from '@/modules/material/material.util';
+import { getMaterialTypeFromMimetype } from '@/modules/material/material.util';
 
 /**
  * 素材控制器
@@ -38,18 +40,18 @@ export class MaterialController {
         this.upload = multer({ 
             storage: multer.diskStorage({
                 destination: (req, file, cb) => {
-                    // 根据文件类型创建子目录
-                    const fileType = getFileTypeFromMime(file.mimetype);
-                    const subDir = path.join(this.uploadDir, fileType);
-                    
-                    // 确保子目录存在
+                    // 统一使用同一套判定，避免目录与DB不一致
+                    const matType = getMaterialTypeFromMimetype(file.mimetype);
+                    const subDirName = getSubDirByType(matType);
+                    const subDir = path.join(this.uploadDir, subDirName);
+
                     createDirIfNotExists(subDir);
-                    
                     cb(null, subDir);
                 },
                 filename: (req, file, cb) => {
-                    // 生成唯一文件名
-                    const filename = generateUniqueFilename(file.originalname);
+                    // 先修正原始文件名的编码，再生成唯一文件名
+                    const decoded = decodeLatin1ToUtf8(file.originalname);
+                    const filename = generateUniqueFilename(decoded);
                     cb(null, filename);
                 }
             }),
@@ -129,26 +131,23 @@ export class MaterialController {
 
                     // 使用 req.validate 验证并构造 DTO
                     const materialData = await req.validate(CreateMaterialDto, 'body');
+                    // 修正文件名中文乱码（某些浏览器以 latin1 传 filename）
+                    const decodedOriginal = decodeLatin1ToUtf8(req.file.originalname);
+                    req.file.originalname = decodedOriginal;
                     
                     // 为缺失的字段设置默认值
                     if (!materialData.filename) {
                         materialData.filename = req.file.originalname;
                     }
 
-                    console.log('验证后的素材数据:', materialData);
-                    console.log('上传的文件信息:', {
-                        originalname: req.file.originalname,
-                        filename: req.file.filename,
-                        mimetype: req.file.mimetype,
-                        size: req.file.size,
-                        path: req.file.path
-                    });
+                    // 统一规范化中文与特殊字符文件名，multer 已保存为 req.file.filename
+                    // 这里仅记录日志与后续 service 处理
 
                     // 调用服务层处理文件上传和数据保存
                     const material = await this.materialService.uploadFile(req.file, req.user, materialData);
 
                     // 返回创建的素材信息
-                    res.status(201).json({
+                    res.status(200).json({
                         code: 0,
                         message: '素材上传成功',
                         data: plainToInstance(MaterialDTO, material)

@@ -107,11 +107,29 @@ export const writeFile = async (destPath: string, originalPath: string): Promise
  * @returns 唯一的文件名
  */
 export const generateUniqueFilename = (originalName: string): string => {
-    const ext = path.extname(originalName);
-    const name = path.basename(originalName, ext);
+    // 统一将文件名规范化，去除/替换可能导致路径或编码问题的字符
+    const ext = path.extname(originalName || '').normalize();
+    const rawName = path.basename(originalName || '', ext).normalize();
+    // 替换空白与路径危险字符；允许中文，避免丢失
+    const safeName = rawName
+        .replace(/[\\/:*?"<>|]/g, '-')
+        .replace(/\s+/g, '_')
+        .slice(0, 80); // 控制长度，避免过长
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substr(2, 9);
-    return `${name}_${timestamp}_${randomString}${ext}`;
+    return `${safeName || 'file'}_${timestamp}_${randomString}${ext}`;
+}
+
+/**
+ * 将可能为 latin1 的原始文件名转换为 utf8
+ */
+export const decodeLatin1ToUtf8 = (name: string | undefined | null): string => {
+    if (!name) return '';
+    try {
+        return Buffer.from(name, 'latin1').toString('utf8');
+    } catch {
+        return name;
+    }
 }
 
 /**

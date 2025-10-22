@@ -185,7 +185,7 @@
  *             schema:
  *               $ref: '#/components/schemas/CreateOrderDto'
  *       responses:
- *         201:
+ *         200:
  *           description: 成功创建订单
  *           content:
  *             application/json:

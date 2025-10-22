@@ -87,6 +87,15 @@ if (props.handleType !== 'add') {
   formLoading.value = true
   getUser(props.modelValue!.id!).then(res => {
     formData.value = { ...formData.value, ...res.data! }
+    // 详情/编辑模式下，避免上传组件接收到字符串导致报错
+    if (props.handleType === 'detail') {
+      // 保持字符串以供 image 展示
+    } else {
+      // 编辑时清空为 undefined，由用户重新上传；否则 upload 组件可能接收到字符串
+      if (typeof (formData.value as any).avatar === 'string') {
+        (formData.value as any).avatar = undefined as any
+      }
+    }
     userRoleIds.value = (res.data as any)?.roles?.map((role: any) => role.id) || []
     formLoading.value = false
   })
@@ -106,7 +115,10 @@ watchEffect(() => {
     { prop: 'email', label: t('view.user.email'), rules: { type: 'email' } },
     { prop: 'phone', label: t('view.user.phone'), rules: { type: 'phone' } },
     { prop: 'nickname', label: t('view.user.nickname'), rules: { required: true } },
-    // { prop: 'avatar', label: t('view.user.avatar'), type: 'upload-img', single: 'object' },
+    // 详情使用图片展示，新增/编辑使用上传组件
+    props.handleType === 'detail'
+      ? { prop: 'avatar', label: t('view.user.avatar'), type: 'image' }
+      : { prop: 'avatar', label: t('view.user.avatar'), type: 'upload-img', single: 'object' },
     { prop: 'bio', label: t('view.user.bio') },
     { prop: 'status', label: t('common.status'), type: 'select', itemList: [{ label: 'active', value: 'active' }, { label: 'inactive', value: 'inactive' }] },
     {

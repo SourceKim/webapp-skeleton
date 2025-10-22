@@ -31,15 +31,26 @@ export class AuthService {
     async register(userData: {
         username: string;
         password: string;
+        phone: string;
+        nickname: string;
+        gender: User['gender'];
+        birthdate?: string;
         email?: string;
-        phone?: string;
+        avatar?: string;
+        bio?: string;
     }): Promise<{ user: Partial<User>; access_token: string }> {
-        const { username, password, email, phone } = userData;
+        const { username, password, email, phone, nickname, gender, birthdate, avatar, bio } = userData;
 
         // 检查用户名是否已存在
         const existingUser = await this.userRepository.findOne({ where: { username } });
         if (existingUser) {
             throw new HttpException(409, '用户名已存在');
+        }
+
+        // 检查手机号唯一
+        const existingPhone = await this.userRepository.findOne({ where: { phone } });
+        if (existingPhone) {
+            throw new HttpException(409, '手机号已被使用');
         }
 
         // 生成随机 user id
@@ -50,8 +61,13 @@ export class AuthService {
             id: userId,
             username,
             password,
+            phone,
+            nickname,
+            gender,
+            birthdate,
             email: email && email.trim() !== '' ? email : undefined,
-            phone: phone && phone.trim() !== '' ? phone : undefined,
+            avatar: avatar && avatar.trim() !== '' ? avatar : undefined,
+            bio: bio && bio.trim() !== '' ? bio : undefined,
         });
 
         // 保存用户
@@ -59,6 +75,7 @@ export class AuthService {
 
         // 创建用户设置
         const userSettings = this.userSettingsRepository.create({
+            id: this.generateUserId(),
             user: user,
             theme: 'light',
             language: 'zh-CN',

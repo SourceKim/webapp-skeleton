@@ -257,7 +257,7 @@
  *             schema:
  *               $ref: '#/components/schemas/CreateRoleDto'
  *       responses:
- *         201:
+ *         200:
  *           description: 成功创建角色
  *           content:
  *             application/json:

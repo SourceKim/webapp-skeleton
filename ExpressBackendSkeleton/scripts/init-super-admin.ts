@@ -1,5 +1,5 @@
 import { AppDataSource } from '../src/configs/database.config';
-import { User, UserStatus } from '../src/modules/user/user.model';
+import { User, UserStatus, UserGender } from '../src/modules/user/user.model';
 import { Role } from '../src/modules/role/role.model';
 import { Permission } from '../src/modules/permission/permission.model';
 import { nanoid } from 'nanoid';
@@ -159,6 +159,10 @@ async function initSuperAdmin() {
         const adminUsername = process.env.ADMIN_USERNAME || 'super_admin';
         const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
         const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@123';
+        const adminNickname = process.env.ADMIN_NICKNAME || '超级管理员';
+        const adminPhone = process.env.ADMIN_PHONE || '13800000000';
+        const adminGender: UserGender = (process.env.ADMIN_GENDER as UserGender) || UserGender.MALE;
+        const adminBirthdate = process.env.ADMIN_BIRTHDATE || null; // 可选 YYYY-MM-DD
         
         let user = await userRepository.findOne({
             where: { username: adminUsername }
@@ -177,9 +181,20 @@ async function initSuperAdmin() {
             
             // 使用原始 SQL 插入用户记录
             await dataSourceToUse.query(
-                `INSERT INTO users (id, username, email, password, status, isActive) 
-                 VALUES (?, ?, ?, ?, ?, ?)`,
-                [userId, adminUsername, adminEmail, hashedPassword, UserStatus.ACTIVE, true]
+                `INSERT INTO users (id, username, email, password, status, isActive, nickname, phone, gender, birthdate) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    userId,
+                    adminUsername,
+                    adminEmail,
+                    hashedPassword,
+                    UserStatus.ACTIVE,
+                    true,
+                    adminNickname,
+                    adminPhone,
+                    adminGender,
+                    adminBirthdate
+                ]
             );
             
             // 插入用户角色关系

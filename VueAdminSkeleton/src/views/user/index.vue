@@ -60,6 +60,7 @@
     { type: 'index', width: 90 },
     { prop: 'id', label: 'Id', width: 90 },
     { prop: 'username', label: t('view.user.username') },
+    { prop: 'avatar', label: t('view.user.avatar'), type: 'image', width: 80 },
     { prop: 'bio', label: t('view.user.bio') },
     { prop: 'email', label: t('view.user.email') },
     { prop: 'nickname', label: t('view.user.nickname') },

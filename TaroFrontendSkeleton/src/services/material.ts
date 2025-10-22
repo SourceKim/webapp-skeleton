@@ -149,6 +149,33 @@ const materialService = {
     })
   },
 
+  // 以普通用户身份上传素材（用于个人头像等）
+  uploadMaterialAsUser: async (filePath: string, params?: CreateMaterialParams) => {
+    const token = Taro.getStorageSync('token')
+    return new Promise<Material>((resolve, reject) => {
+      Taro.uploadFile({
+        url: `${BASE_URL}/materials/upload`,
+        filePath,
+        name: 'file',
+        header: { 'Authorization': `Bearer ${token}` },
+        formData: params as any,
+        success: (res) => {
+          try {
+            const data = JSON.parse(res.data)
+            if (data.code === 0 && data.data) {
+              resolve(data.data)
+            } else {
+              reject(data.message || '上传失败')
+            }
+          } catch (error) {
+            reject('解析响应失败')
+          }
+        },
+        fail: (err) => reject(err)
+      })
+    })
+  },
+
   // 批量上传素材
   uploadMaterialsBatch: async (filePaths: string[], params?: CreateMaterialParams) => {
     const token = Taro.getStorageSync('token')

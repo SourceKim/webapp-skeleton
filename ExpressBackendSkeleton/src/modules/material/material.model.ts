@@ -14,6 +14,7 @@ export enum MaterialType {
     VIDEO = 'video',
     DOCUMENT = 'document',
     TEXT = 'text',
+    AVATAR = 'avatar',
     OTHER = 'other'
 }
 

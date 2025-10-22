@@ -30,4 +30,7 @@ router.post('/admin', userController.createUser); // 创建用户
 router.put('/admin/:id', userController.updateUser); // 更新指定用户
 router.delete('/admin/:id', userController.deleteUser); // 删除用户
 
+// 头像上传：调用素材上传后把图片URL写入用户avatar
+router.post('/admin/:id/avatar', userController.updateUser); // 简化：前端先上传获取URL，再调用此接口更新 avatar
+
 export default router; 

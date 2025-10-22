@@ -60,7 +60,7 @@ export class UserSettingsController {
             const settingsData = req.body;
             const settings = await this.userSettingsService.createUserSettings(userId, settingsData);
             
-            res.status(201).json({
+            res.status(200).json({
                 code: 0,
                 message: '用户设置创建成功',
                 data: settings

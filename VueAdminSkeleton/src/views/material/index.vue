@@ -38,14 +38,14 @@
 
 <script setup lang='ts'>
 import MTable from '@/components/table/index.vue'
-import { getMaterials } from '@/api/material/material'
+import { getMaterials, deleteMaterial } from '@/api/material/material'
 import { reactive, ref, computed, h } from 'vue'
 import MaterialForm from './form.vue'
 import { useI18n } from 'vue-i18n'
 import type { Material } from '@/api/material/material.d'
 import type { CommonTableColumn } from '@/components/interface/table'
 import { Document, VideoPlay, Microphone, CopyDocument, TopRight } from '@element-plus/icons-vue'
-import { ElMessage, ElButton, ElIcon } from 'element-plus'
+import { ElMessage, ElButton, ElIcon, ElMessageBox } from 'element-plus'
 
 // 表格
 const data = ref<Material[]>([]) // 表格模型数据
@@ -78,9 +78,29 @@ function cellStyle({ row, column }: { row: Material; column: { property: string 
 }
 
 // 删除功能
-function del(rows: Material[]) {
-  // TODO: 实现删除逻辑
-  console.log('删除行:', rows)
+async function del(rows: Material[]) {
+  if (!rows || rows.length === 0) {
+    ElMessage.warning('请选择要删除的素材')
+    return
+  }
+  try {
+    await ElMessageBox.confirm(`确认删除所选 ${rows.length} 个素材？`, '提示', { type: 'warning' })
+  } catch {
+    return
+  }
+
+  const ids = rows.map(r => r.id)
+  try {
+    for (const id of ids) {
+      await deleteMaterial(id, { showLoading: true })
+    }
+    ElMessage.success('删除成功')
+    tableRef.value.fetchQuery()
+    selectRows.value = []
+  } catch (err) {
+    console.error('删除失败:', err)
+    ElMessage.error('删除失败')
+  }
 }
 
 const columns = computed((): CommonTableColumn<Material>[] => [

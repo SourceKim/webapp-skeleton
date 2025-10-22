@@ -77,7 +77,7 @@ export class PermissionController {
         try {
             const permissionData = await req.validate(CreatePermissionDto, 'body');
             const permission = await this.permissionService.createPermission(permissionData);
-            res.status(201).json({
+            res.status(200).json({
                 code: 0,
                 message: '权限创建成功',
                 data: permission

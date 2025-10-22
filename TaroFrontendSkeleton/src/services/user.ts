@@ -2,11 +2,15 @@ import api from './api'
 import type { UserInfo } from './auth'
 
 export interface UpdateProfileParams {
+  username?: string
+  password?: string
   email?: string
   phone?: string
   nickname?: string
   avatar?: string
   bio?: string
+  gender?: 'male' | 'female' | 'other'
+  birthdate?: string
 }
 
 const userService = {

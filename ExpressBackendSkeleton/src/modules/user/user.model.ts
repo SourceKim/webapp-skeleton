@@ -1,5 +1,5 @@
 import { Entity, Column, BeforeInsert, BeforeUpdate, ManyToMany, JoinTable, OneToMany } from 'typeorm';
-import { IsEmail, Length, IsOptional, Matches, IsEnum, MinLength } from 'class-validator';
+import { IsEmail, Length, IsOptional, Matches, IsEnum, MinLength, IsDateString } from 'class-validator';
 import * as bcrypt from 'bcryptjs';
 import { Role } from '@/modules/role/role.model';
 import { BaseEntity } from '@/modules/common/base.model';
@@ -8,6 +8,12 @@ export enum UserStatus {
     ACTIVE = 'active',
     INACTIVE = 'inactive',
     BANNED = 'banned'
+}
+
+export enum UserGender {
+    MALE = 'male',
+    FEMALE = 'female',
+    OTHER = 'other'
 }
 
 @Entity('users')
@@ -25,13 +31,11 @@ export class User extends BaseEntity {
     @IsEmail({}, { message: '邮箱格式不正确' })
     email?: string;
 
-    @Column({ type: 'varchar', length: 100, nullable: true })
-    @IsOptional()
+    @Column({ type: 'varchar', length: 100, nullable: false })
     @Length(2, 100, { message: '昵称长度必须在2-100个字符之间' })
     nickname?: string;
 
-    @Column({ type: 'varchar', length: 20, unique: true, nullable: true })
-    @IsOptional()
+    @Column({ type: 'varchar', length: 20, unique: true, nullable: false })
     @Matches(/^1[3-9]\d{9}$/, { message: '手机号格式不正确' })
     phone?: string;
 
@@ -51,6 +55,19 @@ export class User extends BaseEntity {
     @IsOptional()
     @Length(0, 500, { message: '简介长度不能超过500个字符' })
     bio?: string; // 用户简介
+
+    @Column({
+        type: 'enum',
+        enum: UserGender,
+        nullable: false
+    })
+    @IsEnum(UserGender, { message: '性别不正确' })
+    gender!: UserGender;
+
+    @Column({ type: 'date', nullable: true })
+    @IsOptional()
+    @IsDateString({}, { message: '出生日期格式不正确' })
+    birthdate?: string; // YYYY-MM-DD
 
     @ManyToMany(() => Role, role => role.users)
     @JoinTable({

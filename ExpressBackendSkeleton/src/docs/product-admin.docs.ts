@@ -16,7 +16,7 @@
  *             schema:
  *               $ref: '#/components/schemas/CreateProductDto'
  *       responses:
- *         201:
+ *         200:
  *           description: 成功创建商品
  *           content:
  *             application/json:
@@ -128,7 +128,7 @@
  *             schema:
  *               $ref: '#/components/schemas/CreateCategoryDto'
  *       responses:
- *         201:
+ *         200:
  *           description: 成功创建商品分类
  *           content:
  *             application/json:

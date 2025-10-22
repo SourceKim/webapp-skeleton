@@ -74,7 +74,7 @@ export class RoleController {
         try {
             const roleData = await req.validate(CreateRoleDto, 'body');
             const role = await this.roleService.createRole(roleData);
-            res.status(201).json({
+            res.status(200).json({
                 code: 0,
                 message: '角色创建成功',
                 data: role

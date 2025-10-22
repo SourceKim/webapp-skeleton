@@ -41,7 +41,7 @@ export class ProductController {
     try {
       const dto = await req.validate<CreateProductDto>(CreateProductDto, 'body');
       const data = await this.service.create(dto);
-      res.status(201).json({ code: 0, data });
+      res.status(200).json({ code: 0, data });
     } catch (err) {
       next(err);
     }

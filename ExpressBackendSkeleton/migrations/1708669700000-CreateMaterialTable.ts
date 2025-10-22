@@ -49,7 +49,7 @@ export class CreateMaterialTable1708669700000 implements MigrationInterface {
                     {
                         name: 'type',
                         type: 'enum',
-                        enum: ['image', 'audio', 'video', 'document', 'text', 'other'],
+                        enum: ['image', 'audio', 'video', 'document', 'text', 'avatar', 'other'],
                         default: "'other'",
                         comment: '素材类型'
                     },

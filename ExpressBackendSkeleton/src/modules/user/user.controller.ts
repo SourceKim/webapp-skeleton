@@ -27,7 +27,7 @@ export class UserController {
         try {
             const userData = await req.validate(CreateUserDto, 'body');
             const user = await this.userService.createUser(userData);
-            res.status(201).json({
+            res.status(200).json({
                 code: 0,
                 message: '创建用户成功',
                 data: user
@@ -48,6 +48,17 @@ export class UserController {
     ): Promise<void> => {
         try {
             const { id } = await req.validate(FindByIdDto, 'params');
+            // 过滤白名单字段，避免 forbidNonWhitelisted 触发
+            const allowedKeys = [
+                'username','password','email','nickname','phone','avatar','bio','roles','gender','birthdate'
+            ];
+            const raw: any = req.body || {};
+            const filtered: Record<string, any> = {};
+            for (const key of allowedKeys) {
+                if (key in raw) filtered[key] = raw[key];
+            }
+            // 覆盖 req.body 后再做 DTO 校验
+            (req as any).body = filtered;
             const userData = await req.validate(UpdateUserDto, 'body');
             const user = await this.userService.updateUser(id, userData);
             res.json({

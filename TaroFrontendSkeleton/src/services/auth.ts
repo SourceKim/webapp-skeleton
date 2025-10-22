@@ -8,12 +8,16 @@ export interface LoginParams {
 }
 
 // 用户注册请求参数
+export type Gender = 'male' | 'female' | 'other'
+
 export interface RegisterParams {
   username: string
   password: string
+  phone: string
+  nickname: string
+  gender: Gender
+  birthdate?: string
   email?: string
-  phone?: string
-  nickname?: string
   avatar?: string
   bio?: string
 }

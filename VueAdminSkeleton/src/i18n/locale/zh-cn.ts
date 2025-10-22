@@ -95,6 +95,7 @@ export default {
     },
     operation: {
       edit: '编辑',
+      detail: '详情',
       delete: '删除',
       add: '新增',
       more: '更多',

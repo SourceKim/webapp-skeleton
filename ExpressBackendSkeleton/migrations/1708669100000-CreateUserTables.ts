@@ -39,13 +39,13 @@ export class CreateUserTables1708669100000 implements MigrationInterface {
                         name: "nickname",
                         type: "varchar",
                         length: "100",
-                        isNullable: true
+                        isNullable: false
                     },
                     {
                         name: "phone",
                         type: "varchar",
                         length: "20",
-                        isNullable: true,
+                        isNullable: false,
                         isUnique: true
                     },
                     {
@@ -58,6 +58,17 @@ export class CreateUserTables1708669100000 implements MigrationInterface {
                         name: "bio",
                         type: "varchar",
                         length: "500",
+                        isNullable: true
+                    },
+                    {
+                        name: "gender",
+                        type: "enum",
+                        enum: ["male", "female", "other"],
+                        isNullable: false
+                    },
+                    {
+                        name: "birthdate",
+                        type: "date",
                         isNullable: true
                     },
                     {

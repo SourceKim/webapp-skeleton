@@ -183,7 +183,7 @@
  *             schema:
  *               $ref: '#/components/schemas/CreateUserDto'
  *       responses:
- *         201:
+ *         200:
  *           description: 成功创建用户
  *           content:
  *             application/json:

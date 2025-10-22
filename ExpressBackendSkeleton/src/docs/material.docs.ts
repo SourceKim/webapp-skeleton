@@ -452,7 +452,7 @@
  *               required:
  *                 - file
  *       responses:
- *         201:
+ *         200:
  *           description: 成功上传素材
  *           content:
  *             application/json:
@@ -513,7 +513,7 @@
  *               required:
  *                 - files
  *       responses:
- *         201:
+ *         200:
  *           description: 成功批量上传素材
  *           content:
  *             application/json:
@@ -546,7 +546,7 @@
  *             schema:
  *               $ref: '#/components/schemas/CreateTextMaterialDto'
  *       responses:
- *         201:
+ *         200:
  *           description: 成功创建文本素材
  *           content:
  *             application/json:

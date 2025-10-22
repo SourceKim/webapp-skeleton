@@ -283,7 +283,7 @@
  *             schema:
  *               $ref: '#/components/schemas/RegisterDto'
  *       responses:
- *         201:
+ *         200:
  *           description: 成功注册用户
  *           content:
  *             application/json:

@@ -1,12 +1,14 @@
-import { UserStatus } from '@/modules/user/user.model';
+import { UserStatus, UserGender } from '@/modules/user/user.model';
 
 // 注册请求 DTO
 export interface RegisterDto {
     username: string;
     password: string;
+    phone: string;
+    nickname: string;
+    gender: UserGender;
+    birthdate?: string; // YYYY-MM-DD
     email?: string;
-    phone?: string;
-    nickname?: string;
     avatar?: string;
     bio?: string;
 }
@@ -21,6 +23,8 @@ export interface LoginDto {
 export interface RegisterResponseDto {
     id: string;
     username: string;
+    gender: UserGender;
+    birthdate?: string;
     email?: string;
     phone?: string;
     nickname?: string;
@@ -42,6 +46,8 @@ export interface LoginResponseDto {
     user: {
         id: string;
         username: string;
+        gender: UserGender;
+        birthdate?: string;
         email?: string;
         phone?: string;
         nickname?: string;
@@ -60,6 +66,8 @@ export interface LoginResponseDto {
 export interface ProfileResponseDto {
     id: string;
     username: string;
+    gender: UserGender;
+    birthdate?: string;
     email?: string;
     phone?: string;
     nickname?: string;

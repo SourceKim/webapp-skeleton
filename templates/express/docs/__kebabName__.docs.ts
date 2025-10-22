@@ -52,7 +52,7 @@
  *                 description:
  *                   type: string
  *       responses:
- *         201:
+ *         200:
  *           description: 创建成功
  *
  *   /__kebabNamePlural__/admin/{id}:

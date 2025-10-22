@@ -30,6 +30,8 @@ export class AuthController {
         return {
             id: user.id,
             username: user.username,
+            gender: user.gender,
+            birthdate: user.birthdate,
             email: user.email,
             phone: user.phone,
             nickname: user.nickname,
@@ -52,13 +54,13 @@ export class AuthController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { username, password, email, phone, nickname, avatar, bio } = req.body;
+            const { username, password, email, phone, nickname, gender, birthdate, avatar, bio } = req.body;
             logInfo('用户注册请求', (req as any).requestId, { username, email, phone, nickname });
 
             // 基本验证
-            if (!username || !password) {
-                logError('注册参数缺失', (req as any).requestId, { username, password });
-                throw new HttpException(400, '用户名和密码不能为空');
+            if (!username || !password || !phone || !nickname || !gender) {
+                logError('注册参数缺失', (req as any).requestId, { username, password, phone, nickname, gender });
+                throw new HttpException(400, '用户名、密码、手机号、昵称、性别均为必填');
             }
 
             // 用户名格式验证
@@ -77,21 +79,35 @@ export class AuthController {
             }
 
             // 手机号格式验证
-            if (phone && !phone.match(/^1[3-9]\d{9}$/)) {
+            if (!/^1[3-9]\d{9}$/.test(phone)) {
                 throw new HttpException(400, '手机号格式不正确');
+            }
+
+            // 性别枚举
+            if (!['male', 'female', 'other'].includes(String(gender))) {
+                throw new HttpException(400, '性别取值不正确');
+            }
+
+            // 出生日期格式（可选）
+            if (birthdate && isNaN(Date.parse(birthdate))) {
+                throw new HttpException(400, '出生日期格式不正确');
             }
 
             const result = await this.authService.register({
                 username,
                 password,
+                phone,
+                nickname,
+                gender,
+                birthdate: birthdate && birthdate.trim() !== '' ? birthdate : undefined,
                 email: email && email.trim() !== '' ? email : undefined,
-                phone: phone && phone.trim() !== '' ? phone : undefined
-                // nickname, avatar, bio 等参数可能 AuthService 中的 register 方法不支持
+                avatar: avatar && avatar.trim() !== '' ? avatar : undefined,
+                bio: bio && bio.trim() !== '' ? bio : undefined
             });
             
             logInfo('用户注册成功', (req as any).requestId, { userId: result.user.id, username });
             
-            res.status(201).json({
+            res.status(200).json({
                 code: 0,
                 message: '注册成功',
                 data: this.transformUserToDto(result.user)
