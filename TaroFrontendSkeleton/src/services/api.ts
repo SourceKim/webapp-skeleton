@@ -22,6 +22,20 @@ interface ApiResponse<T = any> {
   error?: any
 }
 
+// 避免多次重定向
+let isRedirecting = false
+
+const handleUnauthorized = () => {
+  if (isRedirecting) return
+  isRedirecting = true
+  try { Taro.removeStorageSync('token') } catch {}
+  Taro.showToast({ title: '登录已过期，请重新登录', icon: 'none', duration: 1500 })
+  setTimeout(() => {
+    Taro.redirectTo({ url: '/pages/login/index' })
+    isRedirecting = false
+  }, 800)
+}
+
 // 获取token
 const getToken = (): string => {
   return Taro.getStorageSync('token') || ''
@@ -57,6 +71,10 @@ const responseInterceptor = <T>(response: ApiResponse<T>): ApiResponse<T> => {
     }
   }
 
+  if (response.code === 401) {
+    handleUnauthorized()
+  }
+
   if (response.code !== 0) {
     console.error('API响应错误:', response)
     Taro.showToast({
@@ -84,6 +102,10 @@ const request = async <T = any>(options: RequestOptions): Promise<ApiResponse<T>
     console.log('收到响应:', response)
     
     // 检查响应状态码
+    if (response.statusCode === 401) {
+      handleUnauthorized()
+      return { code: 401, message: '未授权', data: null as any }
+    }
     if (response.statusCode !== 200) {
       console.error('HTTP错误:', response.statusCode)
       return {

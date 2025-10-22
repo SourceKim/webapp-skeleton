@@ -1,88 +1,110 @@
-import api from './api'
+import api, { BASE_URL } from './api'
 
-// 产品接口
+// 与后端 ProductDTO 对齐的产品模型
+export interface ProductMaterialRef {
+  id: string
+  filename?: string
+  file_path?: string
+  type?: string
+}
+
+export type ProductStatus = 'active' | 'inactive'
+
 export interface Product {
   id: string
   name: string
-  description: string
+  description?: string
   price: number
   stock: number
-  image: string
-  category: string
-  status: 'active' | 'inactive' | 'out_of_stock'
-  created_at: string
-  updated_at: string
+  status: ProductStatus
+  category_id?: string
+  materials?: ProductMaterialRef[]
+  createdAt?: string | Date
+  updatedAt?: string | Date
+  deletedAt?: string | Date | null
 }
 
-// 创建产品请求参数
+// 创建/更新参数与后端 DTO 对齐
 export interface CreateProductParams {
   name: string
-  description: string
+  description?: string
   price: number
   stock: number
-  image: string
-  category: string
-  status?: 'active' | 'inactive'
+  status: ProductStatus
+  category_id?: string
+  material_ids?: string[]
 }
 
-// 更新产品请求参数
 export interface UpdateProductParams {
   name?: string
   description?: string
   price?: number
   stock?: number
-  image?: string
-  category?: string
-  status?: 'active' | 'inactive'
+  status?: ProductStatus
+  category_id?: string
+  material_ids?: string[]
 }
 
-// 产品查询参数
+// 查询参数（分页中间件支持 sort 与 filters）
 export interface ProductQueryParams {
   page?: number
   limit?: number
-  category?: string
+  sort_by?: string
+  sort_order?: 'ASC' | 'DESC'
+  filters?: Record<string, any>
 }
 
-// 产品列表响应
-export interface ProductListResponse {
-  data: Product[]
+export interface PaginatedMeta {
   total: number
   page: number
   limit: number
-  totalPages: number
+  pages: number
+  sort_by?: string
+  sort_order?: 'ASC' | 'DESC'
+}
+
+export interface PaginatedProductsResponse {
+  items: Product[]
+  meta: PaginatedMeta
+}
+
+// 工具：根据 material.file_path 生成可访问 URL
+export const getMaterialUrl = (filePath?: string): string | undefined => {
+  if (!filePath) return undefined
+  const host = BASE_URL.replace(/\/?api\/v1$/, '')
+  if (filePath.startsWith('http')) return filePath
+  // 统一补全 uploads 前缀，后端 file_path 为如 "images/xxx.webp"
+  let p = filePath.startsWith('/') ? filePath : `/${filePath}`
+  if (!p.startsWith('/uploads/')) {
+    p = `/uploads${p}`
+  }
+  return `${host}${p}`
 }
 
 // 产品服务
 const productService = {
-  // 获取产品列表
+  // 获取产品列表（公共端）
   getProducts: (params?: ProductQueryParams) => {
-    return api.get<ProductListResponse>('/products', params)
+    return api.get<PaginatedProductsResponse>('/products', params)
   },
 
-  // 获取产品详情
+  // 获取产品详情（公共端）
   getProduct: (id: string) => {
     return api.get<Product>(`/products/${id}`)
   },
 
-  // 获取产品分类
-  getCategories: () => {
-    return api.get<string[]>('/products/categories')
-  },
-
-  // 创建产品（管理员）
+  // 管理端：创建/更新/删除
   createProduct: (params: CreateProductParams) => {
     return api.post<Product>('/products/admin', params)
   },
 
-  // 更新产品（管理员）
   updateProduct: (id: string, params: UpdateProductParams) => {
     return api.put<Product>(`/products/admin/${id}`, params)
   },
 
-  // 删除产品（管理员）
   deleteProduct: (id: string) => {
     return api.delete(`/products/admin/${id}`)
   }
 }
 
-export default productService 
+export default productService

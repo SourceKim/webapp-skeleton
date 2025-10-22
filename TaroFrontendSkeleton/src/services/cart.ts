@@ -1,54 +1,44 @@
 import api from './api'
-import { Product } from './product'
 
-// 购物车项接口
+export interface CartProduct {
+  id: string
+  name: string
+  price: number
+  stock?: number
+}
+
 export interface CartItem {
   id: string
-  userId: string
-  productId: string
+  cart_id: string
+  product_id: string
   quantity: number
-  product: Product
+  product?: CartProduct
   created_at: string
   updated_at: string
 }
 
-// 添加到购物车请求参数
+export interface Cart {
+  id: string
+  user_id: string
+  total_price: number
+  items?: CartItem[]
+}
+
 export interface AddToCartParams {
-  productId: string
+  product_id: string
   quantity: number
 }
 
-// 更新购物车请求参数
 export interface UpdateCartParams {
   quantity: number
 }
 
-// 购物车服务
 const cartService = {
-  // 获取购物车
-  getCart: () => {
-    return api.get<CartItem[]>('/cart')
-  },
-
-  // 添加商品到购物车
-  addToCart: (params: AddToCartParams) => {
-    return api.post<CartItem>('/cart', params)
-  },
-
-  // 更新购物车商品数量
-  updateCartItem: (id: string, params: UpdateCartParams) => {
-    return api.put<CartItem>(`/cart/${id}`, params)
-  },
-
-  // 从购物车移除商品
-  removeFromCart: (id: string) => {
-    return api.delete(`/cart/${id}`)
-  },
-
-  // 清空购物车
-  clearCart: () => {
-    return api.delete('/cart')
-  }
+  getCart: () => api.get<Cart>('/user/cart'),
+  addToCart: (params: AddToCartParams) => api.post<Cart>('/user/cart/items', params),
+  updateCartItem: (id: string, params: UpdateCartParams) => api.put<Cart>(`/user/cart/items/${id}`, params),
+  removeFromCart: (id: string) => api.delete<Cart>(`/user/cart/items/${id}`),
+  clearCart: () => api.post<Cart>('/user/cart/clear')
 }
 
-export default cartService 
+export default cartService

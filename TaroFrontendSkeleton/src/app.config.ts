@@ -4,6 +4,7 @@ export default defineAppConfig({
     'pages/general/index',
     'pages/resource/index',
     'pages/mall/index',
+    'pages/mall/detail',
     'pages/profile/index'
   ],
   window: {
