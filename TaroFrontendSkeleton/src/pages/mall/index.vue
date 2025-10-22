@@ -15,7 +15,12 @@
           <text class="name" @tap="goDetail(item.id)">{{ item.name }}</text>
           <text class="price">￥{{ formatPrice(item.price) }}</text>
           <text class="stock">库存 {{ item.stock }}</text>
-          <button size="mini" class="add-btn" @tap.stop="addToCart(item)">加入购物车</button>
+          <button
+            size="mini"
+            class="add-btn"
+            :disabled="isAdded(item.id)"
+            @tap.stop="addToCart(item)"
+          >{{ isAdded(item.id) ? '已加入购物车' : '加入购物车' }}</button>
         </view>
       </view>
 
@@ -46,7 +51,6 @@ import { ref, onMounted, computed } from 'vue'
 import Taro from '@tarojs/taro'
 import productService, { type Product, getMaterialUrl } from '../../services/product'
 import { cartService } from '../../services'
-import type { Cart } from '../../services/cart'
 import CartPanel from './components/cart-panel.vue'
 
 const products = ref<Product[]>([])
@@ -57,8 +61,21 @@ const loading = ref(false)
 const hasMore = ref(true)
 const defaultImg = 'https://dummyimage.com/300x200/eaeaea/999.png&text=No+Image'
 const showCart = ref(false)
-const cart = ref<Cart | null>(null)
 const itemsCount = ref(0)
+// 记录已加入购物车的商品
+const addedMap = ref<Record<string, boolean>>({})
+const isAdded = (id: string) => !!addedMap.value[id]
+// 安全区底部间距（px）
+const getSafeBottom = (): number => {
+  try {
+    const sys = Taro.getSystemInfoSync()
+    const safeAreaBottom = (sys as any).safeArea?.bottom ?? sys.windowHeight
+    const inset = Math.max(0, sys.windowHeight - Number(safeAreaBottom))
+    return Number.isFinite(inset) ? inset : 0
+  } catch {
+    return 0
+  }
+}
 
 // 悬浮按钮拖拽状态
 const fabX = ref(0)
@@ -68,7 +85,7 @@ let startX = 0
 let startY = 0
 let startLeft = 0
 let startTop = 0
-let touchStartTime = 0
+// 记录触摸起点时间（如需区分点击/拖拽可再启用）
 let dragged = false
 
 const fabStyle = computed(() => `left:${fabX.value}px;top:${fabY.value}px;`)
@@ -77,7 +94,6 @@ const onFabStart = (e: any) => {
   dragging.value = true
   const t = e.touches?.[0]
   if (!t) return
-  touchStartTime = Date.now()
   // Taro/H5/Weapp: 优先使用 pageX/pageY
   startX = (t.pageX ?? t.clientX) || 0
   startY = (t.pageY ?? t.clientY) || 0
@@ -98,7 +114,7 @@ const onFabMove = (e: any) => {
   let ny = startTop + dy
   const sys = Taro.getSystemInfoSync()
   const maxX = sys.windowWidth - 80
-  const maxY = sys.windowHeight - 140
+  const maxY = sys.windowHeight - 140 - getSafeBottom()
   if (nx < 12) nx = 12
   if (ny < 80) ny = 80
   if (nx > maxX) nx = maxX
@@ -109,7 +125,6 @@ const onFabMove = (e: any) => {
 }
 
 const onFabEnd = () => {
-  const dur = Date.now() - touchStartTime
   dragging.value = false
   // 点击通过 onFabTap 处理；此处仅重置拖拽标记
 }
@@ -163,9 +178,14 @@ const goDetail = (id: string) => {
 }
 
 const addToCart = async (item: Product) => {
+  if (isAdded(item.id)) return
   const resp = await cartService.addToCart({ product_id: item.id, quantity: 1 })
   if (resp.code === 0) {
     Taro.showToast({ title: '已加入购物车', icon: 'success' })
+    // 更新购物车徽标
+    loadCount()
+    // 标记为已加入
+    addedMap.value[item.id] = true
   } else {
     Taro.showToast({ title: resp.message || '操作失败', icon: 'none' })
   }
@@ -176,7 +196,14 @@ const onCountChange = (count: number) => { itemsCount.value = count }
 
 const loadCount = async () => {
   const resp = await cartService.getCart()
-  if (resp.code === 0 && resp.data) itemsCount.value = (resp.data.items || []).reduce((s, i) => s + (i.quantity || 0), 0)
+  if (resp.code === 0 && resp.data) {
+    const items = resp.data.items || []
+    itemsCount.value = items.reduce((s, i) => s + (i.quantity || 0), 0)
+    items.forEach((ci: any) => {
+      const pid = ci?.product?.id
+      if (pid) addedMap.value[pid] = true
+    })
+  }
 }
 
 onMounted(() => {
@@ -185,7 +212,7 @@ onMounted(() => {
   // 初始化 FAB 位置（右下角，避开 tabbar 与安全区）
   const sys = Taro.getSystemInfoSync()
   fabX.value = Math.max(12, sys.windowWidth - 80)
-  fabY.value = Math.max(80, sys.windowHeight - 180)
+  fabY.value = Math.max(80, sys.windowHeight - 180 - getSafeBottom())
 })
 </script>
 
@@ -197,7 +224,7 @@ onMounted(() => {
     .title { font-size: 18px; font-weight: 600; }
   }
   .list {
-    height: calc(100vh - 100px);
+    height: calc(100vh - 100px - env(safe-area-inset-bottom));
   }
   .card {
     display: flex;

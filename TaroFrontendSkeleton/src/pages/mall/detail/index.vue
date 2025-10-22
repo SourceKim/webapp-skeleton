@@ -66,7 +66,7 @@ const formatPrice = (price: number) => {
 
 const goBack = () => {
   // 优先返回上一页，否则回到商城列表
-  if (window && window.history && window.history.length > 1) {
+  if (typeof window !== 'undefined' && window.history && window.history.length > 1) {
     Taro.navigateBack()
   } else {
     Taro.switchTab({ url: '/pages/mall/index' })

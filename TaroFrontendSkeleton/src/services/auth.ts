@@ -98,6 +98,21 @@ const authService = {
       })
   },
 
+  // token 登录：与 login 返回结构保持一致 { access_token, user }
+  tokenLogin: async () => {
+    try {
+      const token = Taro.getStorageSync('token')
+      if (!token) {
+        return { code: 401, message: '未登录', data: null as any }
+      }
+      const resp = await api.post<{ access_token: string, user: UserInfo }>('/auth/token-login')
+      return resp
+    } catch (error) {
+      console.error('token-login 请求错误:', error)
+      return { code: -1, message: 'token 登录失败', data: null as any }
+    }
+  },
+
   // 刷新令牌
   refreshToken: () => {
     return api.post<{ access_token: string }>('/auth/refresh-token')

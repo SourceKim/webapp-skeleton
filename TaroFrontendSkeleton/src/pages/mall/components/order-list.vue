@@ -1,7 +1,7 @@
 <template>
   <view class="order-list">
     <scroll-view class="list" scroll-y @scrolltolower="loadMore" :lower-threshold="100">
-      <view class="card" v-for="o in orders" :key="o.id" @tap="goDetail(o.id)" @click="goDetail(o.id)">
+      <view class="card" v-for="o in orders" :key="o.id" @tap="goDetail(o.id)">
         <view class="row">
           <text class="status">{{ o.status }}</text>
           <text class="total">￥{{ formatPrice(o.total_price) }}</text>
@@ -44,12 +44,11 @@ const fetchList = async (reset = false) => {
   }
 }
 
-const loadMore = () => { if (!hasMore.value && !loading.value) return; fetchList() }
+const loadMore = () => { if (!hasMore.value || loading.value) return; fetchList() }
 const formatPrice = (price: number) => { try { return Number(price).toFixed(2) } catch { return String(price) } }
 const goDetail = (id: string) => {
   const url = `/pages/mall/order-detail/index?id=${id}`
   console.log('[order-list] goDetail click', { id, env: Taro.getEnv(), url, href: typeof window !== 'undefined' ? window.location.href : '' })
-  Taro.showToast({ title: '跳转中...', icon: 'none', duration: 600 })
   Taro.navigateTo({ url })
     .then(() => {
       console.log('[order-list] navigateTo resolved', { href: typeof window !== 'undefined' ? window.location.href : '' })

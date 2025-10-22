@@ -12,12 +12,10 @@ import { useAuthStore } from '../../stores/auth'
 
 const auth = useAuthStore()
 
-onMounted(() => {
-  auth.loadFromStorage()
-  if (!auth.isLoggedIn) {
+onMounted(async () => {
+  const result = await auth.autoLoginByToken()
+  if (!result.ok) {
     Taro.redirectTo({ url: '/pages/login/index' })
-  } else if (!auth.user) {
-    auth.refreshProfile()
   }
 })
 
