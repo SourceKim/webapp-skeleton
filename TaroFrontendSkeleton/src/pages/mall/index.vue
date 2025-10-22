@@ -24,6 +24,7 @@
     </scroll-view>
 
     <!-- 悬浮购物车按钮：可拖动，短按打开购物车 -->
+     <!-- TODO: 在 H5 不可拖动，后续修复-->
     <view
       class="cart-fab"
       :style="fabStyle"
