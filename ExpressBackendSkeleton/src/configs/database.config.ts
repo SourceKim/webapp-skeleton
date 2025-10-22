@@ -12,6 +12,8 @@ import { MaterialTag } from '@/modules/material/mateial-tag/material-tag.model';
 import { Product } from '@/modules/mall/product/product.model';
 import { Cart } from '@/modules/mall/cart/cart.model';
 import { CartItem } from '@/modules/mall/cart/cart-item.model';
+import { Order } from '@/modules/mall/order/order.model';
+import { OrderItem } from '@/modules/mall/order/order-item.model';
 
 export const AppDataSource = new DataSource({
     type: 'mysql',
@@ -35,7 +37,9 @@ export const AppDataSource = new DataSource({
         MaterialTag,
         Product,
         Cart,
-        CartItem
+        CartItem,
+        Order,
+        OrderItem
     ],
     migrations: ['migrations/*.ts'],
     subscribers: [],

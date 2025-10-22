@@ -1,64 +1,86 @@
 import api from './api'
 
-// 订单商品接口
-export interface OrderProduct {
+export type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'completed' | 'canceled'
+
+export interface OrderItemProductRef {
   id: string
   name: string
   price: number
+}
+
+export interface OrderItem {
+  id: string
+  order_id: string
+  product_id: string | null
   quantity: number
-  image: string
+  unit_price: number
+  product?: OrderItemProductRef | null
 }
 
-// 订单地址接口
-export interface OrderAddress {
-  name: string
-  phone: string
-  address: string
-}
-
-// 订单接口
 export interface Order {
   id: string
-  orderNo: string
-  userId: string
-  products: OrderProduct[]
-  totalAmount: number
-  status: 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled'
-  address: OrderAddress
-  created_at: string
-  updated_at: string
+  user_id: string
+  status: OrderStatus
+  total_price: number
+  address?: string
+  shipping_no?: string
+  remark?: string
+  items?: OrderItem[]
+  paid_at?: string | null
+  shipped_at?: string | null
+  completed_at?: string | null
+  created_at?: string
+  updated_at?: string
 }
 
-// 创建订单请求参数
+export interface PaginatedMeta {
+  total: number
+  page: number
+  limit: number
+  pages: number
+  sort_by?: string
+  sort_order?: 'ASC' | 'DESC'
+}
+
+export interface PaginatedOrdersResponse {
+  items: Order[]
+  meta: PaginatedMeta
+}
+
 export interface CreateOrderParams {
-  address: OrderAddress
+  address?: string
+  remark?: string
 }
 
-// 更新订单状态请求参数
-export interface UpdateOrderStatusParams {
-  status: 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled'
-}
-
-// 订单服务
 const orderService = {
-  // 获取订单列表
-  getOrders: () => {
-    return api.get<Order[]>('/orders')
+  // 用户侧：订单列表（分页）
+  getMyOrders: (params?: { page?: number; limit?: number; filters?: Record<string, any>; sort_by?: string; sort_order?: 'ASC'|'DESC' }) => {
+    return api.get<PaginatedOrdersResponse>('/user/orders', params)
   },
 
-  // 获取订单详情
-  getOrder: (id: string) => {
-    return api.get<Order>(`/orders/${id}`)
+  // 用户侧：订单详情
+  getMyOrder: (id: string) => {
+    return api.get<Order>(`/user/orders/${id}`)
   },
 
-  // 创建订单
-  createOrder: (params: CreateOrderParams) => {
-    return api.post<Order>('/orders', params)
+  // 用户侧：从购物车创建订单
+  createOrderFromCart: (params?: CreateOrderParams) => {
+    return api.post<Order>('/user/orders', params)
   },
 
-  // 更新订单状态
-  updateOrderStatus: (id: string, params: UpdateOrderStatusParams) => {
-    return api.put<Order>(`/orders/${id}/status`, params)
+  // 用户侧：确认/支付
+  confirmOrder: (id: string) => {
+    return api.post<Order>(`/user/orders/${id}/confirm`)
+  },
+
+  // 用户侧：取消
+  cancelOrder: (id: string) => {
+    return api.post<Order>(`/user/orders/${id}/cancel`)
+  },
+
+  // 用户侧：完成（确认收货）
+  completeOrder: (id: string) => {
+    return api.post<Order>(`/user/orders/${id}/complete`)
   }
 }
 

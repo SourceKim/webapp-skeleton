@@ -23,7 +23,10 @@
       </view>
       <view class="cart-footer">
         <text class="total">合计：￥{{ totalPrice }}</text>
-        <button size="mini" class="clear-btn" @tap="clearCart">清空</button>
+        <view class="actions">
+          <button size="mini" class="clear-btn" @tap="clearCart">清空</button>
+          <button size="mini" class="checkout-btn" @tap.stop="checkout">结算</button>
+        </view>
       </view>
     </view>
   </view>
@@ -32,7 +35,7 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import Taro from '@tarojs/taro'
-import { cartService } from '../../../services'
+import { cartService, orderService } from '../../../services'
 import type { Cart, CartItem } from '../../../services/cart'
 
 const props = defineProps<{ visible: boolean }>()
@@ -101,10 +104,24 @@ const clearCart = async () => {
     Taro.showToast({ title: resp.message || '操作失败', icon: 'none' })
   }
 }
+
+const checkout = async () => {
+  if (!cart.value || !(cart.value.items?.length)) {
+    Taro.showToast({ title: '购物车为空', icon: 'none' })
+    return
+  }
+  const resp = await orderService.createOrderFromCart()
+  if (resp.code === 0 && resp.data) {
+    emit('close')
+    Taro.navigateTo({ url: `/pages/mall/order-detail/index?id=${resp.data.id}` })
+  } else {
+    Taro.showToast({ title: resp.message || '下单失败', icon: 'none' })
+  }
+}
 </script>
 
 <style lang="scss">
-.cart-modal { position: fixed; left: 0; right: 0; top: 0; bottom: 0; background: rgba(0,0,0,0.45); z-index: 998; display: flex; align-items: flex-end; }
+.cart-modal { position: fixed; left: 0; right: 0; top: 0; bottom: 0; background: rgba(0,0,0,0.45); z-index: 10000; display: flex; align-items: flex-end; padding-bottom: calc(constant(safe-area-inset-bottom) + 50px); padding-bottom: calc(env(safe-area-inset-bottom) + 50px); }
 .cart-panel { background: #fff; width: 100%; max-height: 70vh; border-top-left-radius: 12px; border-top-right-radius: 12px; overflow: hidden; }
 .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f0f0f0; }
 .close-btn { background: #f5f5f5; color: #333; padding: 4px 8px; border-radius: 4px; }

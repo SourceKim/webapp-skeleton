@@ -7,6 +7,7 @@ import userSettingsRoutes from '@/modules/user/user-settings.routes';
 import materialRoutes from '@/modules/material/material.routes';
 import productRoutes from '@/modules/mall/product/product.routes';
 import cartRoutes from '@/modules/mall/cart/cart.routes';
+import orderRoutes from '@/modules/mall/order/order.routes';
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use(`${API_VERSION}`, userSettingsRoutes); // 用户设置路由
 router.use(`${API_VERSION}/materials`, materialRoutes);
 router.use(`${API_VERSION}/products`, productRoutes);
 router.use(`${API_VERSION}`, cartRoutes);
+router.use(`${API_VERSION}`, orderRoutes);
 
 export default router; 

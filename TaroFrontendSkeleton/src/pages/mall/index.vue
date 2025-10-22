@@ -23,8 +23,15 @@
       <view class="no-more" v-else-if="!hasMore">没有更多了</view>
     </scroll-view>
 
-    <!-- 悬浮购物车按钮：打开子组件弹层 -->
-    <view class="cart-fab" @tap="openCart">
+    <!-- 悬浮购物车按钮：可拖动，短按打开购物车 -->
+    <view
+      class="cart-fab"
+      :style="fabStyle"
+      @touchstart="onFabStart"
+      @touchmove.stop="onFabMove"
+      @touchend="onFabEnd"
+      @tap.stop="onFabTap"
+    >
       <text class="fab-text">购物车</text>
       <text v-if="itemsCount > 0" class="fab-badge">{{ itemsCount }}</text>
     </view>
@@ -51,6 +58,65 @@ const defaultImg = 'https://dummyimage.com/300x200/eaeaea/999.png&text=No+Image'
 const showCart = ref(false)
 const cart = ref<Cart | null>(null)
 const itemsCount = ref(0)
+
+// 悬浮按钮拖拽状态
+const fabX = ref(0)
+const fabY = ref(0)
+const dragging = ref(false)
+let startX = 0
+let startY = 0
+let startLeft = 0
+let startTop = 0
+let touchStartTime = 0
+let dragged = false
+
+const fabStyle = computed(() => `left:${fabX.value}px;top:${fabY.value}px;`)
+
+const onFabStart = (e: any) => {
+  dragging.value = true
+  const t = e.touches?.[0]
+  if (!t) return
+  touchStartTime = Date.now()
+  // Taro/H5/Weapp: 优先使用 pageX/pageY
+  startX = (t.pageX ?? t.clientX) || 0
+  startY = (t.pageY ?? t.clientY) || 0
+  startLeft = fabX.value
+  startTop = fabY.value
+  dragged = false
+}
+
+const onFabMove = (e: any) => {
+  if (!dragging.value) return
+  const t = e.touches?.[0]
+  if (!t) return
+  const x = (t.pageX ?? t.clientX) || 0
+  const y = (t.pageY ?? t.clientY) || 0
+  const dx = x - startX
+  const dy = y - startY
+  let nx = startLeft + dx
+  let ny = startTop + dy
+  const sys = Taro.getSystemInfoSync()
+  const maxX = sys.windowWidth - 80
+  const maxY = sys.windowHeight - 140
+  if (nx < 12) nx = 12
+  if (ny < 80) ny = 80
+  if (nx > maxX) nx = maxX
+  if (ny > maxY) ny = maxY
+  fabX.value = nx
+  fabY.value = ny
+  if (Math.abs(dx) + Math.abs(dy) > 4) dragged = true
+}
+
+const onFabEnd = () => {
+  const dur = Date.now() - touchStartTime
+  dragging.value = false
+  // 点击通过 onFabTap 处理；此处仅重置拖拽标记
+}
+
+const onFabTap = () => {
+  if (dragged) return
+  openCart()
+}
 
 const fetchList = async (reset = false) => {
   if (loading.value) return
@@ -115,6 +181,10 @@ const loadCount = async () => {
 onMounted(() => {
   fetchList(true)
   loadCount()
+  // 初始化 FAB 位置（右下角，避开 tabbar 与安全区）
+  const sys = Taro.getSystemInfoSync()
+  fabX.value = Math.max(12, sys.windowWidth - 80)
+  fabY.value = Math.max(80, sys.windowHeight - 180)
 })
 </script>
 
@@ -158,14 +228,13 @@ onMounted(() => {
 /* 悬浮购物车按钮 */
 .cart-fab {
   position: fixed;
-  right: 16px;
-  bottom: 88px;
-  z-index: 999;
+  z-index: 9999;
   background: #1677ff;
   color: #fff;
   border-radius: 18px;
   padding: 6px 10px;
   box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  user-select: none;
 }
 .fab-text { font-size: 12px; }
 .fab-badge {
