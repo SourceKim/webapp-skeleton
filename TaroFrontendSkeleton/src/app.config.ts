@@ -7,7 +7,8 @@ export default defineAppConfig({
     'pages/mall/detail',
     'pages/mall/order-detail/index',
     'pages/mall/order-list/index',
-    'pages/profile/index'
+    'pages/profile/index',
+    'pages/profile/detail/index'
   ],
   window: {
     backgroundTextStyle: 'light',

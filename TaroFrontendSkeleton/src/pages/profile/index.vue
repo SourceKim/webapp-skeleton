@@ -9,6 +9,7 @@
     </view>
     <view class="actions">
       <button class="btn" @tap="goMyOrders">我的订单</button>
+      <button class="btn" @tap="goEditProfile">编辑资料</button>
       <button class="btn" @tap="handleLogout">退出登录</button>
     </view>
   </view>
@@ -42,6 +43,10 @@ const handleLogout = () => {
 
 const goMyOrders = () => {
   Taro.navigateTo({ url: '/pages/mall/order-list/index' })
+}
+
+const goEditProfile = () => {
+  Taro.navigateTo({ url: '/pages/profile/detail/index' })
 }
 </script>
 

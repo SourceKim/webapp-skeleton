@@ -51,6 +51,7 @@ export class UserService {
     }
 
     async updateUser(userId: string, updateData: UpdateUserDto): Promise<UserDTO> {
+        // 仅允许白名单字段被更新，根除 id 被覆盖的风险
         const { roles: roleIds, ...rest } = updateData;
 
         const user = await this.userRepository.findOne({
@@ -71,8 +72,14 @@ export class UserService {
             user.roles = roles;
         }
 
-        // 更新其他用户信息
-        Object.assign(user, rest);
+        // 显式字段映射更新，避免 undefined 覆盖
+        if (rest.username !== undefined) user.username = rest.username;
+        if (rest.password !== undefined) user.password = rest.password;
+        if (rest.email !== undefined) user.email = rest.email;
+        if (rest.nickname !== undefined) user.nickname = rest.nickname as any;
+        if (rest.phone !== undefined) user.phone = rest.phone;
+        if (rest.avatar !== undefined) user.avatar = rest.avatar as any;
+        if (rest.bio !== undefined) user.bio = rest.bio as any;
 
         // 保存用户
         const savedUser = await this.userRepository.save(user);

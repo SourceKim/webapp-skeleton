@@ -4,6 +4,7 @@ import productService from './product'
 import cartService from './cart'
 import orderService from './order'
 import materialService from './material'
+import userService from './user'
 
 export {
   api,
@@ -19,3 +20,4 @@ export * from './product'
 export * from './cart'
 export * from './order'
 export * from './material' 
+export { userService }

@@ -44,14 +44,12 @@ export class CreateUserDto {
 // 更新用户请求 DTO
 export class UpdateUserDto {
     @IsOptional()
-    @IsString()
-    id?: string;
-
     @Length(3, 100, { message: '用户名长度必须在3-100个字符之间' })
-    username!: string;
+    username?: string;
 
+    @IsOptional()
     @MinLength(6, { message: '密码长度不能少于6个字符' })
-    password!: string;
+    password?: string;
 
     @IsOptional()
     @IsEmail({}, { message: '邮箱格式不正确' })

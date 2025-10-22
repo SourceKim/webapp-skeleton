@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { UserService } from '@/modules/user/user.service';
 import { ApiResponse, FindByIdDto, PaginatedResponse } from '@/modules/common/common.dto';
 import { CreateUserDto, UpdateUserDto, UserDTO } from '@/modules/user/user.dto';
+import { HttpException } from '@/exceptions/http.exception';
 
 /**
  * 用户控制器
@@ -49,6 +50,57 @@ export class UserController {
             const { id } = await req.validate(FindByIdDto, 'params');
             const userData = await req.validate(UpdateUserDto, 'body');
             const user = await this.userService.updateUser(id, userData);
+            res.json({
+                code: 0,
+                message: '更新用户成功',
+                data: user
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    /**
+     * 获取当前登录用户信息
+     * GET /api/v1/users/profile
+     */
+    getProfile = async (
+        req: Request,
+        res: Response<ApiResponse<UserDTO>>,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const userId = req.user?.id as string | undefined;
+            if (!userId) {
+                throw new HttpException(401, '未认证');
+            }
+            const user = await this.userService.getUser(userId);
+            res.json({
+                code: 0,
+                message: 'success',
+                data: user
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    /**
+     * 更新当前登录用户信息
+     * PUT /api/v1/users/profile
+     */
+    updateProfile = async (
+        req: Request,
+        res: Response<ApiResponse<UserDTO>>,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const userId = req.user?.id as string | undefined;
+            if (!userId) {
+                throw new HttpException(401, '未认证');
+            }
+            const userData = await req.validate(UpdateUserDto, 'body');
+            const user = await this.userService.updateUser(userId, userData);
             res.json({
                 code: 0,
                 message: '更新用户成功',
