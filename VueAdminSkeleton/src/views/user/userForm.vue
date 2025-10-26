@@ -87,15 +87,7 @@ if (props.handleType !== 'add') {
   formLoading.value = true
   getUser(props.modelValue!.id!).then(res => {
     formData.value = { ...formData.value, ...res.data! }
-    // 详情/编辑模式下，避免上传组件接收到字符串导致报错
-    if (props.handleType === 'detail') {
-      // 保持字符串以供 image 展示
-    } else {
-      // 编辑时清空为 undefined，由用户重新上传；否则 upload 组件可能接收到字符串
-      if (typeof (formData.value as any).avatar === 'string') {
-        (formData.value as any).avatar = undefined as any
-      }
-    }
+    // 回显保留字符串，由 Upload.vue 负责将字符串转成可预览的图片 URL
     userRoleIds.value = (res.data as any)?.roles?.map((role: any) => role.id) || []
     formLoading.value = false
   })

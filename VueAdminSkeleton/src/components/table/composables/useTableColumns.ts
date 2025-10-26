@@ -1,4 +1,5 @@
 import { ref, computed, watch, shallowRef, createVNode, h, type Ref } from 'vue'
+import { getDownloadFileUrl } from '@/utils/file'
 import { useI18n } from 'vue-i18n'
 import { useLocaleStore } from '@/stores/locale'
 import { generateLabelWidth, getItemListRef } from '@/components/utils'
@@ -266,6 +267,30 @@ export function useTableColumns<T extends object>(props: {
           ...tableColumParams,
           row: scope.row,
           index: { $index, $fullIndex }
+        })
+      }
+    }
+
+    // 图片列：根据单元格值渲染图片
+    if (tableColumParams.type === 'image' && !tableColumParams.slots?.default && tableColumParams.prop) {
+      if (!tableColumParams.slots) tableColumParams.slots = {}
+      tableColumParams.showOverflowTooltip = false
+      tableColumParams.align ??= 'center'
+      const size = Math.min(Number(tableColumParams.width ?? 60), 80)
+      tableColumParams.slots.default = (scope: CI<T>) => {
+        const value: any = (scope.row as any)[tableColumParams.prop as string]
+        if (!value) return h('span', '-')
+        let url: string | undefined
+        if (typeof value === 'string') {
+          url = value.startsWith('http') || value.startsWith('data:') ? value : getDownloadFileUrl({ object: value })
+        } else if (typeof value === 'object') {
+          const obj = value as any
+          url = getDownloadFileUrl({ id: obj.id, object: obj.object })
+        }
+        if (!url) return h('span', '-')
+        return h('img', {
+          src: url,
+          style: `width: ${size}px; height: ${size}px; border-radius: 4px; object-fit: cover;`
         })
       }
     }

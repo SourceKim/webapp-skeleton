@@ -5,15 +5,15 @@
     <view v-else>
       <view class="status-box">
         <text class="label">订单状态：</text>
-        <text class="status">{{ order.status }}</text>
+        <text class="status">{{ statusText(order.status) }}</text>
       </view>
 
-      <view class="progress">
-        <view class="step" :class="{ done: isStepDone('pending') }">创建</view>
-        <view class="step" :class="{ done: isStepDone('confirmed') }">已确认</view>
-        <view class="step" :class="{ done: isStepDone('shipped') }">已发货</view>
-        <view class="step" :class="{ done: isStepDone('completed') }">已完成</view>
-      </view>
+      <nut-steps :current="currentStep" progress-dot>
+        <nut-step>创建</nut-step>
+        <nut-step>已确认</nut-step>
+        <nut-step>已发货</nut-step>
+        <nut-step>已完成</nut-step>
+      </nut-steps>
 
       <view class="items">
         <view class="item" v-for="it in order.items || []" :key="it.id">
@@ -28,16 +28,16 @@
       </view>
 
       <view class="actions">
-        <button v-if="order.status==='pending'" class="btn primary" size="mini" @tap="confirm">确认/支付</button>
-        <button v-if="order.status==='pending'" class="btn danger" size="mini" @tap="cancel">取消订单</button>
-        <button v-if="order.status==='shipped'" class="btn primary" size="mini" @tap="complete">确认收货</button>
+        <nut-button v-if="order.status==='pending'" type="primary" size="small" @click="confirm">确认/支付</nut-button>
+        <nut-button v-if="order.status==='pending'" type="danger" size="small" plain @click="cancel">取消订单</nut-button>
+        <nut-button v-if="order.status==='shipped'" type="primary" size="small" @click="complete">确认收货</nut-button>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import Taro, { useRouter } from '@tarojs/taro'
 import orderService, { type Order, type OrderStatus } from '../../../services/order'
 
@@ -64,6 +64,13 @@ const isStepDone = (step: OrderStatus) => {
 }
 
 const formatPrice = (price: number) => { try { return Number(price).toFixed(2) } catch { return String(price) } }
+
+const statusText = (s: OrderStatus | undefined) => ({ pending: '待支付', confirmed: '已确认', shipped: '已发货', completed: '已完成', canceled: '已取消' }[s || 'pending'])
+const currentStep = computed(() => {
+  const m: Record<OrderStatus, number> = { pending: 0, confirmed: 1, shipped: 2, completed: 3, canceled: 0 }
+  const s = order.value?.status || 'pending'
+  return m[s]
+})
 
 const confirm = async () => {
   if (!id) return

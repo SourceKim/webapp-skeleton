@@ -1,16 +1,28 @@
 <template>
   <view class="profile-container" v-if="auth.isLoggedIn">
-    <view class="user-card">
-      <image class="user-avatar" :src="auth.user?.avatar || 'https://picsum.photos/100/100'" />
-      <view class="user-info">
-        <text class="user-nickname">{{ auth.user?.nickname || auth.user?.username }}</text>
-        <text class="user-username">@{{ auth.user?.username }}</text>
-      </view>
-    </view>
-    <view class="actions">
-      <button class="btn" @tap="goMyOrders">我的订单</button>
-      <button class="btn" @tap="goEditProfile">编辑资料</button>
-      <button class="btn" @tap="handleLogout">退出登录</button>
+    <nut-navbar title="我的" left-show safe-area-inset-top />
+
+    <nut-cell-group>
+      <nut-cell>
+        <template #title>
+          <view class="user-card">
+            <image class="user-avatar" :src="auth.user?.avatar || 'https://picsum.photos/100/100'" />
+            <view class="user-info">
+              <text class="user-nickname">{{ auth.user?.nickname || auth.user?.username }}</text>
+              <text class="user-username">@{{ auth.user?.username }}</text>
+            </view>
+          </view>
+        </template>
+      </nut-cell>
+    </nut-cell-group>
+
+    <nut-cell-group title="账户">
+      <nut-cell title="我的订单" is-link @click="goMyOrders" />
+      <nut-cell title="编辑资料" is-link @click="goEditProfile" />
+    </nut-cell-group>
+
+    <view class="mt-10">
+      <nut-button type="danger" block @click="handleLogout">退出登录</nut-button>
     </view>
   </view>
 </template>

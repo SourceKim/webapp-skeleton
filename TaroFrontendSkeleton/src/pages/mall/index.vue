@@ -1,30 +1,29 @@
 <template>
   <view class="mall-page">
-    <view class="toolbar">
-      <text class="title">商品列表</text>
-    </view>
+    <nut-navbar title="商城" left-show safe-area-inset-top />
+    <nut-searchbar v-model="keyword" placeholder="搜索商品" :clearable="true" @search="onSearch" />
 
     <scroll-view class="list" scroll-y @scrolltolower="loadMore" :lower-threshold="100">
       <view v-for="item in products" :key="item.id" class="card">
-        <image
-          class="cover"
-          :src="firstImage(item) || defaultImg"
-          mode="aspectFill"
-        />
+        <image class="cover" :src="firstImage(item) || defaultImg" mode="aspectFill" />
         <view class="info">
-          <text class="name" @tap="goDetail(item.id)">{{ item.name }}</text>
+          <view class="row">
+            <text class="name" @tap="goDetail(item.id)">{{ item.name }}</text>
+            <nut-tag type="danger" plain v-if="item.stock <= 0">售罄</nut-tag>
+          </view>
           <text class="price">￥{{ formatPrice(item.price) }}</text>
           <text class="stock">库存 {{ item.stock }}</text>
-          <button
-            size="mini"
-            class="add-btn"
+          <nut-button
+            size="small"
+            type="primary"
             :disabled="isAdded(item.id)"
-            @tap.stop="addToCart(item)"
-          >{{ isAdded(item.id) ? '已加入购物车' : '加入购物车' }}</button>
+            @click.stop="addToCart(item)"
+          >{{ isAdded(item.id) ? '已加入购物车' : '加入购物车' }}</nut-button>
         </view>
       </view>
 
-      <view class="loading" v-if="loading">加载中...</view>
+      <nut-empty v-if="!loading && products.length === 0" description="暂无商品" />
+      <view class="loading" v-else-if="loading">加载中...</view>
       <view class="no-more" v-else-if="!hasMore">没有更多了</view>
     </scroll-view>
 
@@ -38,6 +37,7 @@
       @touchend="onFabEnd"
       @tap.stop="onFabTap"
     >
+      <nut-icon name="cart" size="18" />
       <text class="fab-text">购物车</text>
       <text v-if="itemsCount > 0" class="fab-badge">{{ itemsCount }}</text>
     </view>
@@ -54,6 +54,7 @@ import { cartService } from '../../services'
 import CartPanel from './components/cart-panel.vue'
 
 const products = ref<Product[]>([])
+const keyword = ref('')
 const page = ref(1)
 const limit = ref(10)
 const total = ref(0)
@@ -142,7 +143,12 @@ const fetchList = async (reset = false) => {
     products.value = []
     hasMore.value = true
   }
-  const resp = await productService.getProducts({ page: page.value, limit: limit.value, sort_by: 'created_at', sort_order: 'DESC' })
+  const params: any = { page: page.value, limit: limit.value, sort_by: 'created_at', sort_order: 'DESC' }
+  const k = keyword.value?.trim()
+  if (k) {
+    params.filters = { name: k }
+  }
+  const resp = await productService.getProducts(params)
   loading.value = false
   if (resp.code === 0 && resp.data) {
     const { items, meta } = resp.data
@@ -158,6 +164,16 @@ const fetchList = async (reset = false) => {
 const loadMore = () => {
   if (!hasMore.value || loading.value) return
   fetchList()
+}
+
+const onSearch = () => {
+  // 简单前端筛选可选；此处重置分页并传 filters 由后端处理
+  // 若后端支持 filters.name 包含查询，可按如下传参：
+  // fetchList(true) 之前设置 filters
+  page.value = 1
+  products.value = []
+  hasMore.value = true
+  fetchList(true)
 }
 
 const formatPrice = (price: number) => {
@@ -241,14 +257,15 @@ onMounted(() => {
   }
   .info {
     flex: 1;
-    padding: 10px 12px;
+    padding: 12px 14px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 6px;
   }
-  .name { font-size: 16px; color: #333; }
-  .price { color: #e64a19; }
-  .stock { color: #999; font-size: 12px; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .name { font-size: 18px; color: #333; font-weight: 600; }
+  .price { color: #e64a19; font-size: 16px; font-weight: 600; }
+  .stock { color: #888; font-size: 13px; }
 .add-btn { margin-top: 6px; background: #1677ff; color: #fff; font-size: 12px; padding: 4px 8px; border-radius: 4px; }
   .loading, .no-more { text-align: center; color: #999; padding: 12px 0; }
 }

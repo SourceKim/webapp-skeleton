@@ -21,7 +21,7 @@
         <!-- 如果类型是 upload-img，则显示图片上传按钮 -->
         <div v-if="type === 'upload-img'" class="el-upload--picture-card">
           <div class="file-lib-btn" v-if="selectFromLib" @click.stop="openFileLib('image/')">
-            {{ $t('m.form.lib') }}
+            {{ $t('comp.upload.selectFromLib') }}
           </div>
           <Plus class="icon" />
         </div>
@@ -86,7 +86,6 @@ import { computed, inject, onUnmounted, ref, watchEffect } from 'vue'
 import { uploadFile } from '@/api/file'
 import selectSysFile from '@/components/form/selectSysFile.vue'
 import { getDownloadFileUrl } from '@/utils/file'
-import type { DownloadParam } from '@/interface/utils.d'
 import { ElUpload, genFileId, uploadProps } from 'element-plus'
 import type { UploadFile } from 'element-plus'
 import Cropper from './Cropper.vue'
@@ -120,6 +119,10 @@ const props = defineProps({
   },
   modelValue: {
     required: true
+  },
+  // 当为单文件模式时，指定回填/提交值的字段：'object' | 'id' | 'url'
+  single: {
+    type: String as PropType<'object' | 'id' | 'url'>
   },
   // 是否允许从文件库中选择
   selectFromLib: {
@@ -158,12 +161,24 @@ const uploadParam = computed(() => {
   return param
 })
 
-const fileList = ref<any[]>([])
+const fileList = ref<UploadFileItem[]>([])
 watchEffect(() => {
-  const files = (props.modelValue as any[]) ?? []
+  const mv: any = props.modelValue
+  let files: UploadFileItem[] = []
+  if (Array.isArray(mv)) {
+    files = mv
+  } else if (mv) {
+    if (typeof mv === 'string') {
+      files = [{ uid: genFileId(), object: mv, status: 'success' } as UploadFileItem]
+    } else if (typeof mv === 'object') {
+      const obj = mv as UploadFileItem
+      if (!obj.uid) obj.uid = genFileId()
+      files = [obj]
+    }
+  }
   files.forEach((file) => {
     if (!file.url) {
-      const url = getDownloadFileUrl({ id: file.id, object: file.object })
+      const url = getDownloadFileUrl({ id: (file as any).id, object: (file as any).object })
       if (url) file.url = url
     }
   })
@@ -185,7 +200,7 @@ const cropperOption = ref({})
 const cropperFile = ref()
 
 // 超过限制时，替换掉第一个 (From element-plus 官网)
-const onExceed = (files: UploadFileItem[], fileList: UploadFileItem[]) => {
+const onExceed = (files: UploadFileItem[], _fileList: UploadFileItem[]) => {
   uploadRef.value.clearFiles()
   const file = files[0]
   file.uid = genFileId()
@@ -232,7 +247,10 @@ function onUpdateFileList(files: UploadFileItem[]) {
 
 function onPreview(file: UploadFileItem) {
   if (props.type === 'upload-img') {
-    previewImageUrlList.value = fileList.value.map((i) => i.url)
+    const urls = fileList.value
+      .map((i) => i.url)
+      .filter((u): u is string => typeof u === 'string' && !!u)
+    previewImageUrlList.value = urls
     initialIndex.value = fileList.value.findIndex((i) => i === file)
     previewImageVisible.value = true
   } else {
@@ -254,19 +272,15 @@ function select(rows: any[]) {
   onUpdateFileList([
     ...fileList.value,
     ...rows.map((i) => {
-      return {
-        url: getDownloadFileUrl({ object: i.object }),
+      const item: UploadFileItem = {
+        uid: genFileId(),
+        url: getDownloadFileUrl({ object: i.object })!,
         status: 'success',
         id: i.id,
         name: i.name,
-        object: i.object,
-        contentType: i.contentType,
-        suffix: i.suffix,
-        size: i.size,
-        imgWidth: i.imgWidth,
-        imgHeight: i.imgHeight,
-        imgRatio: i.imgRatio
+        object: i.object
       }
+      return item
     })
   ])
   visible.value = false
@@ -278,7 +292,12 @@ async function upload() {
   const uploadFiles = fileList.value.filter((i) => ['ready', 'fail'].includes(i.status) || !i.status)
   for (const item of uploadFiles) {
     item.status = 'uploading'
-    const res = await uploadFile(item.raw)
+    if (!item.raw) {
+      // 从库选择的文件没有 raw，跳过上传
+      item.status = 'success'
+      continue
+    }
+    const res = await uploadFile(item.raw as File)
     if (res) {
       item.status = 'success'
     }
@@ -313,7 +332,18 @@ function openFileLib(type?: string) {
 }
 
 function emitModelValue() {
-  emit('update:modelValue', fileList.value)
+  if (props.single) {
+    const first = fileList.value?.[0]
+    let out: any = undefined
+    if (first) {
+      if (props.single === 'object') out = first.object
+      else if (props.single === 'id') out = first.id
+      else if (props.single === 'url') out = first.url
+    }
+    emit('update:modelValue', out)
+  } else {
+    emit('update:modelValue', fileList.value)
+  }
 }
 
 export interface UploadCtx {

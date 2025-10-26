@@ -1,6 +1,18 @@
 <template>
   <view class="general-home">
-    <text class="hello">Hello{{ username }}</text>
+    <nut-navbar title="首页" left-show safe-area-inset-top />
+
+    <view class="welcome card">
+      <text class="hello">Hello{{ username }}</text>
+      <nut-row type="flex" justify="space-between" class="mt-10">
+        <nut-col :span="11">
+          <nut-button type="primary" block @tap="goMall">进入商城</nut-button>
+        </nut-col>
+        <nut-col :span="11">
+          <nut-button type="info" block @tap="goProfile">个人中心</nut-button>
+        </nut-col>
+      </nut-row>
+    </view>
   </view>
   
 </template>
@@ -20,6 +32,11 @@ onMounted(async () => {
 })
 
 const username = computed(() => auth.user?.username ? `, ${auth.user.username}` : '')
+
+const goMall = () => Taro.switchTab({ url: '/pages/mall/index' })
+const goProfile = () => Taro.switchTab({ url: '/pages/profile/index' })
+const goResource = () => Taro.switchTab({ url: '/pages/resource/index' })
+const goOrderList = () => Taro.navigateTo({ url: '/pages/mall/order-list/index' })
 </script>
 
 <style lang="scss">
@@ -29,6 +46,7 @@ const username = computed(() => auth.user?.username ? `, ${auth.user.username}` 
     font-size: 20px;
   }
 }
+.welcome { margin-bottom: 12px; }
 </style>
 
 
