@@ -2,6 +2,7 @@ import { Expose, Type } from 'class-transformer';
 import { IsArray, IsEnum, IsNumber, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 import { BaseDTO } from '@/modules/common/common.dto';
 import { ProductStatus } from './product.model';
+import { MaterialDTO } from '@/modules/material/material.dto';
 
 export class ProductDTO extends BaseDTO {
   @Expose()
@@ -23,7 +24,8 @@ export class ProductDTO extends BaseDTO {
   category_id?: string;
 
   @Expose()
-  materials?: { id: string; filename?: string; file_path?: string; type?: string }[];
+  @Type(() => MaterialDTO)
+  materials?: MaterialDTO[];
 }
 
 export class CreateProductDto {

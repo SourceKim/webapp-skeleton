@@ -2,26 +2,25 @@
   <view class="order-list">
     <scroll-view class="list" scroll-y @scrolltolower="loadMore" :lower-threshold="100">
       <nut-empty v-if="!loading && orders.length === 0" description="暂无订单" />
-      <nut-card v-for="o in orders" :key="o.id" class="card" @click="goDetail(o.id)">
-        <template #header>
-          <view class="row">
-            <nut-tag :type="statusType(o.status)" plain>{{ statusText(o.status) }}</nut-tag>
-            <text class="total">￥{{ formatPrice(o.total_price) }}</text>
+      <nut-card
+        v-for="o in orders"
+        :key="o.id"
+        class="card"
+        :img-url="firstImageUrl(o)"
+        :title="productNames(o)"
+        :is-need-price="true"
+        @click="goDetail(o.id)"
+      >
+        <template #shop-tag>
+          <view class="meta">
+            <text class="sub">订单ID：{{ o.id }}</text>
+            <text class="sub">日期：{{ formatDate(o.created_at) }}</text>
+            <nut-tag size="small">{{ statusText(o.status) }}</nut-tag>
           </view>
         </template>
-        <template #content>
-          <view class="content-row">
-            <image class="thumb" :src="orderThumb(o)" mode="aspectFill" />
-            <view class="meta">
-              <text class="title">{{ orderTitle(o) }}</text>
-              <text class="sub">{{ o.created_at }}</text>
-            </view>
-          </view>
-        </template>
-        <template #footer>
-          <view class="actions">
-            <nut-button size="small" type="primary" plain @click.stop="goDetail(o.id)">查看详情</nut-button>
-          </view>
+
+        <template #price>
+          <nut-price :price="o.total_price" :decimal-digits="2" thousands />
         </template>
       </nut-card>
       <view class="loading" v-if="loading">加载中...</view>
@@ -35,7 +34,6 @@
 import { ref, onMounted } from 'vue'
 import Taro from '@tarojs/taro'
 import orderService, { type Order, type OrderStatus } from '../../../services/order'
-import productService, { getMaterialUrl } from '../../../services/product'
 
 const orders = ref<Order[]>([])
 const page = ref(1)
@@ -43,8 +41,9 @@ const limit = ref(10)
 const total = ref(0)
 const loading = ref(false)
 const hasMore = ref(true)
-const thumbMap = ref<Record<string, string>>({})
 const defaultThumb = 'https://dummyimage.com/160x120/eaeaea/999.png&text=No+Image'
+// 小程序端不一定支持 import.meta，优先使用 Taro 环境变量
+const BASE_FILE_URL = (Taro as any).env?.VITE_FILE_BASE_URL || 'http://localhost:3000/uploads/'
 
 const fetchList = async (reset = false) => {
   if (loading.value) return
@@ -58,61 +57,41 @@ const fetchList = async (reset = false) => {
     orders.value = orders.value.concat(items)
     page.value += 1
     hasMore.value = orders.value.length < total.value
-    // 预取前若干商品缩略图，避免过多并发
-    preloadThumbs(items)
   } else {
     Taro.showToast({ title: resp.message || '加载失败', icon: 'none' })
   }
 }
 
 const loadMore = () => { if (!hasMore.value || loading.value) return; fetchList() }
-const formatPrice = (price: number) => { try { return Number(price).toFixed(2) } catch { return String(price) } }
 const statusText = (s: OrderStatus) => ({ pending: '待支付', confirmed: '已确认', shipped: '已发货', completed: '已完成', canceled: '已取消' }[s] || s)
-const statusType = (s: OrderStatus): 'primary' | 'success' | 'warning' | 'danger' | 'default' => {
-  switch (s) {
-    case 'pending':
-      return 'warning'
-    case 'confirmed':
-      return 'primary'
-    case 'shipped':
-      return 'primary'
-    case 'completed':
-      return 'success'
-    case 'canceled':
-      return 'danger'
-    default:
-      return 'default'
-  }
+const productNames = (o: Order): string => {
+  const names = (o.items || [])
+    .map(i => i.product?.name)
+    .filter((n): n is string => !!n)
+  return names.length > 0 ? names.join(', ') : '商品'
 }
-const firstProductId = (o: Order): string | undefined => o.items?.find(i => !!i.product_id)?.product_id || undefined
-const orderTitle = (o: Order): string => {
-  const first = o.items?.[0]
-  const name = first?.product?.name || '商品'
-  const count = o.items?.reduce((s, i) => s + (i.quantity || 0), 0) || 0
-  return count > 1 ? `${name} 等 ${count} 件` : name
+// 使用插槽，不再通过函数返回 VNode
+// 价格由 slot #price 的 nut-price 渲染
+const formatDate = (d?: string) => {
+  if (!d) return ''
+  try { return new Date(d).toLocaleString() } catch { return d }
 }
-const orderThumb = (o: Order): string => {
-  const pid = firstProductId(o)
-  if (!pid) return defaultThumb
-  return thumbMap.value[pid] || defaultThumb
-}
-const preloadThumbs = async (ordersChunk: Order[]) => {
-  const ids: string[] = []
-  for (const o of ordersChunk) {
-    const pid = firstProductId(o)
-    if (pid && !thumbMap.value[pid] && !ids.includes(pid)) ids.push(pid)
-    if (ids.length >= 6) break
-  }
-  for (const pid of ids) {
-    try {
-      const resp = await productService.getProduct(pid)
-      if (resp.code === 0 && resp.data) {
-        const fp = resp.data.materials?.find(m => m.type === 'image')?.file_path || resp.data.materials?.[0]?.file_path
-        const url = getMaterialUrl(fp) || defaultThumb
-        thumbMap.value = { ...thumbMap.value, [pid]: url }
+const firstImageUrl = (o: Order): string => {
+  try {
+    for (const it of o.items || []) {
+      const mats = it.product?.materials as any[] | undefined
+      if (mats && mats.length > 0) {
+        const img = mats.find(m => m?.type === 'image') || mats[0]
+        const fp = img?.file_path as string | undefined
+        if (fp) {
+          const base = String(BASE_FILE_URL)
+          const u = base.replace(/\/+$/, '/') + String(fp).replace(/^\/+/, '')
+          return u
+        }
       }
-    } catch {}
-  }
+    }
+  } catch {}
+  return defaultThumb
 }
 const goDetail = (id: string) => {
   const url = `/pages/mall/order-detail/index?id=${id}`

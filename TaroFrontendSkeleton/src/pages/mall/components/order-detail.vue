@@ -16,15 +16,26 @@
       </nut-steps>
 
       <view class="items">
-        <view class="item" v-for="it in order.items || []" :key="it.id">
-          <text class="name">{{ it.product?.name || '商品' }}</text>
-          <text class="qty">x{{ it.quantity }}</text>
-          <text class="price">￥{{ formatPrice(it.unit_price) }}</text>
-        </view>
+        <nut-card
+          v-for="it in order.items || []"
+          :key="it.id"
+          class="card"
+          :img-url="firstImageUrl(it.product)"
+          :title="it.product?.name || '商品'"
+          :is-need-price="false"
+        >
+          <template #shop-tag>
+            <view class="meta">
+              <text class="sub">数量：x{{ it.quantity }}</text>
+              <text class="sub">单价：￥{{ formatPrice(it.unit_price) }}</text>
+              <text class="sub">总价：￥{{ formatPrice(Number(it.unit_price) * Number(it.quantity)) }}</text>
+            </view>
+          </template>
+        </nut-card>
       </view>
 
       <view class="summary">
-        <text>合计：￥{{ formatPrice(order.total_price) }}</text>
+        <nut-price :price="order.total_price" :decimal-digits="2" thousands />
       </view>
 
       <view class="actions">
@@ -92,6 +103,23 @@ onMounted(() => {
   console.log('[order-detail] fetch', { id })
   fetchDetail()
 })
+
+const defaultThumb = 'https://dummyimage.com/160x120/eaeaea/999.png&text=No+Image'
+const BASE_FILE_URL = (Taro as any).env?.VITE_FILE_BASE_URL || 'http://localhost:3000/uploads/'
+const firstImageUrl = (p?: Order['items'][number]['product'] | null): string => {
+  try {
+    const mats = (p?.materials as any[]) || []
+    if (mats.length > 0) {
+      const img = mats.find(m => m?.type === 'image') || mats[0]
+      const fp = img?.file_path as string | undefined
+      if (fp) {
+        const base = String(BASE_FILE_URL)
+        return base.replace(/\/+$/, '/') + String(fp).replace(/^\/+/, '')
+      }
+    }
+  } catch {}
+  return defaultThumb
+}
 </script>
 
 <style lang="scss">
@@ -105,6 +133,7 @@ onMounted(() => {
 .summary { text-align: right; padding: 12px; color: #333; font-weight: 600; }
 .actions { display: flex; gap: 8px; padding: 12px; position: fixed; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom) + 12px); justify-content: center; }
 .btn { padding: 6px 12px; border-radius: 4px; &.primary { background: #1677ff; color: #fff; } &.danger { background: #ff4d4f; color: #fff; } }
+.meta { display: flex; flex-direction: column; gap: 4px; font-size: small; }
 </style>
 
 

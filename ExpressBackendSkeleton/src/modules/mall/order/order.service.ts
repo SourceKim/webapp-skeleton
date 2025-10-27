@@ -78,6 +78,7 @@ export class OrderService {
     const qb = this.orderRepository.createQueryBuilder('o')
       .leftJoinAndSelect('o.items', 'oi')
       .leftJoinAndSelect('oi.product', 'p')
+      .leftJoinAndSelect('p.materials', 'pm')
       .where('o.user_id = :uid', { uid: userId });
 
     if (query.filters && query.filters.status) {
@@ -88,12 +89,15 @@ export class OrderService {
     const total = await qb.getCount();
     qb.skip((query.page - 1) * query.limit).take(query.limit);
     const items = await qb.getMany();
-    return { items: items.map(i => plainToInstance(OrderDTO, i)), total };
+    const dtos = items.map(i => plainToInstance(OrderDTO, i));
+    return { items: dtos, total };
   }
 
   async getMyOrderDetail(userId: string, id: string): Promise<OrderDTO | null> {
-    const order = await this.orderRepository.findOne({ where: { id, user_id: userId }, relations: { items: { product: true } } });
-    return order ? plainToInstance(OrderDTO, order) : null;
+    const order = await this.orderRepository.findOne({ where: { id, user_id: userId }, relations: { items: { product: { materials: true } } } });
+    if (!order) return null;
+    const dto = plainToInstance(OrderDTO, order);
+    return dto;
   }
 
   async confirm(userId: string, id: string): Promise<OrderDTO | null> {
@@ -103,8 +107,9 @@ export class OrderService {
     order.status = OrderStatus.CONFIRMED;
     order.paid_at = new Date();
     await this.orderRepository.save(order);
-    const full = await this.orderRepository.findOne({ where: { id }, relations: { items: { product: true } } });
-    return plainToInstance(OrderDTO, full);
+    const full = await this.orderRepository.findOne({ where: { id }, relations: { items: { product: { materials: true } } } });
+    const dto = plainToInstance(OrderDTO, full);
+    return dto;
   }
 
   async cancel(userId: string, id: string): Promise<OrderDTO | null> {
@@ -115,8 +120,9 @@ export class OrderService {
     }
     order.status = OrderStatus.CANCELED;
     await this.orderRepository.save(order);
-    const full = await this.orderRepository.findOne({ where: { id }, relations: { items: { product: true } } });
-    return plainToInstance(OrderDTO, full);
+    const full = await this.orderRepository.findOne({ where: { id }, relations: { items: { product: { materials: true } } } });
+    const dto = plainToInstance(OrderDTO, full);
+    return dto;
   }
 
   async ship(adminUserId: string, id: string, shippingNo: string): Promise<OrderDTO | null> {
@@ -138,8 +144,9 @@ export class OrderService {
     order.shipped_at = new Date();
     order.shipping_no = shippingNo;
     await this.orderRepository.save(order);
-    const full = await this.orderRepository.findOne({ where: { id }, relations: { items: { product: true } } });
-    return plainToInstance(OrderDTO, full);
+    const full = await this.orderRepository.findOne({ where: { id }, relations: { items: { product: { materials: true } } } });
+    const dto = plainToInstance(OrderDTO, full);
+    return dto;
   }
 
   async complete(userId: string, id: string): Promise<OrderDTO | null> {
@@ -149,15 +156,17 @@ export class OrderService {
     order.status = OrderStatus.COMPLETED;
     order.completed_at = new Date();
     await this.orderRepository.save(order);
-    const full = await this.orderRepository.findOne({ where: { id }, relations: { items: { product: true } } });
-    return plainToInstance(OrderDTO, full);
+    const full = await this.orderRepository.findOne({ where: { id }, relations: { items: { product: { materials: true } } } });
+    const dto = plainToInstance(OrderDTO, full);
+    return dto;
   }
 
   // Admin
   async adminPaginate(query: PaginationQueryDto): Promise<{ items: OrderDTO[]; total: number }> {
     const qb = this.orderRepository.createQueryBuilder('o')
       .leftJoinAndSelect('o.items', 'oi')
-      .leftJoinAndSelect('oi.product', 'p');
+      .leftJoinAndSelect('oi.product', 'p')
+      .leftJoinAndSelect('p.materials', 'pm');
 
     if (query.filters && query.filters.user_id) {
       qb.andWhere('o.user_id = :uid', { uid: query.filters.user_id });
@@ -170,7 +179,8 @@ export class OrderService {
     const total = await qb.getCount();
     qb.skip((query.page - 1) * query.limit).take(query.limit);
     const items = await qb.getMany();
-    return { items: items.map(i => plainToInstance(OrderDTO, i)), total };
+    const dtos = items.map(i => plainToInstance(OrderDTO, i));
+    return { items: dtos, total };
   }
 }
 

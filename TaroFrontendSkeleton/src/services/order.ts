@@ -1,4 +1,5 @@
 import api from './api'
+import { type ProductMaterialRef } from './product'
 
 export type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'completed' | 'canceled'
 
@@ -6,6 +7,7 @@ export interface OrderItemProductRef {
   id: string
   name: string
   price: number
+  materials?: ProductMaterialRef[]
 }
 
 export interface OrderItem {

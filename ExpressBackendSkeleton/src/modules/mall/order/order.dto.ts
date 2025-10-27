@@ -2,6 +2,7 @@ import { Expose, Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 import { BaseDTO } from '@/modules/common/common.dto';
 import { OrderStatus } from './order.model';
+import { ProductDTO } from '@/modules/mall/product/product.dto';
 
 export class OrderItemDTO extends BaseDTO {
   @Expose()
@@ -17,7 +18,8 @@ export class OrderItemDTO extends BaseDTO {
   unit_price!: number;
 
   @Expose()
-  product?: { id: string; name: string; price: number } | null;
+  @Type(() => ProductDTO)
+  product?: ProductDTO | null;
 }
 
 export class OrderDTO extends BaseDTO {
@@ -40,6 +42,7 @@ export class OrderDTO extends BaseDTO {
   remark?: string;
 
   @Expose()
+  @Type(() => OrderItemDTO)
   items?: OrderItemDTO[];
 
   @Expose()
