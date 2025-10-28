@@ -88,6 +88,18 @@ export const flatMenus: FlatMenu[] = [
         parentId: '20'
     },
     {
+        id: '23',
+        title: '品牌管理',
+        name: 'brand-manager',
+        path: 'brand-manager',
+        type: 'menu',
+        icon: 'el|menu',
+        cache: true,
+        component: '/src/views/product/brand/index.vue',
+        handleType: 'route',
+        parentId: '20'
+    },
+    {
         id: '22',
         title: '订单管理',
         name: 'order-manager',
