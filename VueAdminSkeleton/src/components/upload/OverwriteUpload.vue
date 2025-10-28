@@ -6,6 +6,7 @@
       :limit="limit"
       :accept="accept"
       :on-exceed="handleExceed"
+      :on-change="handleChange"
       :http-request="handleHttpRequest"
       :on-remove="handleRemove"
       :on-preview="handlePreview"
@@ -84,6 +85,13 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
   // @ts-expect-error 私有方法，但 Element Plus 示例中常用
   uploadRef.value?.handleStart(file)
   uploadRef.value?.submit()
+}
+
+const handleChange: UploadProps['onChange'] = () => {
+  // 初次选择文件时，自动提交（auto-upload=false 时需要手动 submit）
+  if (!props.disabled) {
+    uploadRef.value?.submit()
+  }
 }
 
 const handleHttpRequest: UploadProps['httpRequest'] = async (option) => {
