@@ -1,6 +1,6 @@
 <template>
   <view class="profile-container" v-if="auth.isLoggedIn">
-    <nut-navbar title="我的" left-show safe-area-inset-top />
+    <nut-navbar title="我的" safe-area-inset-top />
 
     <nut-cell-group>
       <nut-cell>

@@ -3,7 +3,6 @@ import { ENV } from './env.config';
 
 // 实体 models
 import { User } from '@/modules/user/user.model';
-import { UserSettings } from '@/modules/user/user-settings.model';
 import { Permission } from '@/modules/permission/permission.model';
 import { Role } from '@/modules/role/role.model';;
 import { Material } from '@/modules/material/material.model';
@@ -29,7 +28,6 @@ export const AppDataSource = new DataSource({
     },
     entities: [
         User, 
-        UserSettings, 
         Permission,
         Role,
         Material,

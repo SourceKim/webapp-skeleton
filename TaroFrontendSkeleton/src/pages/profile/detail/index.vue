@@ -1,6 +1,6 @@
 <template>
   <view class="profile-detail-page" v-if="auth.isLoggedIn">
-    <nut-navbar title="编辑资料" left-show safe-area-inset-top />
+    <nut-navbar title="编辑资料" left-show safe-area-inset-top @on-click-back="handleBack" />
     <view class="content">
       <view class="avatar-section">
         <image class="avatar" :src="avatarPreview || defaultAvatar" mode="aspectFill" />
@@ -105,6 +105,17 @@ const onBirthChange = (params: { selectedOptions: Array<{ text: string; value: n
 const applyBirth = () => {
   form.birthdate = tmpBirth.value
   showBirthPicker.value = false
+}
+
+const handleBack = () => {
+  try {
+    const pages = (Taro.getCurrentPages?.() || []) as any[]
+    if (pages.length > 1) {
+      Taro.navigateBack()
+      return
+    }
+  } catch {}
+  Taro.switchTab({ url: '/pages/profile/index' })
 }
 
 onMounted(async () => {

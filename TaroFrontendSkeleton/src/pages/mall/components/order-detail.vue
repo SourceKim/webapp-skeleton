@@ -8,12 +8,14 @@
         <text class="status">{{ statusText(order.status) }}</text>
       </view>
 
-      <nut-steps :current="currentStep" progress-dot>
-        <nut-step>创建</nut-step>
-        <nut-step>已确认</nut-step>
-        <nut-step>已发货</nut-step>
-        <nut-step>已完成</nut-step>
+      <nut-steps :current="cur" progress-dot>
+        <nut-step :title="statusText('created')">0</nut-step>
+        <nut-step :title="statusText('pending')">1</nut-step>
+        <nut-step :title="statusText('confirmed')">2</nut-step>
+        <nut-step :title="statusText('shipped')">3</nut-step>
+        <nut-step :title="statusText('completed')">4</nut-step>
       </nut-steps>
+
 
       <view class="items">
         <nut-card
@@ -48,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import Taro, { useRouter } from '@tarojs/taro'
 import orderService, { type Order, type OrderStatus } from '../../../services/order'
 
@@ -56,6 +58,8 @@ const router = useRouter()
 const id = (router.params?.id as string) || ''
 const order = ref<Order | null>(null)
 const loading = ref(false)
+const cur = ref<number>(0)
+
 
 const fetchDetail = async () => {
   if (!id) return
@@ -64,24 +68,17 @@ const fetchDetail = async () => {
   loading.value = false
   if (resp.code === 0 && resp.data) {
     order.value = resp.data
+    const statusMap: Record<OrderStatus, number> = { pending: 1, confirmed: 2, shipped: 3, completed: 4, canceled: 0 }
+    cur.value = statusMap[resp.data.status] + 1
   } else {
     Taro.showToast({ title: resp.message || '加载失败', icon: 'none' })
   }
 }
 
-const isStepDone = (step: OrderStatus) => {
-  const rank: Record<OrderStatus, number> = { pending: 0, confirmed: 1, shipped: 2, completed: 3, canceled: -1 }
-  return (order.value?.status ? rank[order.value.status] : -2) >= rank[step]
-}
-
 const formatPrice = (price: number) => { try { return Number(price).toFixed(2) } catch { return String(price) } }
 
-const statusText = (s: OrderStatus | undefined) => ({ pending: '待支付', confirmed: '已确认', shipped: '已发货', completed: '已完成', canceled: '已取消' }[s || 'pending'])
-const currentStep = computed(() => {
-  const m: Record<OrderStatus, number> = { pending: 0, confirmed: 1, shipped: 2, completed: 3, canceled: 0 }
-  const s = order.value?.status || 'pending'
-  return m[s]
-})
+const statusText = (s: "created" | OrderStatus) => ({ created: '创建', pending: '待支付', confirmed: '已确认', shipped: '已发货', completed: '已完成', canceled: '已取消' }[s])
+
 
 const confirm = async () => {
   if (!id) return

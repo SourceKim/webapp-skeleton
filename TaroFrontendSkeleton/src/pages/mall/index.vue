@@ -1,6 +1,6 @@
 <template>
   <view class="mall-page">
-    <nut-navbar title="商城" left-show safe-area-inset-top />
+    <nut-navbar title="商城" safe-area-inset-top />
     <nut-searchbar v-model="keyword" placeholder="搜索商品" :clearable="true" @search="onSearch" />
 
     <scroll-view class="list" scroll-y @scrolltolower="loadMore" :lower-threshold="100">

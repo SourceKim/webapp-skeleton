@@ -1,6 +1,6 @@
 <template>
   <view class="general-home">
-    <nut-navbar title="首页" left-show safe-area-inset-top />
+    <nut-navbar title="首页" safe-area-inset-top />
 
     <view class="welcome card">
       <text class="hello">Hello{{ username }}</text>

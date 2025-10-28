@@ -1,7 +1,7 @@
 <template>
   <view class="login-container">
     <template v-if="isRegister">
-      <nut-navbar title="注册" left-show safe-area-inset-top />
+      <nut-navbar title="注册" safe-area-inset-top />
       <view class="card">
         <text class="login-title">创建账号</text>
         <nut-form>
@@ -37,7 +37,7 @@
       </view>
     </template>
     <template v-else>
-      <nut-navbar title="登录" left-show safe-area-inset-top />
+      <nut-navbar title="登录" safe-area-inset-top />
       <view class="card">
         <text class="login-title">欢迎回来</text>
         <nut-form>
