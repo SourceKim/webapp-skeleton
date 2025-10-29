@@ -10,6 +10,7 @@ import { MaterialCategory } from '@/modules/material/mateial-category/material-c
 import { MaterialTag } from '@/modules/material/mateial-tag/material-tag.model';
 import { ProductBrand } from '@/modules/product/brand/product-brand.model';
 import { ProductCategory } from '@/modules/product/category/product-category.model';
+import { ProductSpu } from '@/modules/product/spu/product-spu.model';
 
 export const AppDataSource = new DataSource({
     type: 'mysql',
@@ -31,7 +32,8 @@ export const AppDataSource = new DataSource({
         MaterialCategory,
         MaterialTag,
         ProductBrand,
-        ProductCategory
+        ProductCategory,
+        ProductSpu
     ],
     migrations: ['migrations/*.ts'],
     subscribers: [],

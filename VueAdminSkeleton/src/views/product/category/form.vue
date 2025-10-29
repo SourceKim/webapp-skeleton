@@ -49,6 +49,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { CreateProductCategoryDto, ProductCategory, UpdateProductCategoryDto } from '@/api/product/category.d'
 import { createCategory, updateCategory, getCategories } from '@/api/product/category'
 import { uploadMaterial } from '@/api/material/material'
+import { getUploadFileUrl } from '@/utils/file'
 import OverwriteUpload from '@/components/upload/OverwriteUpload.vue'
 
 const props = defineProps<{ handleType?: string, modelValue?: ProductCategory }>()
@@ -124,10 +125,7 @@ const uploader = async (file: File) => {
   fd.append('description', 'category image')
   const res: any = await uploadMaterial(fd, { showLoading: true })
   if (res?.code === 0 && res.data?.id) {
-    const UPLOAD_BASE = (import.meta.env.VITE_UPLOAD_BASE_URL || import.meta.env.VITE_FILE_BASE_URL || 'http://localhost:3000/uploads/') as string
-    const base = UPLOAD_BASE.replace(/\/$/, '')
-    const filePath = String(res.data.file_path || '').replace(/^\//,'')
-    const url = `${base}/${filePath}`
+    const url = getUploadFileUrl(res.data.file_path) || ''
     return { url, id: res.data.id, raw: res.data }
   }
   throw new Error('upload failed')

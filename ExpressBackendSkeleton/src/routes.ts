@@ -7,6 +7,7 @@ import materialRoutes from '@/modules/material/material.routes';
 // mall 模块已移除
 import productBrandRoutes from '@/modules/product/brand/product-brand.routes';
 import productCategoryRoutes from '@/modules/product/category/product-category.routes';
+import productSpuRoutes from '@/modules/product/spu/product-spu.routes';
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.use(`${API_VERSION}/materials`, materialRoutes);
 // 商品管理（品牌等）
 router.use(`${API_VERSION}/products`, productBrandRoutes);
 router.use(`${API_VERSION}/products`, productCategoryRoutes);
+router.use(`${API_VERSION}/products`, productSpuRoutes);
 
 
 export default router; 

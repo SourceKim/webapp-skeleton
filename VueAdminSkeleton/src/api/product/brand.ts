@@ -24,4 +24,9 @@ export function deleteBrand(id: string, option?: RequestOption): RestResponse<{ 
   return createAxios(option).delete(`${BASE_URL}/products/brands/admin/${id}`)
 }
 
+// 便于弹窗选择品牌：支持传入查询参数（如 { limit: 100 }）
+export function getBrandsAll(params?: Record<string, any>, option?: RequestOption): RestResponse<PaginatedResponse<ProductBrand>> {
+  return createAxios(option).get(`${BASE_URL}/products/brands`, { params })
+}
+
 

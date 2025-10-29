@@ -83,14 +83,15 @@ export class MaterialService {
             // 计算文件哈希值
             const fileHash = await calculateFileHash(file.path);
             
-            // 检查文件是否已经存在（通过哈希值）
+            // 检查文件是否已经存在（通过哈希值），若存在则直接返回该素材
             const existingMaterial = await this.materialRepository.findOne({ 
-                where: { file_hash: fileHash } 
+                where: { file_hash: fileHash },
+                relations: ['material_category', 'material_tags', 'user']
             });
             if (existingMaterial) {
-                // 删除刚上传的重复文件
+                // 删除刚上传的重复文件并直接返回已存在的素材
                 await deleteFileIfExists(file.path);
-                throw new HttpException(400, `文件已存在，文件名: ${existingMaterial.filename}`);
+                return existingMaterial;
             }
             
             // 开始数据库事务
