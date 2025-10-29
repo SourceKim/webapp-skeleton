@@ -11,6 +11,10 @@ import { MaterialTag } from '@/modules/material/mateial-tag/material-tag.model';
 import { ProductBrand } from '@/modules/product/brand/product-brand.model';
 import { ProductCategory } from '@/modules/product/category/product-category.model';
 import { ProductSpu } from '@/modules/product/spu/product-spu.model';
+import { ProductSku } from '@/modules/product/sku/product-sku.model';
+import { ProductAttributeKey } from '@/modules/product/attribute/product-attribute-key.model';
+import { ProductAttributeValue } from '@/modules/product/attribute/product-attribute-value.model';
+import { ProductSkuAttribute } from '@/modules/product/attribute/product-sku-attribute.model';
 
 export const AppDataSource = new DataSource({
     type: 'mysql',
@@ -33,7 +37,11 @@ export const AppDataSource = new DataSource({
         MaterialTag,
         ProductBrand,
         ProductCategory,
-        ProductSpu
+        ProductSpu,
+        ProductSku,
+        ProductAttributeKey,
+        ProductAttributeValue,
+        ProductSkuAttribute
     ],
     migrations: ['migrations/*.ts'],
     subscribers: [],

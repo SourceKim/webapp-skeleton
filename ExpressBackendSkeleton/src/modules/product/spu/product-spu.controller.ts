@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiResponse, FindByIdDto, PaginatedResponse } from '@/modules/common/common.dto';
 import { ProductSpuDTO, CreateProductSpuDto, UpdateProductSpuDto, UpdateProductSpuStatusDto } from './product-spu.dto';
 import { ProductSpuService } from './product-spu.service';
+import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class ProductSpuController {
     private service = new ProductSpuService();
@@ -14,6 +16,22 @@ export class ProductSpuController {
         try {
             const { items, total } = await this.service.findAll(req.pagination);
             return res.pagination(items, total);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    // 生成 SKU（简化版：直接依据提交的 items 创建）
+    public generateSkus = async (
+        req: Request,
+        res: Response<ApiResponse<{ count: number }>>,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const { id } = await req.validate(FindByIdDto, 'params');
+            const body = req.body as { items: Array<{ sku_code?: string; sku_name?: string; price?: string; stock?: number; status?: string; is_default?: boolean; attribute_value_ids?: string[] }> };
+            const count = await this.service.generateSkus(id, body.items || []);
+            res.status(200).json({ code: 0, message: '生成成功', data: { count } });
         } catch (error) {
             next(error);
         }

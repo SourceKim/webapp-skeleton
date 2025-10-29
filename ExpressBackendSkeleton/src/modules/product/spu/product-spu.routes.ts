@@ -19,6 +19,7 @@ router.use('/spu/admin', adminMiddleware);
 router.post('/spu/admin', controller.create);
 router.put('/spu/admin/:id', controller.update);
 router.delete('/spu/admin/:id', controller.remove);
+router.post('/spu/admin/:id/generate-skus', controller.generateSkus);
 
 export default router;
 

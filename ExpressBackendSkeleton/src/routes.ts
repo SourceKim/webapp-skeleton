@@ -8,6 +8,8 @@ import materialRoutes from '@/modules/material/material.routes';
 import productBrandRoutes from '@/modules/product/brand/product-brand.routes';
 import productCategoryRoutes from '@/modules/product/category/product-category.routes';
 import productSpuRoutes from '@/modules/product/spu/product-spu.routes';
+import productSkuRoutes from '@/modules/product/sku/product-sku.routes';
+import productAttributeRoutes from '@/modules/product/attribute/product-attribute.routes';
 
 const router = Router();
 
@@ -27,6 +29,8 @@ router.use(`${API_VERSION}/materials`, materialRoutes);
 router.use(`${API_VERSION}/products`, productBrandRoutes);
 router.use(`${API_VERSION}/products`, productCategoryRoutes);
 router.use(`${API_VERSION}/products`, productSpuRoutes);
+router.use(`${API_VERSION}/products`, productSkuRoutes);
+router.use(`${API_VERSION}/products`, productAttributeRoutes);
 
 
 export default router; 

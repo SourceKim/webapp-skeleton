@@ -24,6 +24,7 @@
 <script setup lang="ts">
 import MTable from '@/components/table/index.vue'
 import { reactive, ref, computed, defineAsyncComponent, h } from 'vue'
+import { useRouter } from 'vue-router'
 import type { CommonTableColumn } from '@/components/interface/table'
 import type { ProductSpu } from '@/api/product/spu.d'
 import { getSpuList, deleteSpu } from '@/api/product/spu'
@@ -37,6 +38,7 @@ const tableRef = ref()
 const formVisible = ref(false)
 const handleType = ref<string>()
 const row = ref<ProductSpu>()
+const router = useRouter()
 
 function openForm(type: string, r?: ProductSpu) {
   handleType.value = type
@@ -67,6 +69,7 @@ const columns = computed((): CommonTableColumn<ProductSpu>[] => [
     buttons: [
       { label: '编辑', icon: 'edit', onClick: (r: ProductSpu) => openForm('edit', r) },
       { label: '详情', icon: 'document', onClick: (r: ProductSpu) => openForm('detail', r) },
+      { label: 'SKU管理', icon: 'setting', onClick: (r: ProductSpu) => router.push({ path: `/${import.meta.env.VITE_LAYOUT_ROUTE_NAME}/mall-manager/sku-manager`, query: { spuId: r.id } }) },
       { label: '删除', icon: 'delete', type: 'danger', onClick: async (r: ProductSpu) => { await deleteSpu(r.id); tableRef.value?.fetchQuery?.() } }
     ]
   }
