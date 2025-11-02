@@ -137,8 +137,8 @@ watch(() => props.modelValue, (v) => {
   // 初始化图集预览
   const files = ((v.sub_materials || []) as any[]).map(m => ({ name: m.filename || m.original_name || m.id, url: getUploadFileUrl(m.file_path) || '', response: { id: m.id } }))
   gallery.value = files as any
-  categoryName.value = v.category_id || ''
-  brandName.value = v.brand_id || ''
+  categoryName.value = (v as any)?.category?.name || ''
+  brandName.value = (v as any)?.brand?.name || ''
 }, { immediate: true })
 
 async function onSubmit() {
