@@ -26,12 +26,13 @@
       <nut-button type="default" @tap.stop @click.stop="openSku('cart')">加入购物车</nut-button>
       <nut-button type="primary" @tap.stop @click.stop="openSku('buy')">立即购买</nut-button>
     </view>
-    <nut-sku
-      v-model:visible="skuVisible"
+    <SkuPanel
+      v-model:modelValue="skuVisible"
       :sku="skuTree"
       :sku-list="skuList"
       :goods="goodsData"
       :loading="skuLoading"
+      :btn-options="['buy','cart']"
       @close="skuVisible = false"
       @add-cart="onAddCart"
       @buy-click="onBuyNow"
@@ -42,6 +43,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef } from 'vue'
+import SkuPanel from '@/components/sku-panel.vue'
 import Taro, { useLoad } from '@tarojs/taro'
 import mallService, { type Spu, getUploadUrl } from '@/services/mall'
 
@@ -109,7 +111,7 @@ const openSku = async (action: 'cart' | 'buy') => {
     goodsData.value = {
       imagePath: images.value[0] || defaultImg,
       spuId: spu.value.id,
-      price,
+      price: Number(price) || 0,
       stockNum
     }
   } finally {
@@ -129,33 +131,62 @@ function buildNutSkuData(skus: any[]) {
   if (!skus || skus.length === 0) {
     return { tree: [], list: [], price: '0', stockNum: 0 }
   }
-  const keyMap = new Map<string, { k: string; k_id: string; k_s: string; v: Array<{ id: string; name: string }> }>()
+  const keyMap = new Map<string, { k: string; k_id: string; vMap: Map<string, string> }>()
   const keyOrder: string[] = []
-  skus.forEach((sku) => {
-    const attrs: Array<any> = sku.attributes || []
-    attrs.forEach((a: any) => {
-      if (!keyMap.has(a.key_id)) {
-        keyOrder.push(a.key_id)
-        keyMap.set(a.key_id, { k: a.key_name || a.key_id, k_id: a.key_id, k_s: `s${keyOrder.length}`, v: [] })
+  for (const sku of skus) {
+    const attrsVerbose: Array<any> = sku.sku_attributes || []
+    if (attrsVerbose.length > 0) {
+      for (const it of attrsVerbose) {
+        const keyId = it?.attribute_key?.id
+        if (!keyId) continue
+        const keyName = it?.attribute_key?.name || keyId
+        const valId = it?.attribute_value?.value_id || it?.attribute_value?.id
+        const valName = it?.attribute_value?.value || valId
+        if (!keyMap.has(keyId)) {
+          keyOrder.push(keyId)
+          keyMap.set(keyId, { k: keyName, k_id: keyId, vMap: new Map() })
+        }
+        const entry = keyMap.get(keyId)!
+        if (valId && !entry.vMap.has(valId)) entry.vMap.set(valId, valName)
       }
-      const entry = keyMap.get(a.key_id)!
-      if (!entry.v.find((x) => x.id === a.value_id)) {
-        entry.v.push({ id: a.value_id, name: a.value || a.value_id })
+    } else {
+      const attrs: Array<any> = sku.attributes || []
+      for (const a of attrs) {
+        if (!keyMap.has(a.key_id)) {
+          keyOrder.push(a.key_id)
+          keyMap.set(a.key_id, { k: a.key_name || a.key_id, k_id: a.key_id, vMap: new Map() })
+        }
+        const entry = keyMap.get(a.key_id)!
+        if (a.value_id && !entry.vMap.has(a.value_id)) entry.vMap.set(a.value_id, a.value || a.value_id)
       }
-    })
+    }
+  }
+  // 转为 NutUI sku 组结构
+  const tree = keyOrder.map((keyId) => {
+    const entry = keyMap.get(keyId)!
+    return { id: entry.k_id, name: entry.k, list: Array.from(entry.vMap.entries()).map(([id, name]) => ({ id, name, active: false, disable: false })) }
   })
-  const tree = Array.from(keyMap.values())
   const list = skus.map((sku) => {
-    const row: any = { id: sku.id, skuId: sku.id, price: Number(sku.price || '0'), stockNum: Number(sku.stock || 0) }
-    const attrs: Array<any> = sku.attributes || []
-    attrs.forEach((a: any) => {
-      const idx = keyOrder.indexOf(a.key_id)
-      if (idx >= 0) row[`s${idx + 1}`] = a.value_id
-    })
+    const row: any = { id: sku.id, price: Number(sku.price || 0), stock: Number(sku.stock || 0) }
+    const pairs: string[] = []
+    const attrsVerbose: Array<any> = sku.sku_attributes || []
+    if (attrsVerbose.length > 0) {
+      for (const it of attrsVerbose) {
+        const keyId = it?.attribute_key?.id
+        const valId = it?.attribute_value?.value_id || it?.attribute_value?.id
+        if (keyId && valId) pairs.push(`${keyId}:${valId}`)
+      }
+    } else {
+      const attrs: Array<any> = sku.attributes || []
+      for (const a of attrs) {
+        if (a?.key_id && a?.value_id) pairs.push(`${a.key_id}:${a.value_id}`)
+      }
+    }
+    row.skuId = pairs.join(';')
     return row
   })
   const price = String(list[0]?.price ?? '0')
-  const stockNum = list.reduce((sum: number, it: any) => sum + (Number(it.stockNum) || 0), 0)
+  const stockNum = list.reduce((sum: number, it: any) => sum + (Number(it.stock) || 0), 0)
   return { tree, list, price, stockNum }
 }
 </script>
