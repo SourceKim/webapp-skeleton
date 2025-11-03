@@ -18,6 +18,7 @@
 
     <nut-cell-group title="账户">
       <nut-cell title="我的订单" is-link @click="goMyOrders" />
+      <nut-cell title="地址管理" is-link @click="goAddresses" />
       <nut-cell title="编辑资料" is-link @click="goEditProfile" />
     </nut-cell-group>
 
@@ -59,6 +60,10 @@ const goMyOrders = () => {
 
 const goEditProfile = () => {
   Taro.navigateTo({ url: '/pages/profile/detail/index' })
+}
+
+const goAddresses = () => {
+  Taro.navigateTo({ url: '/pages/address/index' })
 }
 </script>
 

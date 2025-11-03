@@ -10,6 +10,7 @@ import productCategoryRoutes from '@/modules/product/category/product-category.r
 import productSpuRoutes from '@/modules/product/spu/product-spu.routes';
 import productSkuRoutes from '@/modules/product/sku/product-sku.routes';
 import productAttributeRoutes from '@/modules/product/attribute/product-attribute.routes';
+import userAddressRoutes from '@/modules/user/address/user-address.routes';
 
 const router = Router();
 
@@ -21,6 +22,7 @@ router.use(`${API_VERSION}/auth`, authRoutes);
 router.use(`${API_VERSION}/permissions`, permissionRoutes);
 router.use(`${API_VERSION}/roles`, roleRoutes);
 router.use(`${API_VERSION}/users`, userRoutes);
+router.use(`${API_VERSION}/addresses`, userAddressRoutes);
 
 // 素材管理路由
 router.use(`${API_VERSION}/materials`, materialRoutes);
