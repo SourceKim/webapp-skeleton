@@ -8,7 +8,7 @@
       <scroll-view class="list" scroll-y>
         <view v-if="!loading && items.length === 0" class="empty">暂无商品</view>
         <view v-for="it in items" :key="it.id" class="item">
-          <nut-checkbox v-model="it.selected" @change="onToggleSelected(it)" />
+          <nut-checkbox v-model="it.selected" :disabled="togglingIds.has(it.id)" @change="onToggleSelected(it)" />
           <image v-if="coverOf(it)" class="cover" :src="coverOf(it)" mode="aspectFill" />
           <view class="info">
             <view class="title">
@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, computed, ref } from 'vue'
+import { onMounted, watch, computed, ref, nextTick } from 'vue'
 import api from '@/services/api'
 import { getUploadUrl } from '@/services/mall'
 
@@ -49,6 +49,8 @@ const visible = computed({
 
 const loading = ref(false)
 const items = ref<any[]>([])
+const togglingIds = ref<Set<string>>(new Set())
+const suppressIds = ref<Set<string>>(new Set())
 
 const selectedCount = computed(() => items.value.filter(i => i.selected).reduce((n, i) => n + (Number(i.quantity)||0), 0))
 const totalPrice = computed(() => items.value.filter(i => i.selected).reduce((sum, i) => sum + Number(i.sku?.price || 0) * (Number(i.quantity)||0), 0))
@@ -78,10 +80,20 @@ async function onChangeQty(it: any, qty: number) {
 }
 
 async function onToggleSelected(it: any) {
-  const { code } = await api.put('/cart/selected', { selected: it.selected, cart_item_ids: [it.id] })
+  if (!it?.id) return
+  if (suppressIds.value.has(it.id)) return
+  if (togglingIds.value.has(it.id)) return
+  const target = !!it.selected
+  togglingIds.value.add(it.id)
+  const { code } = await api.put('/cart/selected', { selected: target, cart_item_ids: [it.id] })
   if (code !== 0) {
-    it.selected = !it.selected
+    // 失败回退，阻止回退触发的 change 再次调用
+    suppressIds.value.add(it.id)
+    it.selected = !target
+    await nextTick()
+    suppressIds.value.delete(it.id)
   }
+  togglingIds.value.delete(it.id)
 }
 
 async function remove(it: any) {

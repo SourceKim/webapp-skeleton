@@ -30,6 +30,25 @@ router.post('/', async (req: Request, res: Response) => {
     }
 });
 
+router.put('/selected', async (req: Request, res: Response) => {
+    try {
+        // 容错解析，避免前端类型/字段名差异导致 400
+        const raw = (req.body || {}) as any;
+        const ids: string[] = Array.isArray(raw.cart_item_ids) ? raw.cart_item_ids
+            : (Array.isArray(raw.ids) ? raw.ids : []);
+        const selRaw = raw.selected;
+        const selected = selRaw === true || selRaw === 'true' || selRaw === 1 || selRaw === '1';
+        if (!ids || ids.length === 0) { res.status(400).json({ code: 400, message: 'cart_item_ids 不能为空' }); return; }
+        const userId = req.user!.id;
+        await service.updateSelected(userId, selected, ids);
+        res.json({ code: 0, message: 'OK' });
+    } catch (e: any) {
+        const status = e?.status || 500;
+        res.status(status).json({ code: status, message: e?.message || '批量更新失败' });
+    }
+});
+
+// 注意顺序：放在 /selected 之后，避免 /selected 被当成 :id
 router.put('/:id', async (req: Request, res: Response) => {
     try {
         const dto = (await (req as any).validate(UpdateCartDto, 'body')) as UpdateCartDto;
@@ -52,18 +71,6 @@ router.delete('/:id', async (req: Request, res: Response) => {
         res.json({ code: 0, message: 'OK' });
     } catch (e: any) {
         res.status(500).json({ code: 500, message: '删除失败' });
-    }
-});
-
-router.put('/selected', async (req: Request, res: Response) => {
-    try {
-        const dto = (await (req as any).validate(UpdateSelectedDto, 'body')) as UpdateSelectedDto;
-        const userId = req.user!.id;
-        await service.updateSelected(userId, dto.selected, dto.cart_item_ids);
-        res.json({ code: 0, message: 'OK' });
-    } catch (e: any) {
-        const status = e?.status || 500;
-        res.status(status).json({ code: status, message: e?.message || '批量更新失败' });
     }
 });
 
