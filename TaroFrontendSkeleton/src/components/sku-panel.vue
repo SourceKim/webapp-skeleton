@@ -17,6 +17,7 @@
 
 <script setup lang="ts">
 import { computed, shallowRef, watch } from 'vue'
+import Taro from '@tarojs/taro'
 
 interface GoodsData { imagePath?: string; price?: number; stockNum?: number; [k: string]: any }
 
@@ -50,8 +51,51 @@ const onClose = () => {
   emit('close')
   emit('update:modelValue', false)
 }
-const onAddCart = (p: any) => emit('add-cart', p)
-const onBuyClick = (p: any) => emit('buy-click', p)
+function getSelections() {
+  const pairs: string[] = []
+  const map: Record<string, string> = {}
+  for (const group of localSku.value || []) {
+    const k = group?.id
+    const active = Array.isArray(group?.list) ? group.list.find((it: any) => it?.active) : null
+    if (!k || !active?.id) return { ok: false, pairs: [], map: {} }
+    pairs.push(`${k}:${active.id}`)
+    map[k] = String(active.id)
+  }
+  return { ok: true, pairs, map }
+}
+
+function resolveMatchedSku(pairs: string[]) {
+  if (!Array.isArray(pairs) || pairs.length === 0) return null
+  const key = pairs.join(';')
+  // skuList 中 row.skuId 在上游构建时按相同顺序拼接
+  const item = (props.skuList || []).find((row: any) => String(row?.skuId || '') === key)
+  return item || null
+}
+
+function forwardOperate(type: 'cart'|'buy', original: any) {
+  const sel = getSelections()
+  if (!sel.ok) {
+    Taro.showToast({ title: '请选择完整规格', icon: 'none' })
+    return
+  }
+  const matched = resolveMatchedSku(sel.pairs)
+  if (!matched) {
+    Taro.showToast({ title: '该规格不存在或已下架', icon: 'none' })
+    return
+  }
+  const payload = {
+    ...original,
+    sku: { id: matched.id, price: matched.price, stock: matched.stock },
+    skuPairs: sel.pairs,
+    selections: sel.map,
+    buyNum: Number(original?.buyNum || original?.num || 1)
+  }
+  if (type === 'cart') emit('add-cart', payload)
+  else emit('buy-click', payload)
+}
+
+const onAddCart = (p: any) => forwardOperate('cart', p)
+const onBuyClick = (p: any) => forwardOperate('buy', p)
 
 // 本地可选状态副本
 const localSku = shallowRef<any[]>([])
@@ -84,6 +128,16 @@ function onSelectSku(ss: any) {
 }
 
 function onClickBtnOperate(op: any) {
+  // 兼容不同版本的 NutUI Sku：有的版本只抛 click-btn-operate
+  const t = op?.operate || op?.type || op?.event || op
+  if (t === 'cart' || t === 'add-cart') {
+    forwardOperate('cart', op)
+    return
+  }
+  if (t === 'buy' || t === 'buy-click') {
+    forwardOperate('buy', op)
+    return
+  }
   emit('click-btn-operate', op)
 }
 </script>

@@ -16,6 +16,7 @@ import { ProductAttributeKey } from '@/modules/product/attribute/product-attribu
 import { ProductAttributeValue } from '@/modules/product/attribute/product-attribute-value.model';
 import { ProductSkuAttribute } from '@/modules/product/attribute/product-sku-attribute.model';
 import { UserAddress } from '@/modules/user/address/user-address.model';
+import { Cart } from '@/modules/mall/cart/cart.model';
 
 export const AppDataSource = new DataSource({
     type: 'mysql',
@@ -44,6 +45,7 @@ export const AppDataSource = new DataSource({
         ProductAttributeValue,
         ProductSkuAttribute
         ,UserAddress
+        ,Cart
     ],
     migrations: ['migrations/*.ts'],
     subscribers: [],

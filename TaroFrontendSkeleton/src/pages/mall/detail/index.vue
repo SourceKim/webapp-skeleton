@@ -1,6 +1,10 @@
 <template>
   <view class="detail-page">
-    <nut-navbar title="商品详情" left-show @on-click-back="goBack" safe-area-inset-top />
+    <nut-navbar title="商品详情" left-show @on-click-back="goBack" safe-area-inset-top >
+      <template #right>
+        <nut-icon name="cart" size="18" @click="showCart = true" />
+      </template>
+    </nut-navbar>
 
     <swiper class="gallery" circular indicator-dots v-if="images.length">
       <swiper-item v-for="(img, idx) in images" :key="idx" class="gallery-item">
@@ -37,6 +41,7 @@
       @add-cart="onAddCart"
       @buy-click="onBuyNow"
     />
+    <CartPopup v-model:modelValue="showCart" />
   </view>
   
 </template>
@@ -44,6 +49,8 @@
 <script setup lang="ts">
 import { ref, shallowRef } from 'vue'
 import SkuPanel from '@/components/sku-panel.vue'
+import CartPopup from '@/components/cart-popup.vue'
+import api from '@/services/api'
 import Taro, { useLoad } from '@tarojs/taro'
 import mallService, { type Spu, getUploadUrl } from '@/services/mall'
 
@@ -58,6 +65,8 @@ const skuAction = ref<'cart' | 'buy'>('cart')
 const skuTree = shallowRef<any[]>([])
 const skuList = shallowRef<any[]>([])
 const goodsData = shallowRef<any>({ price: '0', imagePath: '', stockNum: 0 })
+// 购物车弹层
+const showCart = ref(false)
 
 const loadDetail = async (id: string) => {
   const resp = await mallService.getSpuDetail(id)
@@ -119,7 +128,17 @@ const openSku = async (action: 'cart' | 'buy') => {
   }
 }
 
-function onAddCart() {
+async function onAddCart(payload?: any) {
+  console.log("onaddcart", payload)
+  const skuId = payload?.sku?.id || payload?.id || payload?.skuId
+  const quantity = Number(payload?.buyNum || payload?.num || 1)
+  if (!skuId) { Taro.showToast({ title: '请选择规格', icon: 'none' }); return }
+  const resp = await api.post('/cart', { sku_id: skuId, quantity })
+  if (resp.code === 0) {
+    Taro.showToast({ title: '已加入购物车', icon: 'success' })
+  } else {
+    Taro.showToast({ title: resp.message || '加入失败', icon: 'none' })
+  }
   skuVisible.value = false
 }
 

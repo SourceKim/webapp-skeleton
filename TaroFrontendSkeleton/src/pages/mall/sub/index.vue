@@ -1,6 +1,10 @@
 <template>
   <view class="sub-page">
-    <nut-navbar title="商城" left-show @on-click-back="goBack" safe-area-inset-top />
+    <nut-navbar title="商城" left-show @on-click-back="goBack" safe-area-inset-top>
+      <template #right>
+        <nut-icon name="cart" size="18" @click="showCart = true" />
+      </template>
+    </nut-navbar>
     <scroll-view class="main" scroll-y @scrolltolower="loadMore" :lower-threshold="100">
       <view v-if="brand" class="brand-intro">
         <image v-if="getBrandLogo(brand)" class="brand-logo" :src="getBrandLogo(brand)" mode="aspectFill" />
@@ -58,12 +62,15 @@
       @add-cart="onAddCart"
       @buy-click="onBuyNow"
     />
+    <CartPopup v-model:modelValue="showCart" />
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, shallowRef } from 'vue'
 import SkuPanel from '@/components/sku-panel.vue'
+import CartPopup from '@/components/cart-popup.vue'
+import api from '@/services/api'
 import Taro, { useRouter } from '@tarojs/taro'
 import mallService, { type Category, type Spu, type Brand, getUploadUrl } from '@/services/mall'
 
@@ -88,6 +95,8 @@ const currentSpu = ref<Spu | null>(null)
 const goodsData = shallowRef<any>({ price: '0', imagePath: '', stockNum: 0 })
 const skuTree = shallowRef<any[]>([])
 const skuList = shallowRef<any[]>([])
+// 购物车弹层
+const showCart = ref(false)
 
 const goBack = () => Taro.navigateBack()
 
@@ -230,8 +239,16 @@ function buildNutSkuData(skus: any[]) {
   return { tree, list, price, stockNum }
 }
 
-function onAddCart() {
-  // 仅关闭弹窗，后续可接入购物车接口
+async function onAddCart(payload?: any) {
+  const skuId = payload?.sku?.id || payload?.id || payload?.skuId
+  const quantity = Number(payload?.buyNum || payload?.num || 1)
+  if (!skuId) { Taro.showToast({ title: '请选择规格', icon: 'none' }); return }
+  const resp = await api.post('/cart', { sku_id: skuId, quantity })
+  if (resp.code === 0) {
+    Taro.showToast({ title: '已加入购物车', icon: 'success' })
+  } else {
+    Taro.showToast({ title: resp.message || '加入失败', icon: 'none' })
+  }
   skuVisible.value = false
 }
 

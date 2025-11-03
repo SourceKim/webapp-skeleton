@@ -103,7 +103,6 @@ const onChange = async (cal: { custom: string, value: { id: string, name: string
 }
  */
 const close = (val: any) => {
-  try { console.log('[AddressForm] close val =', val) } catch {}
   const data = val?.data || {}
   if (val?.type === 'custom' && data) {
     if (data.province?.name) form.province = data.province.name
@@ -142,7 +141,6 @@ onMounted(async () => {
 })
 
 const validate = (): string | null => {
-  try { console.log('[AddressForm] validate -> form:', { province: form.province, city: form.city, country: form.country }) } catch {}
   if (!form.name) return '请输入收货人'
   if (!form.phone) return '请输入手机号'
   if (!form.province || !form.city || !form.country) return '请输入省市区'
@@ -155,7 +153,6 @@ const submit = async () => {
   if (msg) { Taro.showToast({ title: msg, icon: 'none' }); return }
   const payload: any = { ...form }
   if (payload.tag === '') delete payload.tag
-  try { console.log('[AddressForm] submit payload =', payload) } catch {}
   const res = isEdit.value
     ? await addressService.update(id.value, payload)
     : await addressService.create(payload)

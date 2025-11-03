@@ -11,6 +11,8 @@ import productSpuRoutes from '@/modules/product/spu/product-spu.routes';
 import productSkuRoutes from '@/modules/product/sku/product-sku.routes';
 import productAttributeRoutes from '@/modules/product/attribute/product-attribute.routes';
 import userAddressRoutes from '@/modules/user/address/user-address.routes';
+import cartRoutes from '@/modules/mall/cart/cart.routes';
+import cartAdminRoutes from '@/modules/mall/cart/cart.admin.routes';
 
 const router = Router();
 
@@ -23,6 +25,8 @@ router.use(`${API_VERSION}/permissions`, permissionRoutes);
 router.use(`${API_VERSION}/roles`, roleRoutes);
 router.use(`${API_VERSION}/users`, userRoutes);
 router.use(`${API_VERSION}/addresses`, userAddressRoutes);
+router.use(`${API_VERSION}/cart`, cartRoutes);
+router.use(`${API_VERSION}`, cartAdminRoutes);
 
 // 素材管理路由
 router.use(`${API_VERSION}/materials`, materialRoutes);
