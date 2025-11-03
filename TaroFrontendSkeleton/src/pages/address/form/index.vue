@@ -15,7 +15,8 @@
           v-model:visible="showPopup"
           :province="address.provinces"
           :city="address.cities"
-          :country="address.districts"
+          :country="address.countries"
+          :town="address.towns"
           @change="onChange"
           @close="close"
           custom-address-title="请选择所在地区"
@@ -51,42 +52,32 @@
 import { onMounted, reactive, computed, ref } from 'vue'
 import Taro, { getCurrentInstance } from '@tarojs/taro'
 import addressService from '@/services/address'
+import { getCityList, getCountryList, getPronvinceList, getTownList } from '@/utils/region-loader'
 
 const form = reactive({
-  name: '', phone: '', province: '', city: '', district: '', detail: '', postal_code: '', is_default: false,
+  name: '', phone: '', province: '', city: '', country: '', town: '', detail: '', postal_code: '', is_default: false,
   tag: '' as '' | 'HOME' | 'COMPANY' | 'SCHOOL' | 'OTHER'
 })
 
 // 地区选择（NutUI Address）
 const showPopup = ref(false)
 const text = ref('选择地址')
-// 简化示例级联数据（province -> city -> country）
-const address = reactive({
-  provinces: [
-    { id: 'gx', name: '广西' },
-    { id: 'bj', name: '北京' },
-  ],
-  cities: [
-  { id: 'nn', name: '南宁' },
-  { id: 'gl', name: '桂林' },
-  ],
-  districts: [
-    { id: 'qx', name: '青秀区' },
-    { id: 'xs', name: '西乡塘区' },
-  ],
-})
-
+// 地区列表容器（运行时加载自 wecatch/china_regions）
+const address = reactive({ provinces: [] , cities: [{}] as any[], countries: [{}] as any[], towns: [{}] as any[] })
 const showAddress = () => { showPopup.value = true }
-const onChange = (cal: { custom: string, value: { id: string, name: string } , next: string}) => {
+const onChange = async (cal: { custom: string, value: { id: string, name: string } , next: string}) => {
   if (cal.custom === 'province') {
     form.province = cal.value.name
+    address.cities = getCityList(cal.value.id)
   } else if (cal.custom === 'city') {
     form.city = cal.value.name
+    address.countries = getCountryList(cal.value.id)
   } else if (cal.custom === 'country') {
-    form.district = cal.value.name
-    showPopup.value = false
+    form.country = cal.value.name
+    address.towns = getTownList(cal.value.id)
+  } else if (cal.custom === 'town') {
+    form.town = cal.value.name
   }
-  
 }
 
 /*
@@ -111,13 +102,17 @@ const onChange = (cal: { custom: string, value: { id: string, name: string } , n
     "type": "custom"
 }
  */
-const close = (val: {data: { addressIdStr: string , addressStr: string , province: { id: string, name: string } , city: { id: string, name: string } , country: { id: string, name: string } }, type: string}) => {
-  if (val.type === 'custom') {
-    form.province = val.data.province.name
-    form.city = val.data.city.name
-    form.district = val.data.country.name
+const close = (val: any) => {
+  try { console.log('[AddressForm] close val =', val) } catch {}
+  const data = val?.data || {}
+  if (val?.type === 'custom' && data) {
+    if (data.province?.name) form.province = data.province.name
+    if (data.city?.name) form.city = data.city.name
+    if (data.country?.name) form.country = data.country.name
+    if (data.town?.name) form.town = data.town.name
   }
-  text.value = val.data.addressStr
+  const pieces = [form.province, form.city, form.country, form.town].filter(Boolean)
+  text.value = data.addressStr || pieces.join(' ')
   showPopup.value = false
 }
 
@@ -128,15 +123,29 @@ const isEdit = computed(() => !!id.value)
 onMounted(async () => {
   if (isEdit.value) {
     const res = await addressService.detail(id.value)
-    if (res.code === 0 && res.data) Object.assign(form, res.data)
+    if (res.code === 0 && res.data) {
+      const d: any = res.data
+      form.name = d.name || ''
+      form.phone = d.phone || ''
+      form.province = d.province || ''
+      form.city = d.city || ''
+      form.country = d.country || ''
+      form.town = d.town || ''
+      form.detail = d.detail || ''
+      form.postal_code = d.postal_code || ''
+      form.is_default = Boolean(d.is_default)
+      form.tag = (d.tag || '') as any
+      text.value = d.province + d.city + d.country + d.town
+    }
   }
+  address.provinces = getPronvinceList()
 })
 
 const validate = (): string | null => {
-  try { console.log('[AddressForm] validate -> form:', { province: form.province, city: form.city, district: form.district }) } catch {}
+  try { console.log('[AddressForm] validate -> form:', { province: form.province, city: form.city, country: form.country }) } catch {}
   if (!form.name) return '请输入收货人'
   if (!form.phone) return '请输入手机号'
-  if (!form.province || !form.city || !form.district) return '请输入省市区'
+  if (!form.province || !form.city || !form.country) return '请输入省市区'
   if (!form.detail) return '请输入详细地址'
   return null
 }

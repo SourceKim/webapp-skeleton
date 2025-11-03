@@ -45,7 +45,13 @@ export class UserAddress extends BaseEntity {
     @Column({ type: 'varchar', length: 50 })
     @IsString()
     @MaxLength(50)
-    district!: string;
+    country!: string;
+
+    @Column({ type: 'varchar', length: 50, nullable: true })
+    @IsOptional()
+    @IsString()
+    @MaxLength(50)
+    town?: string;
 
     @Column({ type: 'varchar', length: 200 })
     @IsString()

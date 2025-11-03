@@ -7,7 +7,8 @@ export interface AddressItem {
   phone: string
   province: string
   city: string
-  district: string
+  country: string
+  town?: string
   detail: string
   postal_code?: string
   is_default: boolean

@@ -20,7 +20,10 @@ export class UserAddressDTO extends BaseDTO {
     city!: string;
 
     @Expose()
-    district!: string;
+    country!: string;
+
+    @Expose()
+    town?: string;
 
     @Expose()
     detail!: string;
@@ -57,7 +60,12 @@ export class CreateUserAddressDto {
 
     @IsString()
     @MaxLength(50)
-    district!: string;
+    country!: string;
+
+    @IsOptional()
+    @IsString()
+    @MaxLength(50)
+    town?: string;
 
     @IsString()
     @MaxLength(200)
@@ -101,7 +109,12 @@ export class UpdateUserAddressDto {
     @IsOptional()
     @IsString()
     @MaxLength(50)
-    district?: string;
+    country?: string;
+
+    @IsOptional()
+    @IsString()
+    @MaxLength(50)
+    town?: string;
 
     @IsOptional()
     @IsString()

@@ -11,19 +11,20 @@ const controller = new UserAddressController();
 // 用户端：需登录
 router.use(authMiddleware);
 
+// 管理端：需管理员（注意顺序，需在参数路由前注册）
+router.use('/admin', adminMiddleware);
+router.get('/admin', paginationQuery(), paginationResponse, controller.adminList);
+router.get('/admin/:id', controller.adminDetail);
+router.put('/admin/:id', controller.adminUpdate);
+router.delete('/admin/:id', controller.adminRemove);
+
+// 用户端路由（放在最后，避免 '/admin' 被当作 ':id'）
 router.get('/', controller.list);
 router.get('/:id', controller.detail);
 router.post('/', controller.create);
 router.put('/:id', controller.update);
 router.delete('/:id', controller.remove);
 router.put('/:id/default', controller.setDefault);
-
-// 管理端：需管理员
-router.use('/admin', adminMiddleware);
-router.get('/admin', paginationQuery(), paginationResponse, controller.adminList);
-router.get('/admin/:id', controller.adminDetail);
-router.put('/admin/:id', controller.adminUpdate);
-router.delete('/admin/:id', controller.adminRemove);
 
 export default router;
 

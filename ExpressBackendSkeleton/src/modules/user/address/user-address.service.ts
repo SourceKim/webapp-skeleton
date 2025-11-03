@@ -39,7 +39,8 @@ export class UserAddressService {
             phone: data.phone,
             province: data.province,
             city: data.city,
-            district: data.district,
+            country: data.country,
+            town: data.town,
             detail: data.detail,
             postal_code: data.postal_code,
             is_default: Boolean(data.is_default),
@@ -66,7 +67,8 @@ export class UserAddressService {
         entity.phone = data.phone ?? entity.phone;
         entity.province = data.province ?? entity.province;
         entity.city = data.city ?? entity.city;
-        entity.district = data.district ?? entity.district;
+        entity.country = data.country ?? entity.country;
+        entity.town = data.town ?? entity.town;
         entity.detail = data.detail ?? entity.detail;
         entity.postal_code = data.postal_code ?? entity.postal_code;
         entity.is_default = data.is_default ?? entity.is_default;
@@ -118,7 +120,8 @@ export class UserAddressService {
         entity.phone = data.phone ?? entity.phone;
         entity.province = data.province ?? entity.province;
         entity.city = data.city ?? entity.city;
-        entity.district = data.district ?? entity.district;
+        entity.country = data.country ?? entity.country;
+        entity.town = data.town ?? entity.town;
         entity.detail = data.detail ?? entity.detail;
         entity.postal_code = data.postal_code ?? entity.postal_code;
         entity.is_default = data.is_default ?? entity.is_default;

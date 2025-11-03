@@ -73,7 +73,7 @@ const setDefault = async (item: AddressItem) => {
 }
 
 const formatTitle = (it: AddressItem) => `${it.name} ${it.phone}`
-const formatSub = (it: AddressItem) => `${it.province}${it.city}${it.district}${it.detail}`
+const formatSub = (it: AddressItem) => `${it.province}${it.city}${it.country}${it.detail}`
 </script>
 
 <style lang="scss">
