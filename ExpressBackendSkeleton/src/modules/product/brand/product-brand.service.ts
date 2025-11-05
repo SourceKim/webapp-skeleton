@@ -15,15 +15,6 @@ export class ProductBrandService {
         this.brandRepository = AppDataSource.getRepository(ProductBrand);
     }
 
-    private buildLogoUrl(material?: { file_path?: string } | null): string | undefined {
-        const filePath = material?.file_path;
-        if (!filePath) return undefined;
-        const base = (ENV.API_URL || '').replace(/\/$/, '');
-        const mount = (ENV.UPLOADS_PATH || '/uploads');
-        const rel = filePath.startsWith('/') ? filePath : `/${filePath}`;
-        return `${base}${mount}${rel}`;
-    }
-
     async findAllBrands(query: PaginationQueryDto): Promise<{ items: ProductBrandDTO[]; total: number }> {
         const qb = this.brandRepository.createQueryBuilder('brand')
             .leftJoinAndSelect('brand.material', 'material');
@@ -41,7 +32,6 @@ export class ProductBrandService {
         const dtos = items.map(b => plainToInstance(ProductBrandDTO, {
             ...b,
             material_id: (b as any)?.material?.id,
-            logo_url: this.buildLogoUrl((b as any)?.material)
         }));
         return { items: dtos, total };
     }
@@ -52,7 +42,6 @@ export class ProductBrandService {
         return plainToInstance(ProductBrandDTO, { 
             ...brand, 
             material_id: (brand as any)?.material?.id,
-            logo_url: this.buildLogoUrl((brand as any)?.material)
         });
     }
 
@@ -78,7 +67,6 @@ export class ProductBrandService {
         return plainToInstance(ProductBrandDTO, { 
             ...reloaded!, 
             material_id: (reloaded as any)?.material?.id,
-            logo_url: this.buildLogoUrl((reloaded as any)?.material)
         });
     }
 
@@ -104,7 +92,6 @@ export class ProductBrandService {
         return plainToInstance(ProductBrandDTO, { 
             ...reloaded!, 
             material_id: (reloaded as any)?.material?.id,
-            logo_url: this.buildLogoUrl((reloaded as any)?.material)
         });
     }
 

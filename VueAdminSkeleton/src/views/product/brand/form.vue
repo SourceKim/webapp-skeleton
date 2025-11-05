@@ -73,8 +73,7 @@ watch(() => props.modelValue, (v) => {
   form.description = v.description || ''
   form.website = v.website || ''
   form.status = v.status
-  form.material_id = v.material_id || ''
-  logoUrl.value = v.logo_url
+  form.material_id = v.material_id
 }, { immediate: true })
 
 async function onSubmit() {

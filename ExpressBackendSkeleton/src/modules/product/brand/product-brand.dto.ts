@@ -14,9 +14,6 @@ export class ProductBrandDTO extends BaseDTO {
     material_id?: string;
 
     @Expose()
-    logo_url?: string;
-
-    @Expose()
     website?: string;
 
     @Expose()

@@ -6,7 +6,7 @@
       <nut-cell>
         <template #title>
           <view class="user-card">
-            <image class="user-avatar" :src="auth.user?.avatar || 'https://picsum.photos/100/100'" />
+            <image class="user-avatar" :src="getUploadUrl(auth.user?.avatar)" />
             <view class="user-info">
               <text class="user-nickname">{{ auth.user?.nickname || auth.user?.username }}</text>
               <text class="user-username">@{{ auth.user?.username }}</text>
@@ -32,6 +32,7 @@
 import { onMounted } from 'vue'
 import Taro from '@tarojs/taro'
 import { useAuthStore } from '../../stores/auth'
+import { getUploadUrl } from '../../services'
 
 const auth = useAuthStore()
 

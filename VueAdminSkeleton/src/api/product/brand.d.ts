@@ -5,7 +5,6 @@ export interface ProductBrand {
   material_id?: string
   website?: string
   status: 'ENABLED' | 'DISABLED'
-  logo_url?: string
   createdAt?: string | Date
   updatedAt?: string | Date
 }

@@ -73,10 +73,10 @@ const loadDetail = async (id: string) => {
   if (resp.code === 0 && resp.data) {
     spu.value = resp.data
     const list: string[] = []
-    const main = getUploadUrl(resp.data.main_material || undefined)
+    const main = getUploadUrl(resp.data.main_material?.file_path)
     if (main) list.push(main)
     const subs = (resp.data.sub_materials || [])
-      .map(m => getUploadUrl(m))
+      .map(m => getUploadUrl(m.file_path))
       .filter((u): u is string => !!u)
     images.value = list.concat(subs)
     if (resp.data.detail_content) {

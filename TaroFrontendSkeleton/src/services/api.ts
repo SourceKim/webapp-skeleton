@@ -1,7 +1,7 @@
 import Taro from '@tarojs/taro'
 
 // API基础URL
-export const BASE_URL = 'http://localhost:3000/api/v1'
+export const BASE_URL = process.env.TARO_APP_API_URL
 
 // 请求方法类型
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'

@@ -51,7 +51,7 @@ const fetchBrands = async () => {
   }
 }
 
-const getLogo = (item: Brand) => getUploadUrl(item.logo_url || item.material?.file_path)
+const getLogo = (item: Brand) => getUploadUrl(item.material?.file_path)
 
 const goSub = (item: Brand) => {
   Taro.navigateTo({ url: `/pages/mall/sub/index?brand_id=${item.id}` })

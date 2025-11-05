@@ -10,31 +10,46 @@
       <nut-empty description="暂无地址" />
     </view>
 
-    <nut-cell-group v-else>
-      <nut-cell v-for="item in list" :key="item.id" :title="formatTitle(item)" :sub-title="formatSub(item)">
-        <template #link>
-          <view class="ops">
-            <nut-button size="small" type="primary" @click.stop="edit(item.id)">编辑</nut-button>
-            <nut-button size="small" plain type="warning" @click.stop="setDefault(item)" v-if="!item.is_default">设为默认</nut-button>
-            <nut-button size="small" type="danger" @click.stop="remove(item.id)">删除</nut-button>
-          </view>
-        </template>
-        <template #desc>
-          <nut-tag v-if="item.is_default" type="success">默认</nut-tag>
-          <nut-tag v-if="item.tag" class="ml-6">{{ item.tag }}</nut-tag>
-        </template>
-      </nut-cell>
-    </nut-cell-group>
+    <nut-address-list
+      :data="listWithFullAddress"
+      @click-item="editClick"
+      @del-icon="delClick"
+      @edit-icon="editClick"
+      :show-bottom-button="false"
+      :data-options="dataOptions"
+    >
+  </nut-address-list>
+
+
   </view>
   
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import Taro from '@tarojs/taro'
 import addressService, { AddressItem } from '@/services/address'
 
-const list = ref<AddressItem[]>([])
+const list = ref<(AddressItem)[]>([])
+const listWithFullAddress = computed(() => list.value.map(item => ({
+  ...item,
+  fullAddress: [
+    item.province,
+    item.city,
+    item.country,
+    item.town,
+    item.detail
+  ].filter(Boolean).join('')
+})))
+
+// 组件内优先获取基础数据结构中定义的字段，若想自定义 key 值，可以通过 dataOptions 设置映射关系
+const dataOptions = reactive({
+  id: 'id',
+  addressName: 'name',
+  phone: "phone",
+  defaultAddress: 'is_default',
+  fullAddress: 'fullAddress',
+})
 
 const load = async () => {
   const res = await addressService.list()
@@ -53,11 +68,11 @@ const goCreate = () => {
   Taro.navigateTo({ url: '/pages/address/form/index' })
 }
 
-const edit = (id: string) => {
+const editClick = (id: string) => {
   Taro.navigateTo({ url: `/pages/address/form/index?id=${id}` })
 }
 
-const remove = async (id: string) => {
+const delClick = async (id: string) => {
   const confirm = await Taro.showModal({ title: '删除地址', content: '确认删除该地址？' })
   if (confirm.confirm) {
     const res = await addressService.remove(id)
@@ -72,8 +87,6 @@ const setDefault = async (item: AddressItem) => {
   if (res.code === 0) await load()
 }
 
-const formatTitle = (it: AddressItem) => `${it.name} ${it.phone}`
-const formatSub = (it: AddressItem) => `${it.province}${it.city}${it.country}${it.detail}`
 </script>
 
 <style lang="scss">

@@ -100,8 +100,8 @@ const showCart = ref(false)
 
 const goBack = () => Taro.navigateBack()
 
-const getCover = (s: Spu) => getUploadUrl(s.main_material || undefined)
-const getBrandLogo = (b: Brand | null) => b ? getUploadUrl(b.logo_url || b.material?.file_path) : undefined
+const getCover = (s: Spu) => getUploadUrl(s.main_material?.file_path)
+const getBrandLogo = (b: Brand | null) => b ? getUploadUrl(b.material?.file_path) : ''
 
 const fetchCategories = async () => {
   const { code, data } = await mallService.getCategories({ page: 1, limit: 50, parent_id: null, status: 'ENABLED' })

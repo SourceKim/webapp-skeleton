@@ -9,7 +9,7 @@ export interface Material {
   id: string
   filename?: string
   originalname?: string
-  path?: string
+  file_path?: string
   mimetype?: string
   size?: number
   type: MaterialType
@@ -24,7 +24,6 @@ export interface Material {
   tags?: string[]
   metadata?: any
   parent_id?: string
-  url?: string
   created_at: string
   updated_at: string
 }

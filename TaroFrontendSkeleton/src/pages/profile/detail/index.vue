@@ -58,7 +58,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import Taro from '@tarojs/taro'
 import { useAuthStore } from '../../../stores/auth'
-import { userService } from '../../../services'
+import { getUploadUrl, userService } from '../../../services'
 import materialService from '../../../services/material'
  
 
@@ -80,7 +80,6 @@ const onGenderChange = (e: any) => { genderIndex.value = Number(e.detail.value);
 
 const defaultAvatar = 'https://picsum.photos/100/100'
 const avatarPreview = ref('')
-const FILE_BASE = 'http://localhost:3000/uploads/'
 
 // 出生日期选择器
 const showBirthPicker = ref(false)
@@ -138,7 +137,7 @@ onMounted(async () => {
     form.gender = ((resp.data as any).gender || 'male') as any
     form.birthdate = ((resp.data as any).birthdate || '') as any
     genderIndex.value = Math.max(0, genderOptions.indexOf(form.gender))
-    avatarPreview.value = form.avatar ? (form.avatar.startsWith('http') ? form.avatar : (FILE_BASE + form.avatar)) : ''
+    avatarPreview.value = getUploadUrl(form.avatar)
   }
 })
 
@@ -172,7 +171,7 @@ const handleChangeAvatar = async () => {
     // 以相对路径存库，前端展示拼接 BASE
     const path = (uploaded as any).file_path || (uploaded as any).path || ''
     form.avatar = path
-    avatarPreview.value = path ? (path.startsWith('http') ? path : (FILE_BASE + path)) : ''
+    avatarPreview.value = getUploadUrl(path)
     Taro.showToast({ title: '头像已更新，记得保存', icon: 'none' })
   } catch (e) {
     Taro.showToast({ title: '上传失败', icon: 'none' })

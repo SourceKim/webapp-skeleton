@@ -141,7 +141,7 @@ function onAddressSelected(_: any, now: any) {
 }
 
 function coverOf(it: any): string | undefined {
-  return getUploadUrl(it?.spu?.main_material)
+  return getUploadUrl(it?.spu?.main_material.file_path)
 }
 </script>
 

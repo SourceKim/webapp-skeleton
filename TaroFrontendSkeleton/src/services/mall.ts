@@ -1,4 +1,5 @@
-import api, { BASE_URL } from './api'
+import api from './api'
+import { Material } from './material'
 
 export interface PaginatedMeta {
   total: number
@@ -14,7 +15,6 @@ export interface Brand {
   name: string
   description?: string
   material_id?: string
-  logo_url?: string
   website?: string
   status: 'ENABLED' | 'DISABLED'
   created_at?: string
@@ -45,9 +45,9 @@ export interface Spu {
   category_id?: string
   brand_id?: string
   status: SpuStatus
-  main_material?: string | null
-  sub_materials?: string[] | null
-  detail_content?: string | null
+  main_material?: Material
+  sub_materials?: Material[]
+  detail_content?: string
 }
 
 export type SkuStatus = 'ON_SHELF' | 'OFF_SHELF'
@@ -110,49 +110,9 @@ export interface SkuQueryParams {
   filters?: FilterParams
 }
 
-/**
- * 将后端返回的文件字段（可能为字符串/对象/数组）规范化为可访问的 URL。
- * 支持以下输入：
- * - 字符串：直接为路径或完整 URL
- * - 对象：包含 file_path 或 url 字段
- * - 数组：取第一个条目的字符串或对象(file_path/url)
- */
-export const getUploadUrl = (input?: unknown): string | undefined => {
-  let filePath: string | undefined
-
-  if (typeof input === 'string') {
-    filePath = input
-  } else if (Array.isArray(input)) {
-    const first = input[0]
-    if (typeof first === 'string') filePath = first
-    else if (first && typeof first === 'object') {
-      const obj: any = first
-      if (typeof obj.file_path === 'string') filePath = obj.file_path
-      else if (typeof obj.url === 'string') filePath = obj.url
-    }
-  } else if (input && typeof input === 'object') {
-    const obj: any = input
-    if (typeof obj.file_path === 'string') filePath = obj.file_path
-    else if (typeof obj.url === 'string') filePath = obj.url
-  }
-
-  if (!filePath) return undefined
-  if (typeof filePath === 'string' && filePath.startsWith('http')) return filePath
-  const viteEnvBase: string | undefined = (() => {
-    try { return (0, eval)('import.meta.env?.VITE_FILE_BASE_URL') } catch { return undefined }
-  })()
-  const envBase: string | undefined = viteEnvBase || (process.env as any)?.FILE_BASE_URL
-  // 兼容：优先使用环境变量 VITE_FILE_BASE_URL（建议形如 http://host:port/uploads/）
-  let base = envBase && typeof envBase === 'string' ? envBase : ''
-  if (!base) {
-    // 回退：从 BASE_URL 推导主机并拼上 uploads/
-    const host = BASE_URL.replace(/\/?api\/v1$/, '')
-    base = `${host}/uploads/`
-  }
-  // 规范化：移除多余斜杠并拼接
-  const normalizedBase = base.replace(/\/+$/, '/')
-  const normalizedPath = filePath.replace(/^\/+/, '')
-  return `${normalizedBase}${normalizedPath}`
+export const getUploadUrl = (filePath?: string): string => {
+  if (!filePath) return ''
+  return process.env.TARO_APP_UPLOAD_URL + filePath
 }
 
 /**

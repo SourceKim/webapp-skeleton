@@ -26,6 +26,5 @@ const addressService = {
 }
 
 export default addressService
-export type { AddressItem }
 
 

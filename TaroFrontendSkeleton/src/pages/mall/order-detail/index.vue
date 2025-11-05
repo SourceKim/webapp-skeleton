@@ -54,7 +54,7 @@ useLoad(async (options) => {
 })
 
 function coverOf(it: any): string | undefined {
-  return getUploadUrl(it?.sku_snapshot?.spu?.main_material)
+  return getUploadUrl(it?.sku_snapshot?.spu?.main_material.file_path)
 }
 </script>
 
