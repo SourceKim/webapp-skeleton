@@ -1,0 +1,166 @@
+<template>
+  <view class="order-confirm">
+    <nut-navbar title="确认订单" left-show @on-click-back="goBack" safe-area-inset-top />
+
+    <view class="section addr" @click="goChooseAddress">
+      <view v-if="address">
+        <view class="name">{{ address.name }} {{ address.phone }}</view>
+        <view class="detail">{{ address.province }}{{ address.city }}{{ address.country }}{{ address.town || '' }} {{ address.detail }}</view>
+      </view>
+      <view v-else class="placeholder">请选择收货地址</view>
+    </view>
+
+    <nut-address
+      v-model:visible="showPopupExist"
+      type="exist"
+      :exist-address="existAddress"
+      @close="onAddressClose"
+      :is-show-custom-address="false"
+      @selected="onAddressSelected"
+      exist-address-title="配送至"
+    />
+
+    <view class="section">
+      <view v-for="it in items" :key="it.cart_id" class="row">
+        <image v-if="coverOf(it)" class="cover" :src="coverOf(it)" mode="aspectFill" />
+        <view class="info">
+          <view class="title">{{ it.spu?.name }}</view>
+          <view class="sub" v-if="it.spu?.sub_title">{{ it.spu?.sub_title }}</view>
+        </view>
+        <view class="attrs" v-if="Array.isArray(it.sku?.attributes)">
+          <text v-for="a in it.sku.attributes" :key="(a.key_id||'')+':'+(a.value_id||'')" class="attr">{{ a.key_name || a.key_id }}：{{ a.value || a.value_id }}</text>
+        </view>
+        <view class="meta">
+          <text class="price">￥{{ Number(it.sku?.price || 0).toFixed(2) }}</text>
+          <text class="qty">x{{ it.quantity }}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section total">
+      <view>合计：<text class="amount">￥{{ payable.toFixed(2) }}</text></view>
+    </view>
+
+    <view class="section pay">
+      <view class="title">支付方式</view>
+      <nut-radio-group v-model="paymentMethod" direction="horizontal">
+        <nut-radio label="ALIPAY">支付宝</nut-radio>
+        <nut-radio label="WECHAT">微信支付</nut-radio>
+        <nut-radio label="CASH">货到付款</nut-radio>
+      </nut-radio-group>
+    </view>
+
+    <view class="footer">
+      <nut-button type="primary" block @click="submitOrder" :disabled="!address || submitting">提交订单</nut-button>
+    </view>
+  </view>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import Taro, { useRouter } from '@tarojs/taro'
+import api from '@/services/api'
+import { getUploadUrl } from '@/services/mall'
+
+const router = useRouter()
+const ids = ref<string[]>([])
+const items = ref<any[]>([])
+const payable = ref(0)
+const submitting = ref(false)
+const address = ref<any | null>(null)
+const addressesList = ref<any[]>([])
+const showPopupExist = ref(false)
+const existAddress = ref<any[]>([])
+const paymentMethod = ref<'ALIPAY' | 'WECHAT' | 'CASH'>('ALIPAY')
+
+function goBack() { Taro.navigateBack() }
+function goChooseAddress() { showPopupExist.value = true }
+
+async function loadPreview() {
+  const { code, data: respData, message } = await api.post('/orders/preview', { cart_item_ids: ids.value })
+  if (code === 0 && respData) {
+    items.value = (respData as any).items || []
+    payable.value = Number((respData as any).payable_amount || 0)
+  } else {
+    Taro.showToast({ title: message || '预览失败', icon: 'none' })
+  }
+}
+
+async function loadDefaultAddress() {
+  const { code, data: addrData } = await api.get('/addresses')
+  if (code === 0 && addrData && Array.isArray(addrData)) {
+    addressesList.value = addrData
+    address.value = addrData.find((a: any) => a.is_default) || addrData[0] || null
+    existAddress.value = addrData.map((a: any) => ({
+      id: a.id,
+      name: a.name,
+      phone: a.phone,
+      provinceName: a.province,
+      cityName: a.city,
+      countyName: a.country,
+      townName: a.town || '',
+      addressDetail: a.detail,
+      selectedAddress: !!a.is_default
+    }))
+  }
+}
+
+async function submitOrder() {
+  if (!address.value) { Taro.showToast({ title: '请选择地址', icon: 'none' }); return }
+  submitting.value = true
+  try {
+    const { code, message } = await api.post('/orders', { cart_item_ids: ids.value, address_id: address.value.id, payment_method: paymentMethod.value })
+    if (code === 0) {
+      Taro.showToast({ title: '下单成功', icon: 'success' })
+      setTimeout(() => Taro.redirectTo({ url: '/pages/mall/order-list/index' }), 600)
+    } else {
+      Taro.showToast({ title: message || '下单失败', icon: 'none' })
+    }
+  } finally { submitting.value = false }
+}
+
+onMounted(() => {
+  const p = (router?.params?.ids as string) || ''
+  ids.value = p ? p.split(',').filter(Boolean) : []
+  loadPreview()
+  loadDefaultAddress()
+})
+
+function onAddressClose(_: any) {
+  // 关闭时不做额外处理
+}
+
+function onAddressSelected(_: any, now: any) {
+  const id = now?.id
+  if (!id) { showPopupExist.value = false; return }
+  const found = addressesList.value.find((a: any) => a.id === id)
+  if (found) address.value = found
+  // 同步默认选中态
+  existAddress.value = existAddress.value.map((e: any) => ({ ...e, selectedAddress: e.id === id }))
+  showPopupExist.value = false
+}
+
+function coverOf(it: any): string | undefined {
+  return getUploadUrl(it?.spu?.main_material)
+}
+</script>
+
+<style lang="scss">
+.order-confirm { padding-bottom: 72px; }
+.section { background: #fff; padding: 12px; margin-top: 8px; }
+.addr .name { font-weight: 600; }
+.addr .detail { margin-top: 4px; color: #666; font-size: 12px; }
+.addr .placeholder { color: #999; }
+.row { padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+.row:last-child { border-bottom: none }
+.title { font-weight: 600; }
+.sub { color: #888; font-size: 12px; margin-top: 2px; }
+.attrs { margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; }
+.attr { background: #f6f6f6; padding: 2px 6px; border-radius: 3px; color: #666; font-size: 12px }
+.meta { display: flex; justify-content: space-between; margin-top: 6px; }
+.price { color: #fa2c19; font-weight: 600; }
+.total .amount { color: #fa2c19; font-weight: 700; }
+.footer { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; padding: 10px 12px env(safe-area-inset-bottom); box-shadow: 0 -2px 8px rgba(0,0,0,0.06); }
+</style>
+
+

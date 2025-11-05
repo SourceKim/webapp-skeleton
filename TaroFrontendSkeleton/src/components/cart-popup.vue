@@ -28,7 +28,7 @@
       </scroll-view>
       <view class="footer">
         <view class="total">已选 {{ selectedCount }} 件，合计 ￥{{ totalPrice.toFixed(2) }}</view>
-        <nut-button type="primary" size="small" :disabled="selectedCount===0">去结算</nut-button>
+        <nut-button type="primary" size="small" :disabled="selectedCount===0" @click="goConfirm">去结算</nut-button>
       </view>
     </view>
   </nut-popup>
@@ -38,6 +38,7 @@
 import { onMounted, watch, computed, ref, nextTick } from 'vue'
 import api from '@/services/api'
 import { getUploadUrl } from '@/services/mall'
+import Taro from '@tarojs/taro';
 
 const props = defineProps<{ modelValue: boolean }>()
 const emit = defineEmits<{ (e: 'update:modelValue', v: boolean): void }>()
@@ -69,6 +70,16 @@ async function fetchList() {
 
 function coverOf(it: any): string | undefined {
   return getUploadUrl(it?.spu?.main_material)
+}
+
+function goConfirm() {
+  const ids = items.value.filter(i => i.selected).map(i => i.id)
+  if (!ids.length) return
+  emit('update:modelValue', false)
+  setTimeout(() => {
+    // 以逗号串传递 cart_item_ids
+    Taro.navigateTo({ url: `/pages/mall/order-confirm/index?ids=${ids.join(',')}` })
+  }, 0)
 }
 
 async function onChangeQty(it: any, qty: number) {
