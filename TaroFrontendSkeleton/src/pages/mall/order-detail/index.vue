@@ -1,28 +1,94 @@
 <template>
   <view class="order-detail">
     <nut-navbar title="订单详情" left-show @on-click-back="goBack" safe-area-inset-top />
-    <view class="section">
-      <view class="row"><text>订单号</text><text class="val">{{ order?.id }}</text></view>
-      <view class="row"><text>状态</text><text class="val">{{ order?.order_status }}</text></view>
-      <view class="row"><text>金额</text><text class="val">￥{{ Number(order?.payable_amount||0).toFixed(2) }}</text></view>
-      <view class="row"><text>支付方式</text><text class="val">{{ order?.payment_method || '-' }}</text></view>
-      <view class="row"><text>收货人</text><text class="val">{{ order?.address_snapshot?.name }} {{ order?.address_snapshot?.phone }}</text></view>
-      <view class="row"><text>地址</text><text class="val">{{ fullAddr }}</text></view>
+    
+    <!-- 状态栏 -->
+    <view class="status-bar">
+      <view class="status-text">{{ order?.order_status }}</view>
+      <view class="status-desc">感谢您对我们的信任，期待再次光临</view>
     </view>
-    <view class="section">
-      <view class="title">商品列表</view>
-      <view class="item" v-for="it in items" :key="it.id">
-        <image v-if="coverOf(it)" class="cover" :src="coverOf(it)" mode="aspectFill" />
-        <view class="info">
-          <view class="name">{{ it?.sku_snapshot?.spu?.name || '商品' }}</view>
-          <view class="sub" v-if="it?.sku_snapshot?.spu?.sub_title">{{ it?.sku_snapshot?.spu?.sub_title }}</view>
+
+    <!-- 地址信息 -->
+    <view class="card address-card">
+      <view class="icon-box">
+        <nut-icon name="location" size="20" color="#333" />
+      </view>
+      <view class="address-info">
+        <view class="user-row">
+          <text class="name">{{ order?.address_snapshot?.name }}</text>
+          <text class="phone">{{ order?.address_snapshot?.phone }}</text>
         </view>
-        <view class="attrs" v-if="Array.isArray(it?.sku_snapshot?.attributes)">
-          <text v-for="a in it.sku_snapshot.attributes" :key="(a.key_id||'')+':'+(a.value_id||'')" class="attr">{{ a.key_name || a.key_id }}：{{ a.value || a.value_id }}</text>
-        </view>
-        <view class="meta"><text>￥{{ Number(it.unit_price||0).toFixed(2) }}</text><text>x{{ it.quantity }}</text></view>
+        <view class="address-text">{{ fullAddr }}</view>
       </view>
     </view>
+
+    <!-- 商品列表 -->
+    <view class="card goods-card">
+      <view class="card-title">商品信息</view>
+      <view class="goods-list">
+        <view class="goods-item" v-for="it in items" :key="it.id">
+          <image v-if="coverOf(it)" class="goods-img" :src="coverOf(it)" mode="aspectFill" />
+          <view class="goods-content">
+            <view class="goods-main">
+              <view class="goods-name">{{ it?.sku_snapshot?.spu?.name || '商品' }}</view>
+              <view class="goods-price">
+                <text class="symbol">￥</text>
+                <text class="num">{{ Number(it.unit_price||0).toFixed(2) }}</text>
+              </view>
+            </view>
+            
+            <view class="goods-sub">
+              <view class="goods-specs" v-if="getSpecs(it)">
+                <text>{{ getSpecs(it) }}</text>
+              </view>
+              <view class="goods-qty">x{{ it.quantity }}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <view class="price-summary">
+        <view class="summary-row">
+          <text>商品总价</text>
+          <text>￥{{ Number(order?.total_amount || 0).toFixed(2) }}</text>
+        </view>
+        <view class="summary-row">
+          <text>运费</text>
+          <text>+ ￥{{ Number(order?.shipping_amount || 0).toFixed(2) }}</text>
+        </view>
+        <view class="summary-row">
+          <text>优惠</text>
+          <text>- ￥{{ Number(order?.discount_amount || 0).toFixed(2) }}</text>
+        </view>
+        <view class="total-row">
+          <text>实付款</text>
+          <text class="total-price">￥{{ Number(order?.payable_amount || 0).toFixed(2) }}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 订单信息 -->
+    <view class="card info-card">
+      <view class="info-row">
+        <text class="label">订单编号</text>
+        <text class="value">{{ order?.id }}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">下单时间</text>
+        <text class="value">{{ order?.created_at }}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">支付方式</text>
+        <text class="value">{{ order?.payment_method || '-' }}</text>
+      </view>
+      <view class="info-row" v-if="order?.remark">
+        <text class="label">订单备注</text>
+        <text class="value">{{ order?.remark }}</text>
+      </view>
+    </view>
+
+    <!-- 底部占位 -->
+    <view class="footer-placeholder"></view>
   </view>
 </template>
 
@@ -34,12 +100,19 @@ import { getUploadUrl } from '@/services/mall'
 
 const order = ref<any | null>(null)
 const items = ref<any[]>([])
+
 const fullAddr = computed(() => {
   const a = order.value?.address_snapshot || {}
   return `${a.province || ''}${a.city || ''}${a.country || ''}${a.town || ''} ${a.detail || ''}`.trim()
 })
 
 function goBack(){ Taro.navigateBack() }
+
+function getSpecs(it: any) {
+  const attrs = it?.sku_snapshot?.attributes || []
+  if (!Array.isArray(attrs) || attrs.length === 0) return ''
+  return attrs.map((a: any) => a.value || a.value_id).join('; ')
+}
 
 useLoad(async (options) => {
   const id = String(options?.id || '')
@@ -54,24 +127,229 @@ useLoad(async (options) => {
 })
 
 function coverOf(it: any): string | undefined {
-  return getUploadUrl(it?.sku_snapshot?.spu?.main_material.file_path)
+  return getUploadUrl(it?.sku_snapshot?.spu?.main_material?.file_path)
 }
 </script>
 
 <style lang="scss">
-.section { background: #fff; padding: 12px; margin-top: 8px; }
-.row { display: flex; justify-content: space-between; padding: 6px 0 }
-.val { font-weight: 600 }
-.title { font-weight: 600; margin-bottom: 8px }
-.item { padding: 8px 0; border-bottom: 1px solid #f5f5f5; display: flex; gap: 10px; align-items: flex-start }
-.cover { width: 56px; height: 56px; border-radius: 6px; background: #f6f6f6 }
-.info { flex: 1; display: flex; flex-direction: column }
-.item:last-child { border-bottom: none }
-.name { font-weight: 600 }
-.sub { color: #888; font-size: 12px; margin-top: 2px }
-.attrs { margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap }
-.attr { background: #f6f6f6; padding: 2px 6px; border-radius: 3px; color: #666; font-size: 12px }
-.meta { display: flex; justify-content: space-between; margin-top: 6px }
+.order-detail {
+  min-height: 100vh;
+  background: #f7f7f7;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.status-bar {
+  background: linear-gradient(135deg, #fa2c19 0%, #fa6419 100%);
+  color: #fff;
+  padding: 20px 16px;
+  
+  .status-text {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  
+  .status-desc {
+    font-size: 12px;
+    opacity: 0.9;
+  }
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  margin: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.address-card {
+  display: flex;
+  align-items: flex-start;
+  margin-top: -20px; // 向上浮动
+  position: relative;
+  z-index: 1;
+  
+  .icon-box {
+    margin-top: 2px;
+    margin-right: 12px;
+  }
+  
+  .address-info {
+    flex: 1;
+  }
+  
+  .user-row {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 6px;
+    
+    .name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-right: 8px;
+    }
+    
+    .phone {
+      font-size: 14px;
+      color: #666;
+    }
+  }
+  
+  .address-text {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+  }
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.goods-list {
+  border-bottom: 1px solid #f5f5f5;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.goods-item {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  .goods-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 6px;
+    background: #f5f5f5;
+    flex-shrink: 0;
+  }
+  
+  .goods-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2px 0;
+  }
+  
+  .goods-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    
+    .goods-name {
+      flex: 1;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.4;
+      margin-right: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    
+    .goods-price {
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+      
+      .symbol { font-size: 12px; }
+    }
+  }
+  
+  .goods-sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+    
+    .goods-specs {
+      background: #f9f9f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #999;
+    }
+    
+    .goods-qty {
+      font-size: 12px;
+      color: #999;
+    }
+  }
+}
+
+.price-summary {
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 8px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  .total-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f5f5f5;
+    font-size: 14px;
+    color: #333;
+    
+    .total-price {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fa2c19;
+      margin-left: 6px;
+    }
+  }
+}
+
+.info-card {
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 12px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .label {
+      color: #666;
+    }
+    
+    .value {
+      color: #333;
+      flex: 1;
+      text-align: right;
+      margin-left: 20px;
+      word-break: break-all;
+    }
+  }
+}
+
+.footer-placeholder {
+  height: 20px;
+}
 </style>
 
 

@@ -54,6 +54,9 @@ export class MallOrder extends BaseEntity {
 
     @Column({ type: 'varchar', length: 500, nullable: true })
     remark?: string | null;
+
+    @OneToMany(() => MallOrderItem, item => item.order)
+    items!: MallOrderItem[];
 }
 
 @Entity('mall_order_items')
@@ -77,6 +80,10 @@ export class MallOrderItem extends BaseEntity {
     @Column({ type: 'decimal', precision: 10, scale: 2 })
     total_price!: string;
 }
+
+
+
+
 
 
 

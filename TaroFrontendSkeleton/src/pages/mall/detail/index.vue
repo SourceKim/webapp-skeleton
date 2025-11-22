@@ -27,8 +27,10 @@
     </view>
 
     <view class="footer">
-      <nut-button type="default" @tap.stop @click.stop="openSku('cart')">加入购物车</nut-button>
-      <nut-button type="primary" @tap.stop @click.stop="openSku('buy')">立即购买</nut-button>
+      <view class="action-btns">
+        <nut-button type="primary" plain size="large" @click="openSku('cart')">加入购物车</nut-button>
+        <nut-button type="primary" size="large" @click="openSku('buy')">立即购买</nut-button>
+      </view>
     </view>
     <SkuPanel
       v-model:modelValue="skuVisible"
@@ -142,8 +144,27 @@ async function onAddCart(payload?: any) {
   skuVisible.value = false
 }
 
-function onBuyNow() {
-  skuVisible.value = false
+async function onBuyNow(payload?: any) {
+  const skuId = payload?.sku?.id || payload?.id || payload?.skuId
+  const quantity = Number(payload?.buyNum || payload?.num || 1)
+  
+  if (!skuId) { 
+    Taro.showToast({ title: '请选择规格', icon: 'none' })
+    return 
+  }
+
+  const resp = await api.post('/cart', { sku_id: skuId, quantity })
+  if (resp.code === 0) {
+    skuVisible.value = false
+    const itemId = (resp.data as any)?.id
+    if (itemId) {
+      Taro.navigateTo({ url: `/pages/mall/order-confirm/index?ids=${itemId}` })
+    } else {
+      Taro.showToast({ title: '已加入购物车', icon: 'success' })
+    }
+  } else {
+    Taro.showToast({ title: resp.message || '操作失败', icon: 'none' })
+  }
 }
 
 function buildNutSkuData(skus: any[]) {
@@ -212,14 +233,43 @@ function buildNutSkuData(skus: any[]) {
 
 <style lang="scss">
 .detail-page {
-  padding-bottom: 24px;
-  .gallery { height: 300px; background: #000; }
+  padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  background: #f7f7f7;
+  min-height: 100vh;
+  .gallery { height: 100vw; background: #fff; }
   .gallery-item { display: flex; align-items: center; justify-content: center; }
   .gallery image, .gallery .placeholder-img { width: 100%; height: 100%; object-fit: contain; }
-  .section { background: #fff; padding: 12px; margin-top: 8px; }
-  .section-title { display: block; font-weight: 600; margin-bottom: 8px; }
-  .desc { color: #444; line-height: 1.6; }
-  .footer { position: fixed; left: 0; right: 0; bottom: env(safe-area-inset-bottom); z-index: 10; background: #fff; display: flex; gap: 12px; padding: 10px 12px env(safe-area-inset-bottom); box-shadow: 0 -2px 8px rgba(0,0,0,0.06); }
+  .section { background: #fff; padding: 12px; margin-top: 12px; }
+  .section-title { display: block; font-weight: 600; margin-bottom: 12px; font-size: 16px; color: #333; }
+  .desc { color: #666; line-height: 1.6; font-size: 14px; }
+  
+  .footer { 
+    position: fixed; 
+    left: 0; 
+    right: 0; 
+    bottom: 0;
+    z-index: 10; 
+    background: #fff; 
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    padding: 8px 12px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    
+    .action-btns {
+      flex: 1;
+      display: flex;
+      gap: 10px;
+      max-width: 600px;
+      width: 100%;
+      
+      .nut-button {
+        flex: 1;
+        margin: 0;
+      }
+    }
+  }
 }
 </style>
 

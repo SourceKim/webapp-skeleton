@@ -33,15 +33,13 @@
             :key="s.id"
             :title="s.name"
             :desc="s.sub_title || s.description"
+            :img-url="getCover(s)"
             @click="goDetail(s.id)"
           >
-            <template #prolist>
-              <image class="cover" :src="getCover(s) || defaultImg" mode="aspectFill" />
-            </template>
             <template #footer>
               <view class="card-actions">
-                <nut-button type="default" size="small" @tap.stop @click.stop="openSku(s, 'cart')">加入购物车</nut-button>
-                <nut-button type="primary" size="small" @tap.stop @click.stop="openSku(s, 'buy')">立即购买</nut-button>
+                <nut-button type="primary" plain size="small" @tap.stop @click.stop="openSku(s, 'cart')">加购</nut-button>
+                <nut-button type="primary" size="small" @tap.stop @click.stop="openSku(s, 'buy')">购买</nut-button>
               </view>
             </template>
           </nut-card>
@@ -252,9 +250,27 @@ async function onAddCart(payload?: any) {
   skuVisible.value = false
 }
 
-function onBuyNow() {
-  // 仅关闭弹窗，后续可跳转下单页
-  skuVisible.value = false
+async function onBuyNow(payload?: any) {
+  const skuId = payload?.sku?.id || payload?.id || payload?.skuId
+  const quantity = Number(payload?.buyNum || payload?.num || 1)
+  
+  if (!skuId) { 
+    Taro.showToast({ title: '请选择规格', icon: 'none' })
+    return 
+  }
+
+  const resp = await api.post('/cart', { sku_id: skuId, quantity })
+  if (resp.code === 0) {
+    skuVisible.value = false
+    const itemId = (resp.data as any)?.id
+    if (itemId) {
+      Taro.navigateTo({ url: `/pages/mall/order-confirm/index?ids=${itemId}` })
+    } else {
+      Taro.showToast({ title: '已加入购物车', icon: 'success' })
+    }
+  } else {
+    Taro.showToast({ title: resp.message || '操作失败', icon: 'none' })
+  }
 }
 
 const selectCat = (id: string) => {

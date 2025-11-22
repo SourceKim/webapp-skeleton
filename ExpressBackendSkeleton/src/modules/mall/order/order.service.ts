@@ -89,7 +89,11 @@ export class OrderService {
   }
 
   async list(userId: string) {
-    return this.orderRepo.find({ where: { user: { id: userId } as any }, order: { created_at: 'DESC' } as any })
+    return this.orderRepo.find({
+      where: { user: { id: userId } as any },
+      order: { created_at: 'DESC' } as any,
+      relations: ['items']
+    })
   }
 
   async detail(userId: string, id: string) {
