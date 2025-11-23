@@ -6,16 +6,20 @@
       </template>
     </nut-navbar>
     <scroll-view class="main" scroll-y @scrolltolower="loadMore" :lower-threshold="100">
-      <view v-if="brand" class="brand-intro">
-        <image v-if="getBrandLogo(brand)" class="brand-logo" :src="getBrandLogo(brand)" mode="aspectFill" />
-        <view class="brand-text">
-          <view class="brand-name">{{ brand.name }}</view>
-          <view v-if="brand.description" class="brand-desc">{{ brand.description }}</view>
+      <!-- 品牌介绍卡片 -->
+      <view v-if="brand" class="brand-card">
+        <view class="brand-header">
+          <image v-if="getBrandLogo(brand)" class="brand-logo" :src="getBrandLogo(brand)" mode="aspectFill" />
+          <view class="brand-info">
+            <view class="brand-name">{{ brand.name }}</view>
+            <view v-if="brand.description" class="brand-desc">{{ brand.description }}</view>
+          </view>
         </view>
       </view>
 
-      <view class="content">
-        <view class="left">
+      <view class="content-wrapper">
+        <!-- 左侧分类 -->
+        <scroll-view class="category-side" scroll-y>
           <view
             v-for="c in categories"
             :key="c.id"
@@ -23,29 +27,40 @@
             :class="{ active: c.id === activeCatId }"
             @tap="selectCat(c.id)"
           >
-            {{ c.name }}
+            <text class="cat-name">{{ c.name }}</text>
           </view>
-        </view>
+        </scroll-view>
 
-        <view class="right">
-          <nut-card
-            v-for="s in spus"
-            :key="s.id"
-            :title="s.name"
-            :desc="s.sub_title || s.description"
-            :img-url="getCover(s)"
-            @click="goDetail(s.id)"
-          >
-            <template #footer>
-              <view class="card-actions">
-                <nut-button type="primary" plain size="small" @tap.stop @click.stop="openSku(s, 'cart')">加购</nut-button>
-                <nut-button type="primary" size="small" @tap.stop @click.stop="openSku(s, 'buy')">购买</nut-button>
+        <!-- 右侧商品 -->
+        <view class="goods-side">
+          <view class="goods-list">
+            <view 
+              class="goods-card"
+              v-for="s in spus"
+              :key="s.id"
+              @tap="goDetail(s.id)"
+            >
+              <image class="goods-img" :src="getCover(s) || defaultImg" mode="aspectFill" />
+              <view class="goods-info">
+                <view class="goods-name">{{ s.name }}</view>
+                <view class="goods-sub" v-if="s.sub_title">{{ s.sub_title }}</view>
+                <view class="goods-actions">
+                  <nut-button type="primary" plain size="mini" @tap.stop="openSku(s, 'cart')">加购</nut-button>
+                  <nut-button type="primary" size="mini" @tap.stop="openSku(s, 'buy')">购买</nut-button>
+                </view>
               </view>
-            </template>
-          </nut-card>
-          <nut-empty v-if="!loading && spus.length === 0" description="暂无商品" />
-          <view class="loading" v-else-if="loading">加载中...</view>
-          <view class="no-more" v-else-if="!hasMore">没有更多了</view>
+            </view>
+          </view>
+          
+          <view class="state-tip" v-if="!loading && spus.length === 0">
+            <nut-empty description="暂无商品" />
+          </view>
+          <view class="state-tip" v-else-if="loading">
+            <text>加载中...</text>
+          </view>
+          <view class="state-tip" v-else-if="!hasMore">
+            <text>没有更多了</text>
+          </view>
         </view>
       </view>
     </scroll-view>
@@ -292,30 +307,171 @@ onMounted(async () => {
 
 <style lang="scss">
 .sub-page {
-  .main { height: calc(100vh - 100px - env(safe-area-inset-bottom)); padding: 12px; box-sizing: border-box; }
-  .content { display: flex; }
-  .left {
-    width: 100px;
-    background: #fafafa;
+  min-height: 100vh;
+  background: #f7f7f7;
+
+  .main {
+    height: calc(100vh - env(safe-area-inset-bottom));
   }
-  .cat-item {
-    padding: 12px;
-    border-left: 3px solid transparent;
-  }
-  .cat-item.active {
+
+  .brand-card {
     background: #fff;
-    border-left-color: #fa2c19;
-    font-weight: 600;
+    margin: 12px 12px 0;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    
+    .brand-header {
+      display: flex;
+      align-items: center;
+      
+      .brand-logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        background: #f5f5f5;
+        flex-shrink: 0;
+        border: 1px solid rgba(0,0,0,0.05);
+      }
+      
+      .brand-info {
+        margin-left: 12px;
+        flex: 1;
+        
+        .brand-name {
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 4px;
+        }
+        
+        .brand-desc {
+          font-size: 12px;
+          color: #666;
+          line-height: 1.4;
+        }
+      }
+    }
   }
-  .right { flex: 1; padding-left: 12px; }
-  .card-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 8px; }
-  .brand-intro { display: flex; align-items: center; padding: 12px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 12px; }
-  .brand-logo { width: 56px; height: 56px; border-radius: 8px; background: #f5f5f5; }
-  .brand-text { margin-left: 12px; }
-  .brand-name { font-weight: 600; }
-  .brand-desc { margin-top: 4px; color: #666; font-size: 12px; line-height: 1.5; }
-  .cover { width: 100%; height: 120px; border-radius: 8px; background: #f5f5f5; }
-  .loading, .no-more { text-align: center; color: #999; padding: 12px 0; }
+
+  .content-wrapper {
+    display: flex;
+    margin-top: 12px;
+    height: calc(100vh - 180px); // 减去顶部导航和品牌卡片的大致高度
+    
+    .category-side {
+      width: 90px;
+      background: #f7f7f7;
+      
+      .cat-item {
+        padding: 14px 10px;
+        text-align: center;
+        position: relative;
+        
+        .cat-name {
+          font-size: 13px;
+          color: #666;
+        }
+        
+        &.active {
+          background: #fff;
+          border-radius: 8px 0 0 8px;
+          
+          .cat-name {
+            color: #fa2c19;
+            font-weight: 600;
+          }
+          
+          &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 16px;
+            background: #fa2c19;
+            border-radius: 0 2px 2px 0;
+          }
+        }
+      }
+    }
+
+    .goods-side {
+      flex: 1;
+      background: #fff;
+      padding: 12px;
+      border-radius: 8px 0 0 0;
+      
+      .goods-list {
+        .goods-card {
+          display: flex;
+          margin-bottom: 16px;
+          
+          &:last-child {
+            margin-bottom: 0;
+          }
+          
+          .goods-img {
+            width: 88px;
+            height: 88px;
+            border-radius: 6px;
+            background: #f9f9f9;
+            flex-shrink: 0;
+          }
+          
+          .goods-info {
+            flex: 1;
+            margin-left: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2px 0;
+            
+            .goods-name {
+              font-size: 14px;
+              font-weight: 600;
+              color: #333;
+              line-height: 1.4;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              line-clamp: 2;
+              -webkit-box-orient: vertical;
+            }
+            
+            .goods-sub {
+              font-size: 11px;
+              color: #999;
+              margin-top: 4px;
+            }
+            
+            .goods-actions {
+              display: flex;
+              justify-content: flex-end;
+              gap: 8px;
+              margin-top: 8px;
+              
+              .nut-button {
+                margin: 0;
+                padding: 0 12px;
+                height: 24px;
+                line-height: 22px;
+              }
+            }
+          }
+        }
+      }
+      
+      .state-tip {
+        padding: 20px 0;
+        text-align: center;
+        color: #999;
+        font-size: 12px;
+      }
+    }
+  }
 }
 </style>
 

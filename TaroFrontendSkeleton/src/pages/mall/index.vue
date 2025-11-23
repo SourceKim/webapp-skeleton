@@ -10,8 +10,10 @@
           @tap="goSub(item)"
         >
           <image v-if="getLogo(item)" class="logo" :src="getLogo(item)" mode="widthFix" />
-          <view class="name">{{ item.name }}</view>
-          <view class="desc" v-if="item.description">{{ item.description }}</view>
+          <view class="info">
+            <view class="name">{{ item.name }}</view>
+            <view class="desc" v-if="item.description">{{ item.description }}</view>
+          </view>
         </view>
       </view>
       <view class="col">
@@ -22,8 +24,10 @@
           @tap="goSub(item)"
         >
           <image v-if="getLogo(item)" class="logo" :src="getLogo(item)" mode="widthFix" />
-          <view class="name">{{ item.name }}</view>
-          <view class="desc" v-if="item.description">{{ item.description }}</view>
+          <view class="info">
+            <view class="name">{{ item.name }}</view>
+            <view class="desc" v-if="item.description">{{ item.description }}</view>
+          </view>
         </view>
       </view>
       <nut-empty class="full-span" v-if="!loading && brands.length === 0" description="暂无品牌" />
@@ -74,13 +78,16 @@ onMounted(fetchBrands)
   .card {
     background: #fff;
     border-radius: 8px;
-    padding: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     margin-bottom: 12px;
+    overflow: hidden;
   }
-  .logo { width: 100%; border-radius: 6px; background: #f5f5f5; display: block; }
-  .name { margin-top: 8px; font-weight: 600; }
-  .desc { margin-top: 4px; color: #999; font-size: 12px; line-height: 1.4; }
+  .logo { width: 100%; height: auto; display: block; background: #f5f5f5; }
+  .info { padding: 8px 10px 12px; }
+  .name { font-weight: 600; font-size: 14px; color: #333; }
+  .desc { margin-top: 4px; color: #999; font-size: 12px; line-height: 1.4; 
+    overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  }
   .loading { text-align: center; color: #999; padding: 12px 0; }
   .full-span { flex-basis: 100%; width: 100%; }
 }
