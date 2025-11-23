@@ -6,9 +6,17 @@ const request = createAxios({})
 export interface CartItemDTO {
   id: string
   user_id?: string
+  user?: { id: string; username: string; email?: string; phone?: string; avatar?: string }
   quantity: number
   selected: boolean
-  sku?: { id: string; sku_code?: string; sku_name?: string; price?: number }
+  sku?: { 
+    id: string
+    sku_code?: string
+    sku_name?: string
+    price?: number
+    spu?: { name: string; main_material?: { file_path: string } }
+    sku_attributes?: Array<{ attribute_key: { name: string }; attribute_value: { value: string } }>
+  }
   created_at?: string
 }
 

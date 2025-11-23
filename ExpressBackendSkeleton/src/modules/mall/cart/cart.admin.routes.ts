@@ -17,8 +17,13 @@ router.get('/admin/carts', paginationQuery(), paginationResponse, async (req, re
 
   const qb = repo.createQueryBuilder('c')
     .leftJoinAndSelect('c.sku', 'sku')
+    .leftJoinAndSelect('sku.spu', 'spu')
+    .leftJoinAndSelect('spu.main_material', 'mm')
+    .leftJoinAndSelect('sku.sku_attributes', 'attr')
+    .leftJoinAndSelect('attr.attribute_key', 'attr_key')
+    .leftJoinAndSelect('attr.attribute_value', 'attr_val')
     .leftJoin('c.user', 'u')
-    .addSelect(['u.id', 'u.username', 'u.email'])
+    .addSelect(['u.id', 'u.username', 'u.email', 'u.phone', 'u.avatar'])
     .where('c.deleted_at IS NULL');
 
   if (filters?.user_id) qb.andWhere('u.id = :uid', { uid: String(filters.user_id) });

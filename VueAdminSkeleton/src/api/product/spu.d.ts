@@ -6,9 +6,12 @@ export interface ProductSpu {
   sub_title?: string
   description?: string
   category_id?: string
+  category?: { name: string }
   brand_id?: string
+  brand?: { name: string }
   status: 'DRAFT' | 'ON_SHELF' | 'OFF_SHELF'
   main_material_id?: string
+  main_material?: Material
   sub_materials?: Material[]
   detail_content?: string
   createdAt?: string | Date

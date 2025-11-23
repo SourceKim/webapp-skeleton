@@ -10,10 +10,32 @@
         <div class="card-header">SPU 基本信息</div>
       </template>
       <div class="group-body">
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="SPU ID">{{ spuId }}</el-descriptions-item>
-          <el-descriptions-item label="标题">{{ spu?.name || '-' }}</el-descriptions-item>
-        </el-descriptions>
+        <div style="display: flex; gap: 20px;">
+          <div style="width: 100px; height: 100px; border: 1px solid #eee; border-radius: 6px; overflow: hidden; flex-shrink: 0;">
+             <el-image 
+                v-if="spu?.main_material?.file_path"
+                :src="getUploadFileUrl(spu.main_material.file_path)"
+                style="width: 100%; height: 100%;"
+                fit="cover"
+                :preview-src-list="[getUploadFileUrl(spu.main_material.file_path)]"
+                preview-teleported
+             />
+             <div v-else style="width:100%;height:100%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;color:#999;font-size:12px;">暂无图片</div>
+          </div>
+          <div style="flex: 1;">
+            <el-descriptions :column="3" border>
+              <el-descriptions-item label="标题">{{ spu?.name || '-' }}</el-descriptions-item>
+              <el-descriptions-item label="副标题">{{ spu?.sub_title || '-' }}</el-descriptions-item>
+              <el-descriptions-item label="状态">
+                 <el-tag :type="spu?.status === 'ON_SHELF' ? 'success' : 'info'">{{ spu?.status }}</el-tag>
+              </el-descriptions-item>
+              <el-descriptions-item label="分类">{{ spu?.category?.name || '-' }}</el-descriptions-item>
+              <el-descriptions-item label="品牌">{{ spu?.brand?.name || '-' }}</el-descriptions-item>
+              <el-descriptions-item label="ID">{{ spuId }}</el-descriptions-item>
+              <el-descriptions-item label="描述" :span="3">{{ spu?.description || '-' }}</el-descriptions-item>
+            </el-descriptions>
+          </div>
+        </div>
       </div>
     </el-card>
 
@@ -190,6 +212,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { getUploadFileUrl } from '@/utils/file'
 import type { ProductSpu } from '@/api/product/spu.d'
 import { getSpuById } from '@/api/product/spu'
 import type { ProductSku, UpdateProductSkuDto } from '@/api/product/sku.d'

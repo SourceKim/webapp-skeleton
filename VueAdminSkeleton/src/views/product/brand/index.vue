@@ -31,8 +31,9 @@ import { useI18n } from 'vue-i18n'
 import type { CommonTableColumn } from '@/components/interface/table'
 import type { ProductBrand } from '@/api/product/brand.d'
 import { getBrands, deleteBrand } from '@/api/product/brand'
-const BrandForm = defineAsyncComponent(() => import('./form.vue'))
+import { getUploadFileUrl } from '@/utils/file'
 
+const BrandForm = defineAsyncComponent(() => import('./form.vue'))
 const data = ref<ProductBrand[]>([])
 const tableRef = ref()
 const filterParam = reactive({})
@@ -62,13 +63,21 @@ async function del(rows: ProductBrand[]) {
 
 const columns = computed((): CommonTableColumn<ProductBrand>[] => [
   { prop: 'id', label: 'ID', width: 160 },
-  { label: 'Logo', width: 100, align: 'center', slots: { default: ({ row }: any) => h(ElImage, { src: row.logo_url, style: 'width:40px;height:40px; object-fit:cover', fit: 'cover', previewSrcList: row.logo_url ? [row.logo_url] : [] }) } },
+  {
+    label: 'Logo', width: 100, align: 'center', slots: {
+      default: ({ row }: any) => {
+        const url = row.material?.file_path ? getUploadFileUrl(row.material.file_path) : ''
+        if (!url) return '-'
+        return h(ElImage, { src: url, style: 'width:40px;height:40px; object-fit:cover', fit: 'cover', previewSrcList: [url], previewTeleported: true })
+      }
+    }
+  },
   { prop: 'name', label: '名称', width: 200 },
   { prop: 'description', label: '描述', width: 240 },
   { prop: 'website', label: '官网', width: 200, formatter: (row) => row.website || '-' },
   { prop: 'status', label: '状态', width: 100 },
-  { prop: 'createdAt', label: '创建时间', width: 160 },
-  { prop: 'updatedAt', label: '更新时间', width: 160 },
+  { prop: 'created_at', label: '创建时间', width: 160 },
+  { prop: 'updated_at', label: '更新时间', width: 160 },
   {
     type: 'operation',
     fixed: 'right',

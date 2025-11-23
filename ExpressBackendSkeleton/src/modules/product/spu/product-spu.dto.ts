@@ -4,6 +4,9 @@ import { BaseDTO } from '@/modules/common/common.dto';
 import { ProductSpuStatus } from './product-spu.model';
 import { MaterialDTO } from '@/modules/material/material.dto';
 
+import { ProductCategoryDTO } from '../category/product-category.dto';
+import { ProductBrandDTO } from '../brand/product-brand.dto';
+
 export class ProductSpuDTO extends BaseDTO {
     @Expose()
     name: string = '';
@@ -18,13 +21,22 @@ export class ProductSpuDTO extends BaseDTO {
     category_id?: string;
 
     @Expose()
+    category?: ProductCategoryDTO;
+
+    @Expose()
     brand_id?: string;
+
+    @Expose()
+    brand?: ProductBrandDTO;
 
     @Expose()
     status: ProductSpuStatus = ProductSpuStatus.DRAFT;
 
     @Expose()
     main_material_id?: string;
+
+    @Expose()
+    main_material?: MaterialDTO;
 
     @Expose()
     sub_materials?: MaterialDTO[];

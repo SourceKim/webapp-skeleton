@@ -74,6 +74,11 @@ watch(() => props.modelValue, (v) => {
   form.website = v.website || ''
   form.status = v.status
   form.material_id = v.material_id
+  if (v.material_id && (v as any).material?.file_path) {
+    logoUrl.value = getUploadFileUrl((v as any).material.file_path)
+  } else {
+    logoUrl.value = undefined
+  }
 }, { immediate: true })
 
 async function onSubmit() {
