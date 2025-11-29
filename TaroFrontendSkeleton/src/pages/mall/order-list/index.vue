@@ -25,8 +25,13 @@
 
         <view class="footer">
           <text class="time">{{ o.created_at }}</text>
-          <view class="total">
-            共 {{ getCount(o) }} 件，合计：<text class="price">￥{{ Number(o.payable_amount||0).toFixed(2) }}</text>
+          <view class="right-side">
+            <view class="total">
+              共 {{ getCount(o) }} 件，合计：<text class="price">￥{{ Number(o.payable_amount||0).toFixed(2) }}</text>
+            </view>
+            <view class="btns" v-if="o.order_status === 'SHIPPED'">
+               <nut-button type="primary" size="mini" @click.stop="onReceive(o)">确认收货</nut-button>
+            </view>
           </view>
         </view>
       </view>
@@ -92,6 +97,23 @@ async function load(){
   } finally { loading.value = false }
 }
 
+async function onReceive(o: any) {
+  const res = await Taro.showModal({ title: '提示', content: '确认已收到货物？' })
+  if (res.confirm) {
+    try {
+      const { code, message } = await api.put(`/orders/${o.id}/receive`)
+      if (code === 0) {
+        Taro.showToast({ title: '已确认收货', icon: 'success' })
+        load()
+      } else {
+        Taro.showToast({ title: message || '操作失败', icon: 'none' })
+      }
+    } catch (e) {
+      Taro.showToast({ title: '操作异常', icon: 'none' })
+    }
+  }
+}
+
 onMounted(load)
 </script>
 
@@ -112,8 +134,10 @@ onMounted(load)
 
 .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f5f5f5; }
 .time { color: #999; font-size: 12px; }
+.right-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
 .total { font-size: 12px; color: #333; display: flex; align-items: baseline; }
 .price { color: #333; font-size: 16px; font-weight: 600; margin-left: 4px; }
+.btns { display: flex; gap: 8px; }
 
 .empty { text-align: center; color: #999; padding: 24px 0 }
 </style>

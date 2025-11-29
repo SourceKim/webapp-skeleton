@@ -88,6 +88,7 @@
         <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
           <span>SKU 列表</span>
           <el-button type="primary" size="small" @click="openGenerate">生成 SKU</el-button>
+          <el-button size="small" @click="generateDefaultSku" :loading="genDefaultLoading">生成默认 SKU</el-button>
         </div>
       </template>
       <div class="group-body">
@@ -149,7 +150,10 @@
             <template #header>选择属性</template>
             <div v-for="k in attrKeys" :key="k.id" style="margin-bottom:10px;">
               <div style="font-weight:600;margin-bottom:6px;">{{ k.name }}</div>
-              <el-checkbox-group v-model="selected[k.id]">
+              <div v-if="!k.values || k.values.length === 0" style="color:#999;font-size:12px;">
+                (暂无属性值，请先在下方“SKU 属性管理”中添加)
+              </div>
+              <el-checkbox-group v-else v-model="selected[k.id]">
                 <el-checkbox v-for="v in (k.values||[])" :key="v.id" :value="v.id">
                   {{ v.value }}
                 </el-checkbox>
@@ -286,6 +290,38 @@ async function doGenerate() {
   genVisible.value = false
   genForm.value = { price: '0', stock: 0 }
   await fetchSku()
+}
+
+import { ElMessage, ElMessageBox } from 'element-plus'
+
+// ...
+
+const genDefaultLoading = ref(false)
+
+async function generateDefaultSku() {
+  if (!spuId) return
+  try {
+    await ElMessageBox.confirm('生成默认 SKU 将清空当前所有 SKU，是否继续？', '提示', { type: 'warning' })
+    genDefaultLoading.value = true
+    const res = await generateSkus(spuId, [{
+      sku_code: 'default',
+      sku_name: '默认规格',
+      price: '0',
+      stock: 100,
+      attribute_value_ids: [],
+      is_default: true
+    }])
+    if ((res as any).code === 0) {
+      ElMessage.success('生成成功')
+      await fetchSku()
+    } else {
+      ElMessage.error((res as any).message || '生成失败')
+    }
+  } catch (e) {
+    if (e !== 'cancel') console.error(e)
+  } finally {
+    genDefaultLoading.value = false
+  }
 }
 
 // 属性键/值管理

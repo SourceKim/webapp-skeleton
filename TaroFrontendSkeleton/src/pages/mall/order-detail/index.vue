@@ -88,9 +88,10 @@
     </view>
 
     <!-- 底部操作栏 -->
-    <view class="footer-action" v-if="order?.order_status === 'UNPAID' || order?.order_status === 'PENDING'">
-      <nut-button type="default" size="small" plain @click="onCancel">取消订单</nut-button>
-      <nut-button type="primary" size="small" @click="showPay = true">去支付</nut-button>
+    <view class="footer-action" v-if="['UNPAID', 'PENDING', 'SHIPPED'].includes(order?.order_status)">
+      <nut-button v-if="['UNPAID', 'PENDING'].includes(order?.order_status)" type="default" size="small" plain @click="onCancel">取消订单</nut-button>
+      <nut-button v-if="['UNPAID', 'PENDING'].includes(order?.order_status)" type="primary" size="small" @click="showPay = true">去支付</nut-button>
+      <nut-button v-if="order?.order_status === 'SHIPPED'" type="primary" size="small" @click="onReceive">确认收货</nut-button>
     </view>
 
     <!-- 支付方式弹窗 -->
@@ -191,6 +192,23 @@ async function onPay(item: any) {
     }
   } catch (e) {
     Taro.showToast({ title: '支付异常', icon: 'none' })
+  }
+}
+
+async function onReceive() {
+  const res = await Taro.showModal({ title: '提示', content: '确认已收到货物？' })
+  if (res.confirm) {
+    try {
+      const { code, message } = await api.put(`/orders/${order.value.id}/receive`)
+      if (code === 0) {
+        Taro.showToast({ title: '已确认收货', icon: 'success' })
+        load(order.value.id)
+      } else {
+        Taro.showToast({ title: message || '操作失败', icon: 'none' })
+      }
+    } catch (e) {
+      Taro.showToast({ title: '操作异常', icon: 'none' })
+    }
   }
 }
 

@@ -65,8 +65,8 @@ function getSelections() {
 }
 
 function resolveMatchedSku(pairs: string[]) {
-  if (!Array.isArray(pairs) || pairs.length === 0) return null
-  const key = pairs.join(';')
+  // 允许空 pairs (默认 SKU)
+  const key = (pairs || []).join(';')
   // skuList 中 row.skuId 在上游构建时按相同顺序拼接
   const item = (props.skuList || []).find((row: any) => String(row?.skuId || '') === key)
   return item || null

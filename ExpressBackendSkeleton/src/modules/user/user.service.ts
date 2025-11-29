@@ -8,16 +8,19 @@ import { PaginationQueryDto } from '@/modules/common/common.dto';
 import { CreateUserDto, UpdateUserDto, UserDTO } from '@/modules/user/user.dto';
 import { plainToInstance } from 'class-transformer';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
+import { MallOrder, OrderStatus } from '@/modules/mall/order/order.model';
 
 export class UserService {
     private userRepository: Repository<User>;
     private roleRepository: Repository<Role>;
+    private orderRepository: Repository<MallOrder>;
     private dataSource;
 
     constructor() {
         this.dataSource = process.env.NODE_ENV === 'test' ? AppDataSource : AppDataSource;
         this.userRepository = this.dataSource.getRepository(User);
         this.roleRepository = this.dataSource.getRepository(Role);
+        this.orderRepository = this.dataSource.getRepository(MallOrder);
     }
 
     private generateUserId(): string {
@@ -113,6 +116,20 @@ export class UserService {
         }
 
         return plainToInstance(UserDTO, user);
+    }
+
+    async getUserStats(userId: string) {
+        const result = await this.orderRepository.createQueryBuilder('order')
+            .select('SUM(order.payable_amount)', 'total_amount')
+            .where('order.user_id = :userId', { userId })
+            .andWhere('order.order_status = :status', { status: OrderStatus.COMPLETED })
+            .getRawOne();
+
+        return {
+            couponCount: 0,
+            pointCount: 0,
+            totalConsumption: Number(result?.total_amount || 0).toFixed(2)
+        };
     }
 
     async getUsers(query: PaginationQueryDto): Promise<{ users: UserDTO[]; total: number }> {

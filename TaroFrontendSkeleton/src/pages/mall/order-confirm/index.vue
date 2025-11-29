@@ -10,15 +10,40 @@
       <view v-else class="placeholder">请选择收货地址</view>
     </view>
 
-    <nut-address
+    <nut-popup
       v-model:visible="showPopupExist"
-      type="exist"
-      :exist-address="existAddress"
+      position="bottom"
+      closeable
+      round
+      :style="{ height: '60%' }"
       @close="onAddressClose"
-      :is-show-custom-address="false"
-      @selected="onAddressSelected"
-      exist-address-title="配送至"
-    />
+    >
+      <view class="addr-popup">
+        <view class="addr-header">配送至</view>
+        <scroll-view :scroll-y="true" class="addr-list" v-if="addressesList.length > 0">
+           <view v-for="a in addressesList" :key="a.id" class="addr-item" @click="selectAddress(a)">
+              <view class="left">
+                 <view class="top">
+                   <text class="name">{{ a.name }}</text>
+                   <text class="phone">{{ a.phone }}</text>
+                   <text v-if="a.is_default" class="tag">默认</text>
+                 </view>
+                 <view class="detail">{{ a.province }}{{ a.city }}{{ a.country }}{{ a.town||'' }} {{ a.detail }}</view>
+              </view>
+              <nut-icon v-if="address && address.id === a.id" name="Check" color="#fa2c19" />
+           </view>
+           <!-- 底部留白 -->
+           <view style="height: 60px"></view>
+        </scroll-view>
+        <view v-else class="addr-empty">
+          <nut-empty description="暂无收货地址" />
+          <nut-button type="primary" size="small" @click="goCreateAddr">添加收货地址</nut-button>
+        </view>
+        <view class="addr-footer" v-if="addressesList.length > 0">
+           <nut-button block type="primary" @click="goCreateAddr">新增地址</nut-button>
+        </view>
+      </view>
+    </nut-popup>
 
     <view class="section">
       <view v-for="it in items" :key="it.cart_id" class="row">
@@ -60,7 +85,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import Taro, { useRouter } from '@tarojs/taro'
+import Taro, { useRouter, useDidShow } from '@tarojs/taro'
 import api from '@/services/api'
 import { getUploadUrl } from '@/services/mall'
 
@@ -165,8 +190,20 @@ onMounted(() => {
   const p = (router?.params?.ids as string) || ''
   ids.value = p ? p.split(',').filter(Boolean) : []
   loadPreview()
+})
+
+useDidShow(() => {
   loadDefaultAddress()
 })
+
+function goCreateAddr() {
+  Taro.navigateTo({ url: '/pages/address/form/index' })
+}
+
+function selectAddress(item: any) {
+  address.value = item
+  showPopupExist.value = false
+}
 
 function onAddressClose(_: any) {
   // 关闭时不做额外处理
@@ -203,6 +240,19 @@ function coverOf(it: any): string | undefined {
 .price { color: #fa2c19; font-weight: 600; }
 .total .amount { color: #fa2c19; font-weight: 700; }
 .footer { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; padding: 10px 12px env(safe-area-inset-bottom); box-shadow: 0 -2px 8px rgba(0,0,0,0.06); }
+
+.addr-popup { display: flex; flex-direction: column; height: 100%; position: relative; }
+.addr-header { text-align: center; padding: 16px; font-weight: 600; font-size: 16px; border-bottom: 1px solid #eee; }
+.addr-list { flex: 1; overflow: hidden; background: #f5f5f5; height: 100%; }
+.addr-item { background: #fff; padding: 12px; margin-bottom: 1px; display: flex; align-items: center; justify-content: space-between; }
+.addr-item .left { flex: 1; margin-right: 12px; }
+.addr-item .top { display: flex; align-items: center; margin-bottom: 4px; }
+.addr-item .name { font-weight: 600; font-size: 15px; margin-right: 8px; }
+.addr-item .phone { color: #666; font-size: 14px; margin-right: 8px; }
+.addr-item .tag { background: #fa2c19; color: #fff; font-size: 10px; padding: 1px 4px; border-radius: 2px; }
+.addr-item .detail { color: #333; font-size: 13px; line-height: 1.4; }
+.addr-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; }
+.addr-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px; background: #fff; box-shadow: 0 -2px 8px rgba(0,0,0,0.05); }
 </style>
 
 

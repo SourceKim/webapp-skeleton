@@ -97,6 +97,26 @@ export class UserController {
     };
 
     /**
+     * 获取用户统计信息
+     * GET /api/v1/users/stats
+     */
+    getStats = async (
+        req: Request,
+        res: Response<ApiResponse<any>>,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const userId = req.user?.id;
+            if (!userId) throw new HttpException(401, '未认证');
+            
+            const stats = await this.userService.getUserStats(userId);
+            res.json({ code: 0, message: 'success', data: stats });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    /**
      * 更新当前登录用户信息
      * PUT /api/v1/users/profile
      */

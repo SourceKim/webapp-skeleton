@@ -19,6 +19,7 @@ const ensureSelf = (req: Request, res: Response, next: NextFunction): void => {
 };
 
 router.get('/profile/:id', authMiddleware, ensureSelf, userController.getUser); // 获取当前用户信息（由前端传入 id）
+router.get('/stats', authMiddleware, userController.getStats); // 获取用户统计信息
 router.put('/profile/:id', authMiddleware, ensureSelf, userController.updateUser); // 更新当前用户信息（由前端传入 id）
 
 // 管理员 API - 需要管理员权限
