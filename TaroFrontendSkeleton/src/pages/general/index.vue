@@ -9,8 +9,8 @@
       :duration="500"
       circular
     >
-      <swiper-item v-for="(img, idx) in banners" :key="idx">
-        <image :src="img" class="slide-image" mode="aspectFill" />
+      <swiper-item v-for="(item, idx) in banners" :key="item.id" @tap="handleBannerClick(item)">
+        <image :src="getBannerUrl(item)" class="slide-image" mode="aspectFill" />
       </swiper-item>
     </swiper>
 
@@ -56,26 +56,48 @@
 import { ref, onMounted } from 'vue'
 import Taro from '@tarojs/taro'
 import { useAuthStore } from '../../stores/auth'
+import homeService, { type Carousel, getUploadUrl } from '../../services/home'
 
 const auth = useAuthStore()
 const navBarHeight = ref(44) // 默认安全距离
-
-// 模拟全屏轮播图数据
-const banners = ref([
-  'https://images.unsplash.com/photo-1561758033-d8f53cb3209b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', // Burger
-  'https://images.unsplash.com/photo-1550547660-d9450f859349?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', // Burger 2
-  'https://images.unsplash.com/photo-1571091718767-18b5b1457add?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'  // Burger 3
-])
+const banners = ref<Carousel[]>([])
 
 onMounted(async () => {
   const sysInfo = Taro.getSystemInfoSync()
   navBarHeight.value = (sysInfo.statusBarHeight || 20) + 4
   
+  // 自动登录
   const result = await auth.autoLoginByToken()
   if (!result.ok) {
     // Handle login failure if needed
   }
+
+  // 获取轮播图
+  fetchBanners()
 })
+
+const fetchBanners = async () => {
+  try {
+    // 获取启用的轮播图
+    const { code, data } = await homeService.getCarousels({ is_active: true, page: 1, limit: 10 })
+    if (code === 0 && data && data.items) {
+      // 按 sort_order 排序（虽然后端可能已排好，但前端保底）
+      banners.value = data.items.sort((a, b) => a.sort_order - b.sort_order)
+    }
+  } catch (error) {
+    console.error('Fetch banners failed:', error)
+  }
+}
+
+const getBannerUrl = (item: Carousel) => {
+  return getUploadUrl(item.material?.file_path)
+}
+
+const handleBannerClick = (item: Carousel) => {
+  if (item.spu_id) {
+    Taro.navigateTo({ url: `/pages/mall/detail/index?id=${item.spu_id}` })
+  }
+}
 
 const goMall = () => {
   Taro.switchTab({ url: '/pages/mall/index' })

@@ -15,6 +15,8 @@ import cartRoutes from '@/modules/mall/cart/cart.routes';
 import cartAdminRoutes from '@/modules/mall/cart/cart.admin.routes';
 import orderRoutes from '@/modules/mall/order/order.routes';
 import orderAdminRoutes from '@/modules/mall/order/order.admin.routes';
+import carouselRoutes from '@/modules/mall/carousel/carousel.routes';
+import shopIntroRoutes from '@/modules/mall/shop-intro/shop-intro.routes';
 
 const router = Router();
 
@@ -31,6 +33,10 @@ router.use(`${API_VERSION}/cart`, cartRoutes);
 router.use(`${API_VERSION}`, cartAdminRoutes);
 router.use(`${API_VERSION}/orders`, orderRoutes);
 router.use(`${API_VERSION}`, orderAdminRoutes);
+
+// 首页模块
+router.use(`${API_VERSION}/mall`, carouselRoutes);
+router.use(`${API_VERSION}/mall`, shopIntroRoutes);
 
 // 素材管理路由
 router.use(`${API_VERSION}/materials`, materialRoutes);

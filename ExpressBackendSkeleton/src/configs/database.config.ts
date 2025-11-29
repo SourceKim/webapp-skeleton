@@ -18,6 +18,8 @@ import { ProductSkuAttribute } from '@/modules/product/attribute/product-sku-att
 import { UserAddress } from '@/modules/user/address/user-address.model';
 import { Cart } from '@/modules/mall/cart/cart.model';
 import { MallOrder, MallOrderItem } from '@/modules/mall/order/order.model';
+import { Carousel } from '@/modules/mall/carousel/carousel.model';
+import { ShopIntro, ShopIntroBanner } from '@/modules/mall/shop-intro/shop-intro.model';
 
 export const AppDataSource = new DataSource({
     type: 'mysql',
@@ -49,6 +51,9 @@ export const AppDataSource = new DataSource({
         ,Cart
         ,MallOrder
         ,MallOrderItem
+        ,Carousel
+        ,ShopIntro
+        ,ShopIntroBanner
     ],
     migrations: ['migrations/*.ts'],
     subscribers: [],

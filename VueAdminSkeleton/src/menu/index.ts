@@ -205,18 +205,6 @@ export const flatMenus: FlatMenu[] = [
         cache: true,
     },
     {
-        id: '31',
-        title: '首页背景图',
-        name: 'store-home-bg',
-        path: 'home-bg',
-        type: 'menu',
-        icon: 'el|picture',
-        cache: true,
-        component: '/src/views/store/home-bg/index.vue',
-        handleType: 'route',
-        parentId: '30'
-    },
-    {
         id: '32',
         title: '首页轮播',
         name: 'store-home-carousel',
