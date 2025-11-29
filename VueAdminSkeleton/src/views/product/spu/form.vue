@@ -28,13 +28,13 @@
         <el-icon><plus /></el-icon>
       </el-upload>
     </el-form-item>
-    <el-form-item label="分类">
-      <el-input v-model="categoryName" disabled placeholder="未选择" style="width: 240px; margin-right: 8px;" />
-      <el-button v-if="!isDetail" size="small" @click="selectCategoryVisible = true">选择</el-button>
-    </el-form-item>
     <el-form-item label="品牌">
       <el-input v-model="brandName" disabled placeholder="未选择" style="width: 240px; margin-right: 8px;" />
       <el-button v-if="!isDetail" size="small" @click="selectBrandVisible = true">选择</el-button>
+    </el-form-item>
+    <el-form-item label="分类">
+      <el-input v-model="categoryName" disabled placeholder="需先选品牌" style="width: 240px; margin-right: 8px;" />
+      <el-button v-if="!isDetail" size="small" @click="openSelectCategory">选择</el-button>
     </el-form-item>
     <el-form-item label="状态">
       <el-select v-model="form.status" :disabled="isDetail" style="width: 200px">
@@ -53,15 +53,15 @@
     </el-form-item>
   </el-form>
 
-  <el-dialog title="选择分类" v-model="selectCategoryVisible" width="40%" append-to-body>
-    <el-tree
-      :props="{ label: 'name', children: 'children', isLeaf: 'isLeaf' }"
-      node-key="id"
-      lazy
-      highlight-current
-      :load="loadCategoryNode"
-      @node-click="onPickCategory"
-    />
+  <el-dialog title="选择分类" v-model="selectCategoryVisible" width="50%" append-to-body>
+    <el-table :data="categoryList" @row-click="onPickCategory" height="400">
+      <el-table-column label="图片" width="80">
+        <template #default="{ row }">
+          <el-image :src="row.image_url" style="width:40px;height:40px;object-fit:cover" />
+        </template>
+      </el-table-column>
+      <el-table-column prop="name" label="名称" />
+    </el-table>
   </el-dialog>
 
   <el-dialog title="选择品牌" v-model="selectBrandVisible" width="40%" append-to-body>
@@ -80,6 +80,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import type { FormInstance, FormRules, UploadFile, UploadInstance } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import type { CreateProductSpuDto, ProductSpu, UpdateProductSpuDto } from '@/api/product/spu.d'
 import { createSpu, updateSpu } from '@/api/product/spu'
 import { uploadMaterial } from '@/api/material/material'
@@ -116,6 +117,7 @@ const brandName = ref('')
 const selectCategoryVisible = ref(false)
 const selectBrandVisible = ref(false)
 const brandList = ref<ProductBrand[]>([])
+const categoryList = ref<any[]>([])
 
 const rules: FormRules = {
   name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
@@ -201,34 +203,37 @@ async function uploadSub(option: any) {
   }
 }
 
-// 分类懒加载
-const loadCategoryNode = async (node: any, resolve: (data: any[]) => void) => {
-  if (node.level === 0) {
-    const res: any = await getCategories({ parent_id: null })
-    const list = (res?.code === 0 ? res.data?.items : []) || []
-    return resolve(list.map((i: any) => ({ ...i, isLeaf: false })))
+// 分类选择
+async function openSelectCategory() {
+  if (!form.brand_id) {
+    ElMessage.warning('请先选择品牌')
+    return
   }
-  const parent = node.data
-  const res: any = await getCategories({ parent_id: parent.id })
-  const list = (res?.code === 0 ? res.data?.items : []) || []
-  return resolve(list.map((i: any) => ({ ...i, isLeaf: false })))
+  const res: any = await getCategories({ filters: { brand_id: form.brand_id }, limit: 1000 } as any)
+  categoryList.value = (res?.code === 0 ? res.data?.items : []) || []
+  selectCategoryVisible.value = true
 }
-function onPickCategory(node: any) {
-  form.category_id = node.id
-  categoryName.value = node.name
+function onPickCategory(row: any) {
+  form.category_id = row.id
+  categoryName.value = row.name
   selectCategoryVisible.value = false
 }
 
 // 品牌列表获取
 watch(selectBrandVisible, async (v) => {
   if (v) {
-    const res: any = await getBrandsAll({ limit: 100 })
+    const res: any = await getBrandsAll({ limit: 100, status: 'ENABLED' })
     brandList.value = (res?.code === 0 ? res.data?.items : []) || []
   }
 })
 function onPickBrand(r: ProductBrand) {
-  form.brand_id = r.id
-  brandName.value = r.name
+  // 品牌变更，清空分类
+  if (form.brand_id !== r.id) {
+    form.brand_id = r.id
+    brandName.value = r.name
+    form.category_id = undefined
+    categoryName.value = ''
+  }
   selectBrandVisible.value = false
 }
 

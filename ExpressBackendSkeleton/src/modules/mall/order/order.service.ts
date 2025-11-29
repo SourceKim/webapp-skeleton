@@ -51,7 +51,7 @@ export class OrderService {
       discount_amount: '0',
       shipping_amount: '0',
       payable_amount: String(preview.payable_amount.toFixed(2)),
-      order_status: OrderStatus.PENDING,
+      order_status: OrderStatus.UNPAID,
       payment_status: PaymentStatus.UNPAID,
       delivery_status: DeliveryStatus.PENDING,
       payment_method: payment_method || null,
@@ -101,6 +101,32 @@ export class OrderService {
     if (!order) throw new HttpException(404, '订单不存在')
     const items = await this.itemRepo.find({ where: { order: { id } as any } })
     return { order, items }
+  }
+
+  async pay(userId: string, id: string, paymentMethod?: any) {
+    const order = await this.orderRepo.findOne({ where: { id, user: { id: userId } as any } })
+    if (!order) throw new HttpException(404, '订单不存在')
+    if (order.order_status !== OrderStatus.UNPAID) throw new HttpException(400, '订单状态不正确')
+    
+    order.payment_status = PaymentStatus.PAID
+    order.payment_time = new Date()
+    order.order_status = OrderStatus.TO_BE_SHIPPED
+    if (paymentMethod) order.payment_method = paymentMethod
+    
+    await this.orderRepo.save(order)
+    return order
+  }
+
+  async receive(userId: string, id: string) {
+    const order = await this.orderRepo.findOne({ where: { id, user: { id: userId } as any } })
+    if (!order) throw new HttpException(404, '订单不存在')
+    if (order.order_status !== OrderStatus.SHIPPED) throw new HttpException(400, '订单未发货')
+
+    order.order_status = OrderStatus.COMPLETED
+    order.delivery_status = DeliveryStatus.DELIVERED
+    order.received_time = new Date()
+    await this.orderRepo.save(order)
+    return order
   }
 
   async cancel(userId: string, id: string) {

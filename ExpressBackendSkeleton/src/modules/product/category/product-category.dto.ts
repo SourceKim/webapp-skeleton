@@ -20,6 +20,12 @@ export class ProductCategoryDTO extends BaseDTO {
     material_id?: string;
 
     @Expose()
+    brand_id?: string;
+
+    @Expose()
+    brand_name?: string;
+
+    @Expose()
     image_url?: string;
 
     @Expose()
@@ -45,6 +51,10 @@ export class CreateProductCategoryDto {
     material_id?: string;
 
     @IsOptional()
+    @IsString()
+    brand_id?: string;
+
+    @IsOptional()
     @IsEnum(ProductCategoryStatus)
     status?: ProductCategoryStatus;
 }
@@ -67,6 +77,10 @@ export class UpdateProductCategoryDto {
     @IsOptional()
     @IsString()
     material_id?: string | null;
+
+    @IsOptional()
+    @IsString()
+    brand_id?: string | null;
 
     @IsOptional()
     @IsEnum(ProductCategoryStatus)

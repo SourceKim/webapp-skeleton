@@ -1,17 +1,21 @@
 <template>
   <div class="root">
     <div class="toolbar">
+      <el-select v-model="filterBrandId" placeholder="筛选品牌" clearable @change="fetchRoot" style="width: 200px; margin-right: 12px;">
+        <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id" />
+      </el-select>
       <el-button type="primary" @click="openForm('add')" icon="plus">新增分类</el-button>
     </div>
     <el-table
       :data="rootData"
       row-key="id"
-      :lazy="true"
+      :lazy="!filterBrandId"
       :load="loadChildren"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       style="width: 100%"
     >
       <el-table-column prop="name" label="名称" min-width="200" />
+      <el-table-column prop="brand_name" label="所属品牌" width="150" />
       <el-table-column label="图片" width="100" align="center">
         <template #default="{ row }">
           <el-image :src="row.image_url" style="width:40px;height:40px;object-fit:cover" :preview-src-list="row.image_url ? [row.image_url] : []" />
@@ -37,7 +41,9 @@
 <script setup lang="ts">
 import { ref, defineAsyncComponent, onMounted, nextTick } from 'vue'
 import type { ProductCategory } from '@/api/product/category.d'
+import type { ProductBrand } from '@/api/product/brand.d'
 import { getCategories, deleteCategory } from '@/api/product/category'
+import { getBrandsAll } from '@/api/product/brand'
 
 const CategoryForm = defineAsyncComponent(() => import('./form.vue'))
 
@@ -45,6 +51,9 @@ const rootData = ref<ProductCategory[]>([])
 const formVisible = ref(false)
 const handleType = ref<string>()
 const row = ref<ProductCategory>()
+
+const brandList = ref<ProductBrand[]>([])
+const filterBrandId = ref<string>()
 
 function openForm(type: string, r?: ProductCategory) {
   handleType.value = type
@@ -57,8 +66,31 @@ function formClose(refresh?: boolean) {
 }
 
 async function fetchRoot() {
-  const res: any = await getCategories({ parent_id: null })
-  if (res?.code === 0) rootData.value = (res.data?.items || []).map((i: any) => ({ ...i, hasChildren: true }))
+  const params: any = {}
+  if (filterBrandId.value) {
+    // 筛选品牌模式：获取扁平列表
+    params.filters = { brand_id: filterBrandId.value }
+    params.limit = 1000 // 获取所有
+    const res: any = await getCategories(params)
+    if (res?.code === 0) {
+      // 不设置 hasChildren，显示为扁平列表
+      rootData.value = (res.data?.items || [])
+    }
+  } else {
+    // 默认模式：树形懒加载
+    params.parent_id = null
+    const res: any = await getCategories(params)
+    if (res?.code === 0) {
+      rootData.value = (res.data?.items || []).map((i: any) => ({ ...i, hasChildren: true }))
+    }
+  }
+}
+
+async function fetchBrands() {
+  const res = await getBrandsAll({ limit: 100, status: 'ENABLED' })
+  if (res.code === 0) {
+    brandList.value = res.data.items
+  }
 }
 
 async function loadChildren(row: any, treeNode: any, resolve: (data: ProductCategory[]) => void) {
@@ -75,7 +107,10 @@ async function del(r: ProductCategory) {
   await fetchRoot()
 }
 
-onMounted(fetchRoot)
+onMounted(() => {
+  fetchBrands()
+  fetchRoot()
+})
 </script>
 
 <style scoped>

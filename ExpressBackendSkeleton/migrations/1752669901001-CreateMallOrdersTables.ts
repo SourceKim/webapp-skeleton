@@ -17,7 +17,7 @@ export class CreateMallOrdersTables1752669901001 implements MigrationInterface {
         { name: 'delivery_status', type: 'enum', enum: ['PENDING','SHIPPED','DELIVERED'], default: `'PENDING'` },
         { name: 'delivery_time', type: 'timestamp', isNullable: true },
         { name: 'received_time', type: 'timestamp', isNullable: true },
-        { name: 'order_status', type: 'enum', enum: ['PENDING','CONFIRMED','CANCELED','COMPLETED'], default: `'PENDING'` },
+        { name: 'order_status', type: 'enum', enum: ['UNPAID','TO_BE_SHIPPED','SHIPPED','COMPLETED','CANCELED'], default: `'UNPAID'` },
         { name: 'address_id', type: 'varchar', length: '36' },
         { name: 'address_snapshot', type: 'json' },
         { name: 'remark', type: 'varchar', length: '500', isNullable: true },

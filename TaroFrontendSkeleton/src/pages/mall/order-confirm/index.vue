@@ -41,18 +41,20 @@
       <view>合计：<text class="amount">￥{{ payable.toFixed(2) }}</text></view>
     </view>
 
-    <view class="section pay">
-      <view class="title">支付方式</view>
-      <nut-radio-group v-model="paymentMethod" direction="horizontal">
-        <nut-radio label="ALIPAY">支付宝</nut-radio>
-        <nut-radio label="WECHAT">微信支付</nut-radio>
-        <nut-radio label="CASH">货到付款</nut-radio>
-      </nut-radio-group>
-    </view>
+    <!-- 隐藏原有支付方式选择，改为底部弹窗 -->
+    <!-- <view class="section pay"> ... </view> -->
 
     <view class="footer">
-      <nut-button type="primary" block @click="submitOrder" :disabled="!address || submitting">提交订单</nut-button>
+      <nut-button type="primary" block @click="onSubmitClick" :disabled="!address || submitting">立即付款</nut-button>
     </view>
+
+    <!-- 支付方式选择弹窗 -->
+    <nut-action-sheet
+      v-model:visible="showPay"
+      :menu-items="paymentOptions"
+      @choose="onPayChoose"
+      title="选择支付方式"
+    />
   </view>
 </template>
 
@@ -71,10 +73,64 @@ const address = ref<any | null>(null)
 const addressesList = ref<any[]>([])
 const showPopupExist = ref(false)
 const existAddress = ref<any[]>([])
-const paymentMethod = ref<'ALIPAY' | 'WECHAT' | 'CASH'>('ALIPAY')
+// const paymentMethod = ref<'ALIPAY' | 'WECHAT' | 'CASH'>('ALIPAY')
+
+const showPay = ref(false)
+const paymentOptions = [
+  { name: '微信支付', value: 'WECHAT' },
+  { name: '支付宝', value: 'ALIPAY' },
+  { name: '模拟支付', value: 'CASH' }
+]
 
 function goBack() { Taro.navigateBack() }
 function goChooseAddress() { showPopupExist.value = true }
+
+// 1. 点击立即付款 -> 弹出选择
+function onSubmitClick() {
+  if (!address.value) { Taro.showToast({ title: '请选择地址', icon: 'none' }); return }
+  showPay.value = true
+}
+
+// 2. 选择支付方式 -> 创建订单 -> 支付
+async function onPayChoose(item: any) {
+  if (submitting.value) return
+  submitting.value = true
+  try {
+    // 第一步：创建订单 (Status: UNPAID)
+    // 注意：创建订单时不再传递 payment_method，或者传递 null
+    const { code, data: orderData, message } = await api.post('/orders', { 
+      cart_item_ids: ids.value, 
+      address_id: address.value.id 
+    })
+    
+    if (code !== 0 || !orderData) {
+      Taro.showToast({ title: message || '下单失败', icon: 'none' })
+      return
+    }
+
+    const orderId = (orderData as any).id
+
+    // 第二步：发起支付 (调用 pay 接口)
+    const { code: payCode, message: payMsg } = await api.put(`/orders/${orderId}/pay`, { 
+      payment_method: item.value 
+    })
+
+    if (payCode === 0) {
+      Taro.showToast({ title: '支付成功', icon: 'success' })
+      setTimeout(() => Taro.redirectTo({ url: '/pages/mall/order-list/index' }), 600)
+    } else {
+      // 支付失败，但也跳转到订单列表（状态为待付款）
+      Taro.showToast({ title: payMsg || '支付失败', icon: 'none' })
+      setTimeout(() => Taro.redirectTo({ url: '/pages/mall/order-list/index' }), 600)
+    }
+
+  } catch (e) {
+    Taro.showToast({ title: '系统异常', icon: 'none' })
+  } finally {
+    submitting.value = false
+    showPay.value = false
+  }
+}
 
 async function loadPreview() {
   const { code, data: respData, message } = await api.post('/orders/preview', { cart_item_ids: ids.value })
@@ -103,20 +159,6 @@ async function loadDefaultAddress() {
       selectedAddress: !!a.is_default
     }))
   }
-}
-
-async function submitOrder() {
-  if (!address.value) { Taro.showToast({ title: '请选择地址', icon: 'none' }); return }
-  submitting.value = true
-  try {
-    const { code, message } = await api.post('/orders', { cart_item_ids: ids.value, address_id: address.value.id, payment_method: paymentMethod.value })
-    if (code === 0) {
-      Taro.showToast({ title: '下单成功', icon: 'success' })
-      setTimeout(() => Taro.redirectTo({ url: '/pages/mall/order-list/index' }), 600)
-    } else {
-      Taro.showToast({ title: message || '下单失败', icon: 'none' })
-    }
-  } finally { submitting.value = false }
 }
 
 onMounted(() => {

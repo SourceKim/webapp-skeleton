@@ -3,6 +3,8 @@ import { IsEnum, IsInt, IsOptional, IsString, MaxLength, Min } from 'class-valid
 import { BaseEntity } from '@/modules/common/base.model';
 import { Material } from '@/modules/material/material.model';
 
+import { ProductBrand } from '../brand/product-brand.model';
+
 export enum ProductCategoryStatus {
     ENABLED = 'ENABLED',
     DISABLED = 'DISABLED',
@@ -33,6 +35,10 @@ export class ProductCategory extends BaseEntity {
     @ManyToOne(() => Material, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'material_id' })
     material?: Material | null;
+
+    @ManyToOne(() => ProductBrand, { nullable: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'brand_id' })
+    brand?: ProductBrand | null;
 
     @Column({ type: 'enum', enum: ProductCategoryStatus, default: ProductCategoryStatus.ENABLED })
     @IsEnum(ProductCategoryStatus)

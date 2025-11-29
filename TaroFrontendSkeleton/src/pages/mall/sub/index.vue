@@ -117,7 +117,15 @@ const getCover = (s: Spu) => getUploadUrl(s.main_material?.file_path)
 const getBrandLogo = (b: Brand | null) => b ? getUploadUrl(b.material?.file_path) : ''
 
 const fetchCategories = async () => {
-  const { code, data } = await mallService.getCategories({ page: 1, limit: 50, parent_id: null, status: 'ENABLED' })
+  const params: any = { page: 1, limit: 100, status: 'ENABLED' }
+  if (brandId.value) {
+    // 如果有品牌，获取该品牌下的所有分类（扁平）
+    params.filters = { brand_id: brandId.value }
+  } else {
+    // 否则获取顶级分类
+    params.parent_id = null
+  }
+  const { code, data } = await mallService.getCategories(params)
   if (code === 0 && data) {
     categories.value = data.items
     activeCatId.value = data.items[0]?.id || null
@@ -474,5 +482,3 @@ onMounted(async () => {
   }
 }
 </style>
-
-

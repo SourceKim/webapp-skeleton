@@ -12,14 +12,14 @@ router.use(authMiddleware);
 router.get('/attributes/keys', controller.listKeysBySpu);
 
 // 管理员操作
-router.use('/attributes', adminMiddleware);
-router.post('/attributes/keys', controller.createKey);
-router.put('/attributes/keys/:id', controller.updateKey);
-router.delete('/attributes/keys/:id', controller.deleteKey);
+router.use('/attributes/admin', adminMiddleware);
+router.post('/attributes/admin/keys', controller.createKey);
+router.put('/attributes/admin/keys/:id', controller.updateKey);
+router.delete('/attributes/admin/keys/:id', controller.deleteKey);
 
-router.post('/attributes/values', controller.createValue);
-router.put('/attributes/values/:id', controller.updateValue);
-router.delete('/attributes/values/:id', controller.deleteValue);
+router.post('/attributes/admin/values', controller.createValue);
+router.put('/attributes/admin/values/:id', controller.updateValue);
+router.delete('/attributes/admin/values/:id', controller.deleteValue);
 
 export default router;
 

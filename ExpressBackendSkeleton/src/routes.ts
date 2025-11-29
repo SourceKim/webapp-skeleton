@@ -14,6 +14,7 @@ import userAddressRoutes from '@/modules/user/address/user-address.routes';
 import cartRoutes from '@/modules/mall/cart/cart.routes';
 import cartAdminRoutes from '@/modules/mall/cart/cart.admin.routes';
 import orderRoutes from '@/modules/mall/order/order.routes';
+import orderAdminRoutes from '@/modules/mall/order/order.admin.routes';
 
 const router = Router();
 
@@ -29,6 +30,7 @@ router.use(`${API_VERSION}/addresses`, userAddressRoutes);
 router.use(`${API_VERSION}/cart`, cartRoutes);
 router.use(`${API_VERSION}`, cartAdminRoutes);
 router.use(`${API_VERSION}/orders`, orderRoutes);
+router.use(`${API_VERSION}`, orderAdminRoutes);
 
 // 素材管理路由
 router.use(`${API_VERSION}/materials`, materialRoutes);

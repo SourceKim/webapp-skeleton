@@ -4,7 +4,7 @@ import { User } from '@/modules/user/user.model';
 
 export enum PaymentStatus { UNPAID = 'UNPAID', PAID = 'PAID', REFUNDED = 'REFUNDED' }
 export enum DeliveryStatus { PENDING = 'PENDING', SHIPPED = 'SHIPPED', DELIVERED = 'DELIVERED' }
-export enum OrderStatus { PENDING = 'PENDING', CONFIRMED = 'CONFIRMED', CANCELED = 'CANCELED', COMPLETED = 'COMPLETED' }
+export enum OrderStatus { UNPAID = 'UNPAID', TO_BE_SHIPPED = 'TO_BE_SHIPPED', SHIPPED = 'SHIPPED', COMPLETED = 'COMPLETED', CANCELED = 'CANCELED' }
 export enum PaymentMethod { ALIPAY = 'ALIPAY', WECHAT = 'WECHAT', CASH = 'CASH' }
 
 @Entity('mall_orders')
@@ -43,7 +43,7 @@ export class MallOrder extends BaseEntity {
     @Column({ type: 'timestamp', nullable: true })
     received_time?: Date | null;
 
-    @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING })
+    @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.UNPAID })
     order_status!: OrderStatus;
 
     @Column({ type: 'varchar', length: 36 })

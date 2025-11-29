@@ -59,6 +59,27 @@ router.put('/:id/cancel', async (req: Request, res: Response) => {
   }
 })
 
+router.put('/:id/pay', async (req: Request, res: Response) => {
+  try {
+    const { payment_method } = req.body
+    const data = await service.pay(req.user!.id, req.params.id, payment_method)
+    res.json({ code: 0, message: 'OK', data })
+  } catch (e: any) {
+    const status = e?.status || 500
+    res.status(status).json({ code: status, message: e?.message || '支付失败' })
+  }
+})
+
+router.put('/:id/receive', async (req: Request, res: Response) => {
+  try {
+    const data = await service.receive(req.user!.id, req.params.id)
+    res.json({ code: 0, message: 'OK', data })
+  } catch (e: any) {
+    const status = e?.status || 500
+    res.status(status).json({ code: status, message: e?.message || '确认收货失败' })
+  }
+})
+
 export default router
 
 

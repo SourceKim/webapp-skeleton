@@ -9,9 +9,9 @@ import { Cart } from './cart.model';
 const router = Router();
 
 // 管理端购物车列表（分页）
-router.use(authMiddleware, adminMiddleware);
+// router.use(authMiddleware, adminMiddleware); 移除全局使用
 
-router.get('/admin/carts', paginationQuery(), paginationResponse, async (req, res) => {
+router.get('/admin/carts', authMiddleware, adminMiddleware, paginationQuery(), paginationResponse, async (req, res) => {
   const repo = AppDataSource.getRepository(Cart);
   const { page, limit, sort_by, sort_order, filters } = req.pagination;
 

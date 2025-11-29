@@ -11,6 +11,7 @@ export class CreateProductCategoryTables1753669906000 implements MigrationInterf
         { name: 'parent_id', type: 'varchar', length: '36', isNullable: true },
         { name: 'level', type: 'int', default: 0 },
         { name: 'material_id', type: 'varchar', length: '36', isNullable: true },
+        { name: 'brand_id', type: 'varchar', length: '36', isNullable: true },
         { name: 'status', type: 'enum', enum: ['ENABLED', 'DISABLED'], default: `'ENABLED'` },
         { name: 'created_at', type: 'timestamp', default: 'CURRENT_TIMESTAMP' },
         { name: 'updated_at', type: 'timestamp', default: 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' },
@@ -28,6 +29,13 @@ export class CreateProductCategoryTables1753669906000 implements MigrationInterf
     await queryRunner.createForeignKey('product_categories', new TableForeignKey({
       columnNames: ['material_id'],
       referencedTableName: 'materials',
+      referencedColumnNames: ['id'],
+      onDelete: 'SET NULL',
+    }));
+
+    await queryRunner.createForeignKey('product_categories', new TableForeignKey({
+      columnNames: ['brand_id'],
+      referencedTableName: 'product_brands',
       referencedColumnNames: ['id'],
       onDelete: 'SET NULL',
     }));

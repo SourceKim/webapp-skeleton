@@ -5,7 +5,7 @@
       <view v-for="o in items" :key="o.id" class="card" @click="goDetail(o.id)">
         <view class="header">
           <text class="sn">订单号：{{ o.id }}</text>
-          <text class="status">{{ o.order_status }}</text>
+          <text class="status">{{ getStatusText(o.order_status) }}</text>
         </view>
         
         <view class="body">
@@ -43,6 +43,21 @@ import { getUploadUrl } from '@/services/mall'
 
 const items = ref<any[]>([])
 const loading = ref(false)
+
+const statusMap: Record<string, string> = {
+  'UNPAID': '待付款',
+  'PENDING': '待付款',
+  'TO_BE_SHIPPED': '待发货',
+  'CONFIRMED': '待发货',
+  'SHIPPED': '待收货',
+  'DELIVERED': '待收货',
+  'COMPLETED': '已完成',
+  'CANCELED': '已取消'
+}
+
+function getStatusText(status: string) {
+  return statusMap[status] || status
+}
 
 function goBack(){ Taro.navigateBack() }
 function goDetail(id: string){ Taro.navigateTo({ url: `/pages/mall/order-detail/index?id=${id}` }) }

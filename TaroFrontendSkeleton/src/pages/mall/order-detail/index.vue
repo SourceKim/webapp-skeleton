@@ -4,7 +4,7 @@
     
     <!-- 状态栏 -->
     <view class="status-bar">
-      <view class="status-text">{{ order?.order_status }}</view>
+      <view class="status-text">{{ getStatusText(order?.order_status) }}</view>
       <view class="status-desc">感谢您对我们的信任，期待再次光临</view>
     </view>
 
@@ -77,7 +77,7 @@
         <text class="label">下单时间</text>
         <text class="value">{{ order?.created_at }}</text>
       </view>
-      <view class="info-row">
+      <view class="info-row" v-if="order?.payment_method">
         <text class="label">支付方式</text>
         <text class="value">{{ order?.payment_method || '-' }}</text>
       </view>
@@ -86,6 +86,20 @@
         <text class="value">{{ order?.remark }}</text>
       </view>
     </view>
+
+    <!-- 底部操作栏 -->
+    <view class="footer-action" v-if="order?.order_status === 'UNPAID' || order?.order_status === 'PENDING'">
+      <nut-button type="default" size="small" plain @click="onCancel">取消订单</nut-button>
+      <nut-button type="primary" size="small" @click="showPay = true">去支付</nut-button>
+    </view>
+
+    <!-- 支付方式弹窗 -->
+    <nut-action-sheet
+      v-model:visible="showPay"
+      :menu-items="paymentOptions"
+      @choose="onPay"
+      title="选择支付方式"
+    />
 
     <!-- 底部占位 -->
     <view class="footer-placeholder"></view>
@@ -100,6 +114,28 @@ import { getUploadUrl } from '@/services/mall'
 
 const order = ref<any | null>(null)
 const items = ref<any[]>([])
+const showPay = ref(false)
+
+const paymentOptions = [
+  { name: '微信支付', value: 'WECHAT' },
+  { name: '支付宝', value: 'ALIPAY' },
+  { name: '模拟支付', value: 'CASH' } // 对应后端的 PaymentMethod 枚举
+]
+
+const statusMap: Record<string, string> = {
+  'UNPAID': '待付款',
+  'PENDING': '待付款',
+  'TO_BE_SHIPPED': '待发货',
+  'CONFIRMED': '待发货',
+  'SHIPPED': '待收货',
+  'DELIVERED': '待收货',
+  'COMPLETED': '已完成',
+  'CANCELED': '已取消'
+}
+
+function getStatusText(status: string) {
+  return statusMap[status] || status
+}
 
 const fullAddr = computed(() => {
   const a = order.value?.address_snapshot || {}
@@ -129,13 +165,72 @@ useLoad(async (options) => {
 function coverOf(it: any): string | undefined {
   return getUploadUrl(it?.sku_snapshot?.spu?.main_material?.file_path)
 }
+
+async function onCancel() {
+  const res = await Taro.showModal({ title: '提示', content: '确定要取消订单吗？' })
+  if (res.confirm) {
+    const { code, message } = await api.put(`/orders/${order.value.id}/cancel`)
+    if (code === 0) {
+      Taro.showToast({ title: '已取消', icon: 'success' })
+      load(order.value.id)
+    } else {
+      Taro.showToast({ title: message || '取消失败', icon: 'none' })
+    }
+  }
+}
+
+async function onPay(item: any) {
+  try {
+    const { code, message } = await api.put(`/orders/${order.value.id}/pay`, { payment_method: item.value })
+    if (code === 0) {
+      Taro.showToast({ title: '支付成功', icon: 'success' })
+      showPay.value = false
+      load(order.value.id)
+    } else {
+      Taro.showToast({ title: message || '支付失败', icon: 'none' })
+    }
+  } catch (e) {
+    Taro.showToast({ title: '支付异常', icon: 'none' })
+  }
+}
+
+async function load(id: string) {
+  const resp = await api.get(`/orders/${id}`)
+  if (resp.code === 0 && resp.data) {
+    order.value = (resp.data as any).order
+    items.value = (resp.data as any).items || []
+  } else {
+    Taro.showToast({ title: resp.message || '加载失败', icon: 'none' })
+  }
+}
+
+useLoad(async (options) => {
+  const id = String(options?.id || '')
+  if (!id) { Taro.showToast({ title: '参数错误', icon: 'none' }); Taro.navigateBack(); return }
+  load(id)
+})
 </script>
 
 <style lang="scss">
 .order-detail {
   min-height: 100vh;
   background: #f7f7f7;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 60px); // 增加底部 padding 防止遮挡
+}
+
+.footer-action {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 10px 16px;
   padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  z-index: 99;
 }
 
 .status-bar {

@@ -90,6 +90,7 @@ export interface CategoryQueryParams {
   parent_id?: string | null
   level?: number
   status?: 'ENABLED' | 'DISABLED'
+  filters?: FilterParams
 }
 
 export interface FilterParams { [key: string]: any }
@@ -118,28 +119,31 @@ export const getUploadUrl = (filePath?: string): string => {
 /**
  * 构建支持 filters[...] 的查询字符串
  */
-const buildQueryString = (params?: SpuQueryParams): string => {
+const buildQueryString = (params?: any): string => {
   if (!params) return ''
   const search = new URLSearchParams()
-  if (params.page) search.append('page', String(params.page))
-  if (params.limit) search.append('limit', String(params.limit))
-  if (params.sort_by) search.append('sort_by', params.sort_by)
-  if (params.sort_order) search.append('sort_order', params.sort_order)
-  const filters = params.filters
-  if (filters && typeof filters === 'object') {
-    Object.entries(filters).forEach(([field, value]) => {
-      if (value === undefined || value === null || value === '') return
-      if (typeof value === 'object' && !Array.isArray(value)) {
-        Object.entries(value).forEach(([op, opVal]) => {
-          if (opVal !== undefined && opVal !== null && opVal !== '') {
-            search.append(`filters[${field}][${op}]`, String(opVal))
-          }
-        })
-      } else {
-        search.append(`filters[${field}]`, String(value))
-      }
-    })
-  }
+  
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null) return
+    
+    if (key === 'filters' && typeof value === 'object') {
+      Object.entries(value).forEach(([field, val]) => {
+        if (val === undefined || val === null || val === '') return
+        if (typeof val === 'object' && !Array.isArray(val)) {
+          Object.entries(val).forEach(([op, opVal]) => {
+            if (opVal !== undefined && opVal !== null && opVal !== '') {
+              search.append(`filters[${field}][${op}]`, String(opVal))
+            }
+          })
+        } else {
+          search.append(`filters[${field}]`, String(val))
+        }
+      })
+    } else {
+      search.append(key, String(value))
+    }
+  })
+
   const qs = search.toString()
   return qs ? `?${qs}` : ''
 }
@@ -150,7 +154,7 @@ const mallService = {
   getBrand: (id: string) => api.get<Brand>(`/products/brands/${id}`),
 
   // 分类列表（支持 parent_id 为 null 获取顶级分类）
-  getCategories: (params?: CategoryQueryParams) => api.get<PaginatedResponse<Category>>('/products/categories', params),
+  getCategories: (params?: CategoryQueryParams) => api.get<PaginatedResponse<Category>>(`/products/categories${buildQueryString(params)}`),
   getCategory: (id: string) => api.get<Category>(`/products/categories/${id}`),
 
   // SPU 列表与详情

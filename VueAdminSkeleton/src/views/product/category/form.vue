@@ -17,6 +17,11 @@
     <el-form-item label="层级">
       <el-input v-model="levelStr" disabled style="width: 120px;" />
     </el-form-item>
+    <el-form-item label="所属品牌">
+      <el-select v-model="form.brand_id" :disabled="isDetail" placeholder="请选择品牌" style="width: 240px" clearable>
+        <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id" />
+      </el-select>
+    </el-form-item>
     <el-form-item label="状态">
       <el-select v-model="form.status" :disabled="isDetail" style="width: 200px">
         <el-option label="启用" value="ENABLED" />
@@ -44,10 +49,12 @@
  </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch, nextTick } from 'vue'
+import { computed, reactive, ref, watch, nextTick, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { CreateProductCategoryDto, ProductCategory, UpdateProductCategoryDto } from '@/api/product/category.d'
+import type { ProductBrand } from '@/api/product/brand.d'
 import { createCategory, updateCategory, getCategories } from '@/api/product/category'
+import { getBrandsAll } from '@/api/product/brand'
 import { uploadMaterial } from '@/api/material/material'
 import { getUploadFileUrl } from '@/utils/file'
 import OverwriteUpload from '@/components/upload/OverwriteUpload.vue'
@@ -64,12 +71,15 @@ const form = reactive<CreateProductCategoryDto & { id?: string; level?: number }
   description: '',
   parent_id: undefined,
   material_id: undefined,
+  brand_id: undefined,
   status: 'ENABLED'
 })
 const imageUrl = ref<string>()
 const parentName = ref('顶级分类')
 const selectVisible = ref(false)
 const treeRef = ref()
+
+const brandList = ref<ProductBrand[]>([])
 
 const rules: FormRules = {
   name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
@@ -86,9 +96,17 @@ watch(() => props.modelValue, (v) => {
   form.level = v.level
   form.status = v.status
   form.material_id = v.material_id
+  form.brand_id = v.brand_id
   imageUrl.value = v.image_url
   parentName.value = v.parent_id ? v.parent_id : '顶级分类'
 }, { immediate: true })
+
+async function fetchBrands() {
+  const res = await getBrandsAll({ limit: 100, status: 'ENABLED' })
+  if (res.code === 0) {
+    brandList.value = res.data.items
+  }
+}
 
 async function onSubmit() {
   await formRef.value?.validate()
@@ -98,6 +116,7 @@ async function onSubmit() {
       description: form.description,
       parent_id: form.parent_id ?? null,
       material_id: form.material_id ?? null,
+      brand_id: form.brand_id ?? null,
       status: form.status,
     }
     await updateCategory(form.id, payload)
@@ -107,11 +126,14 @@ async function onSubmit() {
       description: form.description,
       parent_id: form.parent_id,
       material_id: form.material_id,
+      brand_id: form.brand_id,
       status: form.status,
     })
   }
   emit('close', true)
 }
+
+onMounted(fetchBrands)
 
 function onUploaded(res: { url: string; id?: string; raw?: any }) {
   imageUrl.value = res.url
