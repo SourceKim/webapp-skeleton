@@ -12,7 +12,8 @@ export default defineAppConfig({
     'pages/profile/index',
     'pages/profile/detail/index',
     'pages/address/index',
-    'pages/address/form/index'
+    'pages/address/form/index',
+    'pages/store-intro/index'
   ],
   window: {
     backgroundTextStyle: 'light',

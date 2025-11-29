@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsInt, IsOptional, IsPositive, IsString, Length, ArrayNotEmpty } from 'class-validator';
 
 export class CreateCartDto {
@@ -6,6 +6,7 @@ export class CreateCartDto {
     @Length(1, 36)
     sku_id!: string;
 
+    @Type(() => Number)
     @IsInt()
     @IsPositive()
     quantity!: number;
@@ -13,6 +14,7 @@ export class CreateCartDto {
 
 export class UpdateCartDto {
     @IsOptional()
+    @Type(() => Number)
     @IsInt()
     @IsPositive()
     quantity?: number;

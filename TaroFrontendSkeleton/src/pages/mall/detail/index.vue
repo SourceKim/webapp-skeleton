@@ -1,75 +1,137 @@
 <template>
   <view class="detail-page">
-    <nut-navbar title="商品详情" left-show @on-click-back="goBack" safe-area-inset-top >
+    <nut-navbar title="商品详情" left-show @on-click-back="goBack" safe-area-inset-top>
       <template #right>
         <nut-icon name="cart" size="18" @click="showCart = true" />
       </template>
     </nut-navbar>
 
+    <!-- 1. 头图占满，不留白 -->
     <swiper class="gallery" circular indicator-dots v-if="images.length">
       <swiper-item v-for="(img, idx) in images" :key="idx" class="gallery-item">
-        <image :src="img" mode="aspectFit" />
+        <image :src="img" mode="aspectFill" />
       </swiper-item>
     </swiper>
     <view v-else class="gallery placeholder">
-      <image class="placeholder-img" :src="defaultImg" mode="aspectFit" />
+      <image class="placeholder-img" :src="defaultImg" mode="aspectFill" />
     </view>
 
-    <view class="section">
-      <text class="section-title">商品描述</text>
+    <!-- 2. 商品信息 -->
+    <view class="info-section">
+      <text class="title">{{ spu?.name || 'Loading...' }}</text>
       <text class="desc">{{ spu?.sub_title || spu?.description || '暂无描述' }}</text>
     </view>
 
+    <!-- 3. 数量选择 -->
     <view class="section">
+      <view class="section-header">
+        <text class="label">数量：</text>
+      </view>
+      <view class="section-body">
+        <nut-input-number v-model="quantity" min="1" />
+      </view>
+    </view>
+
+    <!-- 4. SKU 选择 -->
+    <view class="section" v-if="attributeGroups.length > 0">
+      <view class="attr-group" v-for="group in attributeGroups" :key="group.keyId">
+        <text class="group-title">{{ group.keyName }}</text>
+        <view class="group-values">
+          <view 
+            v-for="val in group.values" 
+            :key="val.id"
+            class="sku-tag"
+            :class="{ active: selectedAttrs[group.keyId] === val.id }"
+            @click="selectAttr(group.keyId, val.id)"
+          >
+            {{ val.name }}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 详情内容 -->
+    <view class="section detail-content">
       <text class="section-title">详情</text>
       <rich-text v-if="detailNodes" :nodes="detailNodes" />
       <text v-else class="desc">暂无详情</text>
     </view>
 
+    <!-- 5. 底部操作栏 -->
     <view class="footer">
+      <view class="total-price">
+        <text class="label">总价:</text>
+        <text class="symbol">¥</text>
+        <text class="num">{{ totalPrice }}</text>
+      </view>
       <view class="action-btns">
-        <nut-button type="primary" plain size="large" @click="openSku('cart')">加入购物车</nut-button>
-        <nut-button type="primary" size="large" @click="openSku('buy')">立即购买</nut-button>
+        <nut-button type="warning" @click="onAddCart">加入购物车</nut-button>
+        <nut-button type="danger" @click="onBuyNow">立即购买</nut-button>
       </view>
     </view>
-    <SkuPanel
-      v-model:modelValue="skuVisible"
-      :sku="skuTree"
-      :sku-list="skuList"
-      :goods="goodsData"
-      :loading="skuLoading"
-      :btn-options="['buy','cart']"
-      @close="skuVisible = false"
-      @add-cart="onAddCart"
-      @buy-click="onBuyNow"
-    />
+    
     <CartPopup v-model:modelValue="showCart" />
   </view>
-  
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef } from 'vue'
-import SkuPanel from '@/components/sku-panel.vue'
+import { ref, computed } from 'vue'
 import CartPopup from '@/components/cart-popup.vue'
 import api from '@/services/api'
 import Taro, { useLoad } from '@tarojs/taro'
 import mallService, { type Spu, getUploadUrl } from '@/services/mall'
 
+// State
 const spu = ref<Spu | null>(null)
 const images = ref<string[]>([])
 const defaultImg = 'https://dummyimage.com/600x400/eaeaea/999.png&text=No+Image'
 const detailNodes = ref<any>(null)
-// SKU 弹窗相关
-const skuVisible = ref(false)
-const skuLoading = ref(false)
-const skuAction = ref<'cart' | 'buy'>('cart')
-const skuTree = shallowRef<any[]>([])
-const skuList = shallowRef<any[]>([])
-const goodsData = shallowRef<any>({ price: '0', imagePath: '', stockNum: 0 })
-// 购物车弹层
 const showCart = ref(false)
 
+// SKU Logic
+const quantity = ref(1)
+const allSkus = ref<any[]>([])
+const attributeGroups = ref<any[]>([])
+const selectedAttrs = ref<Record<string, string>>({})
+
+// Computed
+const currentSku = computed(() => {
+  if (allSkus.value.length === 0) return null
+  
+  // Find SKU that matches all selected attributes
+  return allSkus.value.find(sku => {
+    const attrs = sku.sku_attributes || sku.attributes || []
+    
+    for (const keyId in selectedAttrs.value) {
+      const valId = selectedAttrs.value[keyId]
+      // Find attribute in sku
+      const attr = attrs.find((a: any) => (a.key_id === keyId || a.attribute_key?.id === keyId))
+      if (!attr) return false 
+      const skuValId = attr.value_id || attr.attribute_value?.id || attr.attribute_value?.value_id
+      if (String(skuValId) !== String(valId)) return false
+    }
+    return true
+  }) || null 
+})
+
+const totalPrice = computed(() => {
+  const price = Number(currentSku.value?.price || 0)
+  return (price * quantity.value).toFixed(2)
+})
+
+// Lifecycle
+useLoad((options) => {
+  const id = String(options?.id || '')
+  if (!id) {
+    Taro.showToast({ title: '参数错误', icon: 'none' })
+    Taro.navigateBack()
+    return
+  }
+  loadDetail(id)
+  loadSkus(id)
+})
+
+// Methods
 const loadDetail = async (id: string) => {
   const resp = await mallService.getSpuDetail(id)
   if (resp.code === 0 && resp.data) {
@@ -84,193 +146,232 @@ const loadDetail = async (id: string) => {
     if (resp.data.detail_content) {
       detailNodes.value = resp.data.detail_content
     }
-  } else {
-    Taro.showToast({ title: resp.message || '加载失败', icon: 'none' })
   }
 }
 
-useLoad((options) => {
-  const id = String(options?.id || '')
-  if (!id) {
-    Taro.showToast({ title: '参数错误', icon: 'none' })
-    Taro.navigateBack()
-    return
-  }
-  loadDetail(id)
-})
-
-const goBack = () => {
-  // 优先返回上一页，否则回到商城列表
-  if (typeof window !== 'undefined' && window.history && window.history.length > 1) {
-    Taro.navigateBack()
-  } else {
-    Taro.switchTab({ url: '/pages/mall/index' })
+const loadSkus = async (spuId: string) => {
+  const { code, data } = await mallService.getSkus({ 
+    page: 1, 
+    limit: 100, 
+    filters: { spu_id: spuId, status: 'ON_SHELF' } 
+  })
+  
+  if (code === 0 && data) {
+    const items = (data as any).items || []
+    allSkus.value = items
+    processAttributes(items)
   }
 }
 
-const openSku = async (action: 'cart' | 'buy') => {
-  if (!spu.value) return
-  skuAction.value = action
-  skuVisible.value = true
-  skuLoading.value = true
-  try {
-    const { code, data } = await mallService.getSkus({ page: 1, limit: 100, filters: { spu_id: spu.value.id, status: 'ON_SHELF' } })
-    const items = code === 0 && data ? (data as any).items : []
-    const { tree, list, price, stockNum } = buildNutSkuData(items)
-    skuTree.value = tree
-    skuList.value = list
-    goodsData.value = {
-      imagePath: images.value[0] || defaultImg,
-      spuId: spu.value.id,
-      price: Number(price) || 0,
-      stockNum
+const processAttributes = (skus: any[]) => {
+  const groups: Map<string, { keyId: string, keyName: string, values: Map<string, string> }> = new Map()
+  const keyOrder: string[] = []
+
+  skus.forEach(sku => {
+    const attrs = sku.sku_attributes || sku.attributes || []
+    attrs.forEach((attr: any) => {
+      const keyId = attr.key_id || attr.attribute_key?.id
+      const keyName = attr.key_name || attr.attribute_key?.name || keyId
+      const valId = attr.value_id || attr.attribute_value?.id || attr.attribute_value?.value_id
+      const valName = attr.value || attr.attribute_value?.value || valId
+      
+      if (!keyId) return
+
+      if (!groups.has(keyId)) {
+        groups.set(keyId, { keyId, keyName, values: new Map() })
+        keyOrder.push(keyId)
+      }
+      const group = groups.get(keyId)!
+      if (!group.values.has(valId)) {
+        group.values.set(valId, valName)
+      }
+    })
+  })
+
+  // Convert to array
+  attributeGroups.value = keyOrder.map(keyId => {
+    const g = groups.get(keyId)!
+    return {
+      keyId: g.keyId,
+      keyName: g.keyName,
+      values: Array.from(g.values.entries()).map(([id, name]) => ({ id, name }))
     }
-  } finally {
-    skuLoading.value = false
-  }
+  })
+
+  // Default Select First Option
+  attributeGroups.value.forEach(g => {
+    if (g.values.length > 0) {
+      selectedAttrs.value[g.keyId] = g.values[0].id
+    }
+  })
 }
 
-async function onAddCart(payload?: any) {
-  console.log("onaddcart", payload)
-  const skuId = payload?.sku?.id || payload?.id || payload?.skuId
-  const quantity = Number(payload?.buyNum || payload?.num || 1)
-  if (!skuId) { Taro.showToast({ title: '请选择规格', icon: 'none' }); return }
-  const resp = await api.post('/cart', { sku_id: skuId, quantity })
+const selectAttr = (keyId: string, valId: string) => {
+  selectedAttrs.value[keyId] = valId
+}
+
+const onAddCart = async () => {
+  if (!currentSku.value) {
+     Taro.showToast({ title: '请选择规格', icon: 'none' })
+     return
+  }
+  const resp = await api.post('/cart', { sku_id: currentSku.value.id, quantity: quantity.value })
   if (resp.code === 0) {
     Taro.showToast({ title: '已加入购物车', icon: 'success' })
   } else {
     Taro.showToast({ title: resp.message || '加入失败', icon: 'none' })
   }
-  skuVisible.value = false
 }
 
-async function onBuyNow(payload?: any) {
-  const skuId = payload?.sku?.id || payload?.id || payload?.skuId
-  const quantity = Number(payload?.buyNum || payload?.num || 1)
-  
-  if (!skuId) { 
-    Taro.showToast({ title: '请选择规格', icon: 'none' })
-    return 
+const onBuyNow = async () => {
+  if (!currentSku.value) {
+     Taro.showToast({ title: '请选择规格', icon: 'none' })
+     return
   }
-
-  const resp = await api.post('/cart', { sku_id: skuId, quantity })
+  const resp = await api.post('/cart', { sku_id: currentSku.value.id, quantity: quantity.value })
   if (resp.code === 0) {
-    skuVisible.value = false
     const itemId = (resp.data as any)?.id
     if (itemId) {
       Taro.navigateTo({ url: `/pages/mall/order-confirm/index?ids=${itemId}` })
-    } else {
-      Taro.showToast({ title: '已加入购物车', icon: 'success' })
     }
-  } else {
-    Taro.showToast({ title: resp.message || '操作失败', icon: 'none' })
   }
 }
 
-function buildNutSkuData(skus: any[]) {
-  if (!skus || skus.length === 0) {
-    return { tree: [], list: [], price: '0', stockNum: 0 }
+const goBack = () => {
+  const pages = Taro.getCurrentPages()
+  if (pages.length > 1) {
+    Taro.navigateBack()
+  } else {
+    Taro.switchTab({ url: '/pages/mall/index' })
   }
-  const keyMap = new Map<string, { k: string; k_id: string; vMap: Map<string, string> }>()
-  const keyOrder: string[] = []
-  for (const sku of skus) {
-    const attrsVerbose: Array<any> = sku.sku_attributes || []
-    if (attrsVerbose.length > 0) {
-      for (const it of attrsVerbose) {
-        const keyId = it?.attribute_key?.id
-        if (!keyId) continue
-        const keyName = it?.attribute_key?.name || keyId
-        const valId = it?.attribute_value?.value_id || it?.attribute_value?.id
-        const valName = it?.attribute_value?.value || valId
-        if (!keyMap.has(keyId)) {
-          keyOrder.push(keyId)
-          keyMap.set(keyId, { k: keyName, k_id: keyId, vMap: new Map() })
-        }
-        const entry = keyMap.get(keyId)!
-        if (valId && !entry.vMap.has(valId)) entry.vMap.set(valId, valName)
-      }
-    } else {
-      const attrs: Array<any> = sku.attributes || []
-      for (const a of attrs) {
-        if (!keyMap.has(a.key_id)) {
-          keyOrder.push(a.key_id)
-          keyMap.set(a.key_id, { k: a.key_name || a.key_id, k_id: a.key_id, vMap: new Map() })
-        }
-        const entry = keyMap.get(a.key_id)!
-        if (a.value_id && !entry.vMap.has(a.value_id)) entry.vMap.set(a.value_id, a.value || a.value_id)
-      }
-    }
-  }
-  // 转为 NutUI sku 组结构
-  const tree = keyOrder.map((keyId) => {
-    const entry = keyMap.get(keyId)!
-    return { id: entry.k_id, name: entry.k, list: Array.from(entry.vMap.entries()).map(([id, name]) => ({ id, name, active: false, disable: false })) }
-  })
-  const list = skus.map((sku) => {
-    const row: any = { id: sku.id, price: Number(sku.price || 0), stock: Number(sku.stock || 0) }
-    const pairs: string[] = []
-    const attrsVerbose: Array<any> = sku.sku_attributes || []
-    if (attrsVerbose.length > 0) {
-      for (const it of attrsVerbose) {
-        const keyId = it?.attribute_key?.id
-        const valId = it?.attribute_value?.value_id || it?.attribute_value?.id
-        if (keyId && valId) pairs.push(`${keyId}:${valId}`)
-      }
-    } else {
-      const attrs: Array<any> = sku.attributes || []
-      for (const a of attrs) {
-        if (a?.key_id && a?.value_id) pairs.push(`${a.key_id}:${a.value_id}`)
-      }
-    }
-    row.skuId = pairs.join(';')
-    return row
-  })
-  const price = String(list[0]?.price ?? '0')
-  const stockNum = list.reduce((sum: number, it: any) => sum + (Number(it.stock) || 0), 0)
-  return { tree, list, price, stockNum }
 }
 </script>
 
 <style lang="scss">
 .detail-page {
-  padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
   background: #f7f7f7;
   min-height: 100vh;
-  .gallery { height: 100vw; background: #fff; }
-  .gallery-item { display: flex; align-items: center; justify-content: center; }
-  .gallery image, .gallery .placeholder-img { width: 100%; height: 100%; object-fit: contain; }
-  .section { background: #fff; padding: 12px; margin-top: 12px; }
-  .section-title { display: block; font-weight: 600; margin-bottom: 12px; font-size: 16px; color: #333; }
-  .desc { color: #666; line-height: 1.6; font-size: 14px; }
+
+  .gallery { width: 100vw; height: 100vw; background: #fff; }
+  .gallery-item image, .gallery .placeholder-img { width: 100%; height: 100%; display: block; }
+
+  .info-section {
+    background: #fff;
+    padding: 16px;
+    margin-bottom: 12px;
+    
+    .title {
+      display: block;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    
+    .desc {
+      display: block;
+      font-size: 14px;
+      color: #999;
+      line-height: 1.4;
+    }
+  }
+
+  .section {
+    background: #fff;
+    padding: 16px;
+    margin-top: 12px;
+    
+    .section-header {
+      margin-bottom: 12px;
+      .label { font-size: 14px; font-weight: bold; color: #333; }
+    }
+    
+    .section-title {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 12px;
+      font-size: 15px;
+      position: relative;
+      padding-left: 10px;
+      &:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 4px;
+        bottom: 4px;
+        width: 3px;
+        background: #fa2c19;
+        border-radius: 2px;
+      }
+    }
+  }
   
-  .footer { 
-    position: fixed; 
-    left: 0; 
-    right: 0; 
+  .attr-group {
+    margin-bottom: 16px;
+    &:last-child { margin-bottom: 0; }
+    
+    .group-title {
+      display: block;
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    
+    .group-values {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .sku-tag {
+      padding: 6px 16px;
+      background: #f2f2f2;
+      border-radius: 16px;
+      font-size: 12px;
+      color: #333;
+      border: 1px solid transparent;
+      
+      &.active {
+        background: #fcedeb;
+        color: #fa2c19;
+        border-color: #fa2c19;
+      }
+    }
+  }
+
+  .footer {
+    position: fixed;
+    left: 0;
+    right: 0;
     bottom: 0;
-    z-index: 10; 
-    background: #fff; 
-    display: flex; 
-    justify-content: center;
+    z-index: 99;
+    background: #fff;
+    display: flex;
     align-items: center;
-    padding: 8px 12px;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    padding: 10px 16px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
     box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
     
-    .action-btns {
+    .total-price {
       flex: 1;
       display: flex;
+      align-items: baseline;
+      .label { font-size: 14px; color: #333; margin-right: 4px; }
+      .symbol { font-size: 12px; color: #fa2c19; font-weight: bold;}
+      .num { font-size: 24px; font-weight: bold; color: #fa2c19; }
+    }
+    
+    .action-btns {
+      display: flex;
       gap: 10px;
-      max-width: 600px;
-      width: 100%;
       
       .nut-button {
-        flex: 1;
+        min-width: 100px;
         margin: 0;
       }
     }
   }
 }
 </style>
-
-
