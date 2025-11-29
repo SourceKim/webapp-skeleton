@@ -51,6 +51,11 @@
       <nut-cell title="编辑资料" is-link @click="goEditProfile" />
     </nut-cell-group>
 
+    <nut-cell-group title="服务">
+      <nut-cell title="店铺资料" is-link />
+      <nut-cell title="联系我们" is-link />
+    </nut-cell-group>
+
     <view class="mt-10">
       <nut-button type="danger" block @click="handleLogout">退出登录</nut-button>
     </view>

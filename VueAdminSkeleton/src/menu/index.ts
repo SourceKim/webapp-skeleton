@@ -195,4 +195,49 @@ export const flatMenus: FlatMenu[] = [
         handleType: 'route',
         parentId: '10'
       },
+    {
+        id: '30',
+        title: '店铺管理',
+        name: 'store-manager',
+        path: 'store-manager',
+        type: 'dir',
+        icon: 'el|shop',
+        cache: true,
+    },
+    {
+        id: '31',
+        title: '首页背景图',
+        name: 'store-home-bg',
+        path: 'home-bg',
+        type: 'menu',
+        icon: 'el|picture',
+        cache: true,
+        component: '/src/views/store/home-bg/index.vue',
+        handleType: 'route',
+        parentId: '30'
+    },
+    {
+        id: '32',
+        title: '首页轮播',
+        name: 'store-home-carousel',
+        path: 'home-carousel',
+        type: 'menu',
+        icon: 'el|files',
+        cache: true,
+        component: '/src/views/store/home-carousel/index.vue',
+        handleType: 'route',
+        parentId: '30'
+    },
+    {
+        id: '33',
+        title: '店铺资料',
+        name: 'store-profile',
+        path: 'profile',
+        type: 'menu',
+        icon: 'el|info-filled',
+        cache: true,
+        component: '/src/views/store/profile/index.vue',
+        handleType: 'route',
+        parentId: '30'
+    }
 ]
