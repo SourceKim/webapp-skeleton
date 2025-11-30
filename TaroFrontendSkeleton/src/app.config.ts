@@ -28,19 +28,27 @@ export default defineAppConfig({
     list: [
       {
         pagePath: 'pages/general/index',
-        text: '首页'
+        text: '首页',
+        iconPath: './assets/tabbar/home.svg',
+        selectedIconPath: './assets/tabbar/home-active.svg'
       },
       {
         pagePath: 'pages/store-intro/index',
-        text: '店铺'
+        text: '店铺',
+        iconPath: './assets/tabbar/shop.svg',
+        selectedIconPath: './assets/tabbar/shop-active.svg'
       },
       {
         pagePath: 'pages/mall/index',
-        text: '商城'
+        text: '商城',
+        iconPath: './assets/tabbar/mall.svg',
+        selectedIconPath: './assets/tabbar/mall-active.svg'
       },
       {
         pagePath: 'pages/profile/index',
-        text: '我的'
+        text: '我的',
+        iconPath: './assets/tabbar/profile.svg',
+        selectedIconPath: './assets/tabbar/profile-active.svg'
       }
     ]
   }
