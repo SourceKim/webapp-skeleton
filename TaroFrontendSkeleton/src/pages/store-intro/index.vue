@@ -124,7 +124,7 @@ const openLocation = () => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f8f8f8;
+  background: $style-color-bg;
 
   .content-scroll {
     flex: 1;
@@ -142,27 +142,27 @@ const openLocation = () => {
   }
 
   .info-section {
-    background: #fff;
-    padding: 20px;
+    background: $style-color-white;
+    padding: $style-spacing-base;
     margin-bottom: 20px;
     border-radius: 0 0 12px 12px;
     
     .store-name {
       font-size: 24px;
       font-weight: bold;
-      color: #333;
+      color: $style-text-color-primary;
       margin-bottom: 8px;
     }
     
     .store-intro-text {
-      font-size: 14px;
-      color: #666;
+      font-size: $style-text-size-base;
+      color: $style-text-color-regular;
       line-height: 1.6;
     }
     
     .divider {
       height: 1px;
-      background: #eee;
+      background: $style-border-color;
       margin: 16px 0;
     }
     
@@ -174,29 +174,29 @@ const openLocation = () => {
       .detail-text {
         flex: 1;
         margin-left: 10px;
-        font-size: 14px;
-        color: #333;
+        font-size: $style-text-size-base;
+        color: $style-text-color-primary;
       }
     }
 
     .map-container {
       margin-top: 16px;
-      border-radius: 8px;
+      border-radius: $style-border-radius-base;
       overflow: hidden;
     }
 
     .section-title {
-      font-size: 16px;
+      font-size: $style-text-size-lg;
       font-weight: bold;
       margin-bottom: 12px;
-      border-left: 4px solid #fa2c19;
+      border-left: 4px solid $style-text-color-price;
       padding-left: 8px;
     }
     
     .rich-content {
       margin-top: 20px;
-      font-size: 14px;
-      color: #666;
+      font-size: $style-text-size-base;
+      color: $style-text-color-regular;
       line-height: 1.8;
       
       img {

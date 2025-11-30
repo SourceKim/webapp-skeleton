@@ -250,42 +250,42 @@ const goBack = () => {
 <style lang="scss">
 .detail-page {
   padding-bottom: calc(100px + env(safe-area-inset-bottom));
-  background: #f7f7f7;
+  background: $style-color-bg;
   min-height: 100vh;
 
-  .gallery { width: 100vw; height: 100vw; background: #fff; }
+  .gallery { width: 100vw; height: 100vw; background: $style-color-white; }
   .gallery-item image, .gallery .placeholder-img { width: 100%; height: 100%; display: block; }
 
   .info-section {
-    background: #fff;
-    padding: 16px;
+    background: $style-color-white;
+    padding: $style-spacing-sm;
     margin-bottom: 12px;
     
     .title {
       display: block;
-      font-size: 18px;
+      font-size: $style-text-size-xl;
       font-weight: bold;
-      color: #333;
+      color: $style-text-color-primary;
       margin-bottom: 8px;
       line-height: 1.4;
     }
     
     .desc {
       display: block;
-      font-size: 14px;
-      color: #999;
+      font-size: $style-text-size-base;
+      color: $style-text-color-secondary;
       line-height: 1.4;
     }
   }
 
   .section {
-    background: #fff;
-    padding: 16px;
+    background: $style-color-white;
+    padding: $style-spacing-sm;
     margin-top: 12px;
     
     .section-header {
       margin-bottom: 12px;
-      .label { font-size: 14px; font-weight: bold; color: #333; }
+      .label { font-size: $style-text-size-base; font-weight: bold; color: $style-text-color-primary; }
     }
     
     .section-title {
@@ -302,7 +302,7 @@ const goBack = () => {
         top: 4px;
         bottom: 4px;
         width: 3px;
-        background: #fa2c19;
+        background: $style-text-color-price;
         border-radius: 2px;
       }
     }
@@ -314,8 +314,8 @@ const goBack = () => {
     
     .group-title {
       display: block;
-      font-size: 14px;
-      color: #333;
+      font-size: $style-text-size-base;
+      color: $style-text-color-primary;
       margin-bottom: 8px;
     }
     
@@ -326,17 +326,17 @@ const goBack = () => {
     }
     
     .sku-tag {
-      padding: 6px 16px;
+      padding: 6px $style-spacing-sm;
       background: #f2f2f2;
-      border-radius: 16px;
-      font-size: 12px;
-      color: #333;
+      border-radius: $style-border-radius-lg;
+      font-size: $style-text-size-sm;
+      color: $style-text-color-primary;
       border: 1px solid transparent;
       
       &.active {
         background: #fcedeb;
-        color: #fa2c19;
-        border-color: #fa2c19;
+        color: $style-text-color-price;
+        border-color: $style-text-color-price;
       }
     }
   }
@@ -347,10 +347,10 @@ const goBack = () => {
     right: 0;
     bottom: 0;
     z-index: 99;
-    background: #fff;
+    background: $style-color-white;
     display: flex;
     align-items: center;
-    padding: 10px 16px;
+    padding: 10px $style-spacing-sm;
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
     box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
     
@@ -358,9 +358,9 @@ const goBack = () => {
       flex: 1;
       display: flex;
       align-items: baseline;
-      .label { font-size: 14px; color: #333; margin-right: 4px; }
-      .symbol { font-size: 12px; color: #fa2c19; font-weight: bold;}
-      .num { font-size: 24px; font-weight: bold; color: #fa2c19; }
+      .label { font-size: $style-text-size-base; color: $style-text-color-primary; margin-right: 4px; }
+      .symbol { font-size: $style-text-size-sm; color: $style-text-color-price; font-weight: bold;}
+      .num { font-size: $style-text-size-sm; font-weight: bold; color: $style-text-color-price; }
     }
     
     .action-btns {

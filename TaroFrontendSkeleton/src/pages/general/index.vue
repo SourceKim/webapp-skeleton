@@ -114,7 +114,7 @@ const goStoreIntro = () => {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: #000;
+  background: $style-color-black;
 }
 
 .full-screen-swiper {
@@ -137,16 +137,16 @@ const goStoreIntro = () => {
   .weather-location {
     display: flex;
     align-items: center;
-    color: #fff;
+    color: $style-color-white;
     text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     
     .city {
       margin-left: 4px;
       margin-right: 10px;
-      font-size: 14px;
+      font-size: $style-text-size-base;
     }
     .weather {
-      font-size: 14px;
+      font-size: $style-text-size-base;
     }
   }
 }
@@ -163,7 +163,7 @@ const goStoreIntro = () => {
   
   .action-btn {
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 8px; 
+    border-radius: $style-border-radius-base; 
     padding: 16px 20px;
     display: flex;
     align-items: center;
@@ -188,15 +188,15 @@ const goStoreIntro = () => {
       flex-direction: column;
       
       .main-text {
-        font-size: 18px;
+        font-size: $style-text-size-xl;
         font-weight: bold;
-        color: #333;
+        color: $style-text-color-primary;
         margin-bottom: 2px;
       }
       
       .sub-text {
-        font-size: 10px;
-        color: #999;
+        font-size: $style-text-size-xs;
+        color: $style-text-color-secondary;
         letter-spacing: 1px;
         text-transform: uppercase;
       }

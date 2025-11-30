@@ -154,18 +154,18 @@ const callPhone = () => {
 </script>
 
 <style lang="scss">
-.profile-container { padding: 24px; }
+.profile-container { padding: $style-spacing-base; }
 .user-card { display: flex; align-items: center; }
 .user-avatar { width: 64px; height: 64px; border-radius: 50%; margin-right: 12px; }
 .user-avatar-def { margin-right: 12px; }
-.btn { margin-top: 16px; background: #1677ff; color: #fff; padding: 10px; border-radius: 4px; }
+.btn { margin-top: 16px; background: $style-color-primary; color: $style-color-white; padding: 10px; border-radius: 4px; }
 
 .stats-row {
   display: flex;
-  background: #fff;
-  padding: 16px 0;
+  background: $style-color-white;
+  padding: $style-spacing-sm 0;
   margin-top: 12px;
-  border-radius: 8px;
+  border-radius: $style-border-radius-base;
 }
 .stat-item {
   flex: 1;
@@ -175,14 +175,14 @@ const callPhone = () => {
   justify-content: center;
 }
 .stat-item .num {
-  font-size: 18px;
+  font-size: $style-text-size-xl;
   font-weight: 600;
-  color: #333;
+  color: $style-text-color-primary;
   margin-bottom: 4px;
 }
 .stat-item .label {
-  font-size: 12px;
-  color: #666;
+  font-size: $style-text-size-sm;
+  color: $style-text-color-regular;
 }
 
 .contact-popup-content {
@@ -191,20 +191,20 @@ const callPhone = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #fff;
-  border-radius: 8px;
+  background-color: $style-color-white;
+  border-radius: $style-border-radius-base;
 }
 
 .popup-title {
-  font-size: 16px;
+  font-size: $style-text-size-lg;
   font-weight: bold;
   margin-bottom: 15px;
-  color: #333;
+  color: $style-text-color-primary;
 }
 
 .popup-phone {
-  font-size: 20px;
-  color: #fa2c19;
+  font-size: $style-h1-text-size;
+  color: $style-text-color-price;
   margin-bottom: 20px;
   font-weight: 500;
 }

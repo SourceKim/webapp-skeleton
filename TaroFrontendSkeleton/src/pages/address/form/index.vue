@@ -168,9 +168,9 @@ const goBack = () => {
 </script>
 
 <style lang="scss">
-.address-form-page { padding: 12px; }
-.btns { margin: 16px 0; }
-.row { display: flex; gap: 8px; }
+.address-form-page { padding: $style-spacing-sm; }
+.btns { margin: $style-spacing-sm 0; }
+.row { display: flex; gap: $style-spacing-xs; }
 </style>
 
 

@@ -140,11 +140,11 @@ const handleSubmit = async () => {
 
 <style lang="scss">
 .login-container { padding: 20px; }
-.card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+.card { background: $style-color-white; border-radius: 12px; padding: $style-spacing-sm; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
 .login-title { display:block; font-size: 20px; font-weight: 600; margin-bottom: 12px; }
-.nut-input { width: 100%; padding: 10px 12px; border: 1px solid #eee; border-radius: 8px; background: #fafafa; }
-.nut-textarea { width: 100%; min-height: 80px; padding: 10px 12px; border: 1px solid #eee; border-radius: 8px; background: #fafafa; }
-.picker-display { padding: 10px 12px; border: 1px solid #eee; border-radius: 8px; background: #fafafa; color: #666; }
+.nut-input { width: 100%; padding: 10px 12px; border: 1px solid $style-border-color; border-radius: 8px; background: $style-color-bg; }
+.nut-textarea { width: 100%; min-height: 80px; padding: 10px 12px; border: 1px solid $style-border-color; border-radius: 8px; background: $style-color-bg; }
+.picker-display { padding: 10px 12px; border: 1px solid $style-border-color; border-radius: 8px; background: $style-color-bg; color: $style-text-color-regular; }
 .mt-10 { margin-top: 10px; }
 </style>
 

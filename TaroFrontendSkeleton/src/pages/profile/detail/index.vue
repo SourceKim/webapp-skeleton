@@ -181,15 +181,15 @@ const handleChangeAvatar = async () => {
 
 <style lang="scss">
 .profile-detail-page { padding-top: 0; }
-.content { padding: 16px; }
+.content { padding: $style-spacing-sm; }
 .avatar-section { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-.avatar { width: 72px; height: 72px; border-radius: 50%; background: #f2f3f5; }
-.picker-display { height: 40px; padding: 0 12px; border: 1px solid #eee; border-radius: 8px; background: #fafafa; display: flex; align-items: center; color: #666; }
+.avatar { width: 72px; height: 72px; border-radius: 50%; background: $style-color-bg; }
+.picker-display { height: 40px; padding: 0 12px; border: 1px solid $style-border-color; border-radius: 8px; background: $style-color-bg; display: flex; align-items: center; color: $style-text-color-regular; }
 .mt-16 { margin-top: 16px; }
-.popup-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #f0f0f0; }
-.popup-header .title { font-weight: 600; color: #333; }
-.popup-header .action { color: #666; }
-.popup-header .action.primary { color: #1677ff; }
+.popup-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid $style-border-color; }
+.popup-header .title { font-weight: 600; color: $style-text-color-primary; }
+.popup-header .action { color: $style-text-color-regular; }
+.popup-header .action.primary { color: $style-color-primary; }
 </style>
 
 

@@ -90,10 +90,10 @@ const setDefault = async (item: AddressItem) => {
 </script>
 
 <style lang="scss">
-.address-page { padding: 8px 0 24px; }
-.ops { display: flex; gap: 8px; }
+.address-page { padding: $style-spacing-xs 0 $style-spacing-base; }
+.ops { display: flex; gap: $style-spacing-xs; }
 .ml-6 { margin-left: 6px; }
-.empty { margin-top: 32px; }
+.empty { margin-top: $style-spacing-lg; }
 </style>
 
 

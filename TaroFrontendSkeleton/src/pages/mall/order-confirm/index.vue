@@ -226,33 +226,33 @@ function coverOf(it: any): string | undefined {
 
 <style lang="scss">
 .order-confirm { padding-bottom: 72px; }
-.section { background: #fff; padding: 12px; margin-top: 8px; }
+.section { background: $style-color-white; padding: 12px; margin-top: 8px; }
 .addr .name { font-weight: 600; }
-.addr .detail { margin-top: 4px; color: #666; font-size: 12px; }
-.addr .placeholder { color: #999; }
-.row { padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+.addr .detail { margin-top: 4px; color: $style-text-color-regular; font-size: $style-text-size-sm; }
+.addr .placeholder { color: $style-text-color-secondary; }
+.row { padding: 8px 0; border-bottom: 1px solid $style-color-bg; }
 .row:last-child { border-bottom: none }
 .title { font-weight: 600; }
-.sub { color: #888; font-size: 12px; margin-top: 2px; }
+.sub { color: $style-text-color-secondary; font-size: $style-text-size-sm; margin-top: 2px; }
 .attrs { margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; }
-.attr { background: #f6f6f6; padding: 2px 6px; border-radius: 3px; color: #666; font-size: 12px }
+.attr { background: $style-color-bg; padding: 2px 6px; border-radius: 3px; color: $style-text-color-regular; font-size: $style-text-size-sm; }
 .meta { display: flex; justify-content: space-between; margin-top: 6px; }
-.price { color: #fa2c19; font-weight: 600; }
-.total .amount { color: #fa2c19; font-weight: 700; }
-.footer { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; padding: 10px 12px env(safe-area-inset-bottom); box-shadow: 0 -2px 8px rgba(0,0,0,0.06); }
+.price { color: $style-text-color-price; font-weight: 600; }
+.total .amount { color: $style-text-color-price; font-weight: 700; }
+.footer { position: fixed; left: 0; right: 0; bottom: 0; background: $style-color-white; padding: 10px 12px env(safe-area-inset-bottom); box-shadow: 0 -2px 8px rgba(0,0,0,0.06); }
 
 .addr-popup { display: flex; flex-direction: column; height: 100%; position: relative; }
-.addr-header { text-align: center; padding: 16px; font-weight: 600; font-size: 16px; border-bottom: 1px solid #eee; }
-.addr-list { flex: 1; overflow: hidden; background: #f5f5f5; height: 100%; }
-.addr-item { background: #fff; padding: 12px; margin-bottom: 1px; display: flex; align-items: center; justify-content: space-between; }
+.addr-header { text-align: center; padding: 16px; font-weight: 600; font-size: $style-text-size-lg; border-bottom: 1px solid #eee; }
+.addr-list { flex: 1; overflow: hidden; background: $style-color-bg; height: 100%; }
+.addr-item { background: $style-color-white; padding: 12px; margin-bottom: 1px; display: flex; align-items: center; justify-content: space-between; }
 .addr-item .left { flex: 1; margin-right: 12px; }
 .addr-item .top { display: flex; align-items: center; margin-bottom: 4px; }
 .addr-item .name { font-weight: 600; font-size: 15px; margin-right: 8px; }
-.addr-item .phone { color: #666; font-size: 14px; margin-right: 8px; }
-.addr-item .tag { background: #fa2c19; color: #fff; font-size: 10px; padding: 1px 4px; border-radius: 2px; }
-.addr-item .detail { color: #333; font-size: 13px; line-height: 1.4; }
-.addr-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; }
-.addr-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px; background: #fff; box-shadow: 0 -2px 8px rgba(0,0,0,0.05); }
+.addr-item .phone { color: $style-text-color-regular; font-size: $style-text-size-base; margin-right: 8px; }
+.addr-item .tag { background: $style-text-color-price; color: $style-color-white; font-size: $style-text-size-xs; padding: 1px 4px; border-radius: 2px; }
+.addr-item .detail { color: $style-text-color-primary; font-size: 13px; line-height: 1.4; }
+.addr-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: $style-color-white; }
+.addr-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px; background: $style-color-white; box-shadow: 0 -2px 8px rgba(0,0,0,0.05); }
 </style>
 
 

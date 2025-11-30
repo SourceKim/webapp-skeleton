@@ -340,16 +340,16 @@ onMounted(async () => {
 <style lang="scss">
 .sub-page {
   min-height: 100vh;
-  background: #f7f7f7;
+  background: $style-color-bg;
 
   .main {
     height: calc(100vh - env(safe-area-inset-bottom));
   }
 
   .brand-card {
-    background: #fff;
+    background: $style-color-white;
     margin: 12px 12px 0;
-    padding: 16px;
+    padding: $style-spacing-sm;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.02);
     
@@ -361,7 +361,7 @@ onMounted(async () => {
         width: 48px;
         height: 48px;
         border-radius: 8px;
-        background: #f5f5f5;
+        background: $style-color-bg;
         flex-shrink: 0;
         border: 1px solid rgba(0,0,0,0.05);
       }
@@ -371,15 +371,15 @@ onMounted(async () => {
         flex: 1;
         
         .brand-name {
-          font-size: 16px;
+          font-size: $style-text-size-lg;
           font-weight: 600;
-          color: #333;
+          color: $style-text-color-primary;
           margin-bottom: 4px;
         }
         
         .brand-desc {
-          font-size: 12px;
-          color: #666;
+          font-size: $style-text-size-sm;
+          color: $style-text-color-regular;
           line-height: 1.4;
         }
       }
@@ -393,7 +393,7 @@ onMounted(async () => {
     
     .category-side {
       width: 90px;
-      background: #f7f7f7;
+      background: $style-color-bg;
       
       .cat-item {
         padding: 14px 10px;
@@ -402,15 +402,15 @@ onMounted(async () => {
         
         .cat-name {
           font-size: 13px;
-          color: #666;
+          color: $style-text-color-regular;
         }
         
         &.active {
-          background: #fff;
+          background: $style-color-white;
           border-radius: 8px 0 0 8px;
           
           .cat-name {
-            color: #fa2c19;
+            color: $style-text-color-price;
             font-weight: 600;
           }
           
@@ -422,7 +422,7 @@ onMounted(async () => {
             transform: translateY(-50%);
             width: 3px;
             height: 16px;
-            background: #fa2c19;
+            background: $style-text-color-price;
             border-radius: 0 2px 2px 0;
           }
         }
@@ -431,7 +431,7 @@ onMounted(async () => {
 
     .goods-side {
       flex: 1;
-      background: #fff;
+      background: $style-color-white;
       padding: 12px;
       border-radius: 8px 0 0 0;
       
@@ -461,9 +461,9 @@ onMounted(async () => {
             padding: 2px 0;
             
             .goods-name {
-              font-size: 14px;
+              font-size: $style-text-size-base;
               font-weight: 600;
-              color: #333;
+              color: $style-text-color-primary;
               line-height: 1.4;
               overflow: hidden;
               text-overflow: ellipsis;
@@ -475,7 +475,7 @@ onMounted(async () => {
             
             .goods-sub {
               font-size: 11px;
-              color: #999;
+              color: $style-text-color-secondary;
               margin-top: 4px;
             }
             
@@ -489,7 +489,7 @@ onMounted(async () => {
               .action-add {
                 width: 24px;
                 height: 24px;
-                background: #1677ff;
+                background: $style-color-primary;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
@@ -512,24 +512,24 @@ onMounted(async () => {
                   display: flex;
                   align-items: center;
                   justify-content: center;
-                  font-size: 16px;
+                  font-size: $style-text-size-lg;
                   font-weight: bold;
                   
                   &.minus {
-                    border: 1px solid #ddd;
-                    color: #666;
-                    background: #fff;
+                    border: 1px solid $style-border-color;
+                    color: $style-text-color-regular;
+                    background: $style-color-white;
                   }
                   
                   &.plus {
-                    background: #1677ff;
-                    color: #fff;
+                    background: $style-color-primary;
+                    color: $style-color-white;
                   }
                 }
                 
                 .num {
-                  font-size: 14px;
-                  color: #333;
+                  font-size: $style-text-size-base;
+                  color: $style-text-color-primary;
                   min-width: 16px;
                   text-align: center;
                 }
@@ -542,8 +542,8 @@ onMounted(async () => {
       .state-tip {
         padding: 20px 0;
         text-align: center;
-        color: #999;
-        font-size: 12px;
+        color: $style-text-color-secondary;
+        font-size: $style-text-size-sm;
       }
     }
   }

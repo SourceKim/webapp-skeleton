@@ -106,17 +106,17 @@ onMounted(() => { if (visible.value) cartStore.fetchCart() })
 
 <style lang="scss">
 .cart-popup { display: flex; flex-direction: column; height: 100%; }
-.cart-popup .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; font-weight: 600; border-bottom: 1px solid #f0f0f0; }
+.cart-popup .header { display: flex; align-items: center; justify-content: space-between; padding: 12px $style-spacing-sm; font-weight: 600; border-bottom: 1px solid $style-border-color; }
 .cart-popup .list { flex: 1; padding: 8px 12px; }
-.cart-popup .empty { color: #999; text-align: center; padding: 24px 0; }
-.cart-popup .item { display: flex; align-items: center; gap: 8px; padding: 10px 6px; background: #fff; border-radius: 8px; margin-bottom: 8px; }
-.cart-popup .cover { width: 56px; height: 56px; border-radius: 6px; background: #f6f6f6 }
+.cart-popup .empty { color: $style-text-color-secondary; text-align: center; padding: $style-spacing-base 0; }
+.cart-popup .item { display: flex; align-items: center; gap: 8px; padding: 10px 6px; background: $style-color-white; border-radius: $style-border-radius-base; margin-bottom: 8px; }
+.cart-popup .cover { width: 56px; height: 56px; border-radius: 6px; background: $style-color-bg }
 .cart-popup .info { flex: 1; display: flex; flex-direction: column; }
-.cart-popup .name { font-size: 14px; }
+.cart-popup .name { font-size: $style-text-size-base; }
 .cart-popup .title { display: flex; gap: 8px; align-items: baseline; }
-.cart-popup .sub { color: #888; font-size: 12px; }
-.cart-popup .price { color: #fa2c19; font-weight: 600; margin-top: 4px; }
-.cart-popup .footer { border-top: 1px solid #f0f0f0; padding: 10px 12px env(safe-area-inset-bottom); display: flex; align-items: center; justify-content: space-between; }
-.attrs { margin-top: 4px; color: #666; font-size: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
-.attr { background: #f6f6f6; padding: 2px 6px; border-radius: 3px; }
+.cart-popup .sub { color: $style-text-color-secondary; font-size: $style-text-size-sm; }
+.cart-popup .price { color: $style-text-color-price; font-weight: 600; margin-top: 4px; }
+.cart-popup .footer { border-top: 1px solid $style-border-color; padding: 10px 12px env(safe-area-inset-bottom); display: flex; align-items: center; justify-content: space-between; }
+.attrs { margin-top: 4px; color: $style-text-color-regular; font-size: $style-text-size-sm; display: flex; flex-wrap: wrap; gap: 6px; }
+.attr { background: $style-color-bg; padding: 2px 6px; border-radius: 3px; }
 </style>

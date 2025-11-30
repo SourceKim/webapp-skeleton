@@ -68,27 +68,27 @@ onMounted(fetchBrands)
 .brand-page {
   .grid {
     height: calc(100vh - 100px - env(safe-area-inset-bottom));
-    padding: 12px;
+    padding: $style-spacing-sm;
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: $style-spacing-sm;
     flex-wrap: wrap;
   }
   .col { flex: 1; min-width: 0; }
   .card {
-    background: #fff;
-    border-radius: 8px;
+    background: $style-color-white;
+    border-radius: $style-border-radius-base;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    margin-bottom: 12px;
+    margin-bottom: $style-spacing-sm;
     overflow: hidden;
   }
-  .logo { width: 100%; height: auto; display: block; background: #f5f5f5; }
+  .logo { width: 100%; height: auto; display: block; background: $style-color-bg; }
   .info { padding: 8px 10px 12px; }
-  .name { font-weight: 600; font-size: 14px; color: #333; }
-  .desc { margin-top: 4px; color: #999; font-size: 12px; line-height: 1.4; 
+  .name { font-weight: 600; font-size: $style-text-size-base; color: $style-text-color-primary; }
+  .desc { margin-top: 4px; color: $style-text-color-secondary; font-size: $style-text-size-sm; line-height: 1.4; 
     overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   }
-  .loading { text-align: center; color: #999; padding: 12px 0; }
+  .loading { text-align: center; color: $style-text-color-secondary; padding: 12px 0; }
   .full-span { flex-basis: 100%; width: 100%; }
 }
 </style>
