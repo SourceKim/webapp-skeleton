@@ -1,5 +1,5 @@
 import { Repository, DataSource } from 'typeorm';
-import { nanoid } from 'nanoid';
+import { customAlphabet } from 'nanoid';
 import { AppDataSource } from '../../../configs/database.config';
 import { ShopIntro, ShopIntroBanner } from './shop-intro.model';
 import { CreateShopIntroDto, UpdateShopIntroDto, ShopIntroDTO } from './shop-intro.dto';
@@ -21,6 +21,7 @@ export class ShopIntroService {
     }
 
     private generateId(): string {
+        const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 16);
         return nanoid();
     }
 

@@ -52,13 +52,22 @@
     </nut-cell-group>
 
     <nut-cell-group title="服务">
-      <nut-cell title="店铺资料" is-link />
-      <nut-cell title="联系我们" is-link />
+      <nut-cell title="店铺资料" is-link @click="goStoreIntro"/>
+      <nut-cell title="联系我们" is-link @click="showContactPopup = true" />
     </nut-cell-group>
 
     <view class="mt-10">
       <nut-button type="danger" block @click="handleLogout">退出登录</nut-button>
     </view>
+
+    <nut-popup position="center" v-model:visible="showContactPopup" round>
+      <view class="contact-popup-content">
+        <view class="popup-title">联系我们</view>
+        <view class="popup-phone" v-if="storePhone">{{ storePhone }}</view>
+        <view class="popup-phone" v-else>暂无联系电话</view>
+        <nut-button type="primary" size="small" @click="callPhone" v-if="storePhone">立即拨打</nut-button>
+      </view>
+    </nut-popup>
   </view>
 </template>
 
@@ -68,14 +77,28 @@ import Taro, { useDidShow } from '@tarojs/taro'
 import { useAuthStore } from '../../stores/auth'
 import { getUploadUrl } from '../../services'
 import userService from '@/services/user'
+import homeService from '@/services/home'
 
 const auth = useAuthStore()
 const stats = ref({ couponCount: 0, pointCount: 0, totalConsumption: '0.00' })
+const showContactPopup = ref(false)
+const storePhone = ref('')
 
 async function loadStats() {
   const res = await userService.getStats()
   if (res.code === 0 && res.data) {
     stats.value = res.data
+  }
+}
+
+async function loadStorePhone() {
+  try {
+    const { code, data } = await homeService.getShopIntro()
+    if (code === 0 && data && data.contact_phone) {
+      storePhone.value = data.contact_phone
+    }
+  } catch (e) {
+    console.error(e)
   }
 }
 
@@ -85,10 +108,14 @@ onMounted(async () => {
     Taro.redirectTo({ url: '/pages/login/index' })
   }
   loadStats()
+  loadStorePhone()
 })
 
 useDidShow(() => {
-  if (auth.isLoggedIn) loadStats()
+  if (auth.isLoggedIn) {
+    loadStats()
+    loadStorePhone()
+  }
 })
 
 const handleLogout = () => {
@@ -113,6 +140,16 @@ const goEditProfile = () => {
 
 const goAddresses = () => {
   Taro.navigateTo({ url: '/pages/address/index' })
+}
+
+const goStoreIntro = () => {
+  Taro.switchTab({ url: '/pages/store-intro/index' })
+}
+
+const callPhone = () => {
+  if (storePhone.value) {
+    Taro.makePhoneCall({ phoneNumber: storePhone.value })
+  }
 }
 </script>
 
@@ -147,6 +184,28 @@ const goAddresses = () => {
   font-size: 12px;
   color: #666;
 }
+
+.contact-popup-content {
+  padding: 30px 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+.popup-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.popup-phone {
+  font-size: 20px;
+  color: #fa2c19;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
 </style>
-
-

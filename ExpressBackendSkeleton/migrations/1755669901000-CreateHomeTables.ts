@@ -190,6 +190,22 @@ export class CreateHomeTables1755669901000 implements MigrationInterface {
                         name: 'sort_order',
                         type: 'int',
                         default: 0
+                    },
+                    {
+                        name: 'created_at',
+                        type: 'timestamp',
+                        default: 'CURRENT_TIMESTAMP'
+                    },
+                    {
+                        name: 'updated_at',
+                        type: 'timestamp',
+                        default: 'CURRENT_TIMESTAMP',
+                        onUpdate: 'CURRENT_TIMESTAMP'
+                    },
+                    {
+                        name: 'deleted_at',
+                        type: 'timestamp',
+                        isNullable: true
                     }
                 ],
                 foreignKeys: [

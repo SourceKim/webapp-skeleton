@@ -2,7 +2,7 @@ export default defineAppConfig({
   pages: [
     'pages/general/index',
     'pages/login/index',
-    'pages/resource/index',
+    'pages/store-intro/index',
     'pages/mall/index',
     'pages/mall/sub/index',
     'pages/mall/detail',
@@ -12,8 +12,7 @@ export default defineAppConfig({
     'pages/profile/index',
     'pages/profile/detail/index',
     'pages/address/index',
-    'pages/address/form/index',
-    'pages/store-intro/index'
+    'pages/address/form/index'
   ],
   window: {
     backgroundTextStyle: 'light',
@@ -32,8 +31,8 @@ export default defineAppConfig({
         text: '首页'
       },
       {
-        pagePath: 'pages/resource/index',
-        text: '资源'
+        pagePath: 'pages/store-intro/index',
+        text: '店铺'
       },
       {
         pagePath: 'pages/mall/index',

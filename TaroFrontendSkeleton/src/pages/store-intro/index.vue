@@ -1,6 +1,6 @@
 <template>
   <view class="store-intro">
-    <nut-navbar title="店铺介绍" left-show @on-click-back="goBack" />
+    <nut-navbar title="店铺介绍" />
     
     <scroll-view scroll-y class="content-scroll">
       <!-- 轮播图 -->
@@ -34,13 +34,14 @@
           <text class="detail-text">地址：{{ info.address }}</text>
         </view>
 
-        <!-- 地图 -->
-        <view class="map-container" v-if="hasLocation">
+        <!-- 地图: 仅在非 WEB 环境下显示 -->
+        <view class="map-container" v-if="hasLocation && !isWeb">
           <map
             id="store-map"
             style="width: 100%; height: 200px;"
             :longitude="Number(info!.longitude)"
             :latitude="Number(info!.latitude)"
+            :scale="16"
             :markers="markers"
             :show-location="true"
             @tap="openLocation"
@@ -64,6 +65,7 @@ import { ref, onMounted, computed } from 'vue'
 import homeService, { type ShopIntro, type ShopIntroBanner, getUploadUrl } from '../../services/home'
 
 const info = ref<ShopIntro | null>(null)
+const isWeb = ref(Taro.getEnv() === Taro.ENV_TYPE.WEB)
 
 onMounted(() => {
   fetchStoreIntro()
@@ -114,10 +116,6 @@ const openLocation = () => {
     name: info.value!.name,
     address: info.value!.address
   })
-}
-
-const goBack = () => {
-  Taro.navigateBack()
 }
 </script>
 

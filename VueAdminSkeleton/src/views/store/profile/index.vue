@@ -39,10 +39,30 @@
                         <el-button size="small" type="danger" circle icon="delete" @click="removeBanner(index)" />
                     </div>
                 </div>
-                <div class="add-banner-btn" @click="showMaterialSelector = true">
-                    <el-icon><Plus /></el-icon>
-                    <span>添加图片</span>
-                </div>
+                <el-dropdown trigger="click" @command="handleAddBannerCommand">
+                    <div class="add-banner-btn">
+                        <el-icon><Plus /></el-icon>
+                        <span>添加图片</span>
+                    </div>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item command="upload">本地上传</el-dropdown-item>
+                            <el-dropdown-item command="material">从素材库选择</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+
+                <!-- 隐形上传组件 -->
+                <el-upload
+                    ref="uploadRef"
+                    class="hidden-upload"
+                    action="#"
+                    accept="image/*"
+                    :show-file-list="false"
+                    :http-request="handleUpload"
+                    :before-upload="beforeAvatarUpload"
+                >
+                </el-upload>
             </div>
             <div class="tip">提示：图片顺序即为展示顺序</div>
         </el-form-item>
@@ -64,16 +84,18 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { getShopIntro, updateShopIntro } from '@/api/mall/home'
+import { uploadMaterial } from '@/api/material/material'
 import type { ShopIntroDTO } from '@/api/mall/home'
 import LocationPicker from '@/components/map/LocationPicker.vue'
 import MaterialSelector from '@/components/material/MaterialSelector.vue'
 import { ElMessage } from 'element-plus'
-import type { FormInstance, FormRules } from 'element-plus'
+import type { FormInstance, FormRules, UploadProps } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 
 const loading = ref(false)
 const submitting = ref(false)
 const formRef = ref<FormInstance>()
+const uploadRef = ref()
 const showMaterialSelector = ref(false)
 
 // 临时存储选中的 banner 对象，用于显示
@@ -190,9 +212,55 @@ async function submitForm() {
         }
     })
 }
+
+function handleAddBannerCommand(command: string | number | object) {
+    if (command === 'upload') {
+        if (uploadRef.value) {
+            const input = uploadRef.value.$el.querySelector('input')
+            if (input) input.click()
+        }
+    } else if (command === 'material') {
+        showMaterialSelector.value = true
+    }
+}
+
+const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(rawFile.type)) {
+    ElMessage.error('Picture must be image format!')
+    return false
+  } else if (rawFile.size / 1024 / 1024 > 5) {
+    ElMessage.error('Picture size can not exceed 5MB!')
+    return false
+  }
+  return true
+}
+
+const handleUpload = async (options: any) => {
+    const { file } = options
+    const form = new FormData()
+    form.append('file', file)
+    
+    try {
+        const res = await uploadMaterial(form, { showLoading: true })
+        if (res && res.code === 0 && res.data) {
+            const material = res.data
+            // 添加到 banners
+            banners.value.push({
+                id: material.id,
+                material: material
+            })
+            ElMessage.success('上传成功')
+        }
+    } catch (error) {
+        console.error('Upload error:', error)
+    }
+}
 </script>
 
 <style scoped>
+.hidden-upload {
+    display: none;
+}
 .shop-intro-container {
     padding: 20px;
 }
