@@ -94,10 +94,14 @@ function initMap() {
             ? [props.modelValue.lng, props.modelValue.lat] 
             : [116.397428, 39.90923]; // 默认北京天安门
 
+      // 检查系统是否为暗黑模式
+      const isDark = document.documentElement.classList.contains('dark')
+      
       map = new AMap.Map('amap-container', {
         viewMode: '3D', 
         zoom: 13, 
         center: center, 
+        mapStyle: isDark ? 'amap://styles/dark' : 'amap://styles/normal' // 适配地图暗黑模式
       })
 
       // 点击地图事件
@@ -198,14 +202,44 @@ function emitUpdate() {
 .map-container {
   flex: 1;
   width: 100%;
-  border: 1px solid #dcdfe6;
+  border: 1px solid var(--el-border-color);
   border-radius: 4px;
 }
 
 .info-panel {
   padding: 10px;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   border-radius: 4px;
   font-size: 14px;
+  color: var(--el-text-color-primary);
+}
+</style>
+
+<style>
+/* 高德地图搜索下拉框暗黑模式适配 */
+html.dark .amap-sug-result {
+  background-color: var(--el-bg-color-overlay) !important;
+  border: 1px solid var(--el-border-color-light) !important;
+  color: var(--el-text-color-primary) !important;
+}
+
+html.dark .auto-item {
+  background-color: transparent !important;
+  color: var(--el-text-color-primary) !important;
+}
+
+html.dark .auto-item:hover,
+html.dark .auto-item.active {
+  background-color: var(--el-fill-color-light) !important;
+}
+
+html.dark .auto-item-span {
+  color: var(--el-text-color-secondary) !important;
+}
+
+/* 适配高德地图 Logo/版权文字在暗色底图下的显示（可选） */
+html.dark .amap-copyright,
+html.dark .amap-logo {
+  filter: invert(1) opacity(0.8);
 }
 </style>

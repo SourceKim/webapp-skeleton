@@ -377,9 +377,9 @@ useLoad(async (options) => {
     .goods-price {
       font-weight: 600;
       color: $style-text-color-primary;
-      font-size: $style-text-size-base;
+      font-size: $style-text-size-sm;
       
-      .symbol { font-size: $style-text-size-sm; }
+      .symbol { font-size: $style-text-size-xs; }
     }
   }
   
@@ -428,7 +428,7 @@ useLoad(async (options) => {
     color: $style-text-color-primary;
     
     .total-price {
-      font-size: $style-text-size-xl;
+      font-size: $style-text-size-lg;
       font-weight: 600;
       color: $style-text-color-price;
       margin-left: 6px;

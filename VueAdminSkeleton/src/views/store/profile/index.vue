@@ -269,7 +269,7 @@ const handleUpload = async (options: any) => {
 }
 .location-display {
     margin-top: 10px;
-    color: #666;
+    color: var(--el-text-color-regular);
     font-size: 12px;
     display: flex;
     gap: 20px;
@@ -286,7 +286,7 @@ const handleUpload = async (options: any) => {
     position: relative;
     width: 100px;
     height: 100px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--el-border-color);
     border-radius: 4px;
     overflow: hidden;
 }
@@ -313,23 +313,24 @@ const handleUpload = async (options: any) => {
 .add-banner-btn {
     width: 100px;
     height: 100px;
-    border: 1px dashed #ddd;
+    border: 1px dashed var(--el-border-color);
     border-radius: 4px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #999;
+    color: var(--el-text-color-secondary);
+    background-color: var(--el-fill-color-blank);
 }
 
 .add-banner-btn:hover {
-    border-color: #409eff;
-    color: #409eff;
+    border-color: var(--el-color-primary);
+    color: var(--el-color-primary);
 }
 
 .tip {
     font-size: 12px;
-    color: #999;
+    color: var(--el-text-color-secondary);
 }
 </style>

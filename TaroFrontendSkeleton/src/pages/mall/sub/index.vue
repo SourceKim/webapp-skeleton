@@ -46,9 +46,12 @@
                 <view class="goods-sub" v-if="s.sub_title">{{ s.sub_title }}</view>
                 <view class="goods-actions">
                   <view v-if="cartStore.getSpuQty(s.id) > 0" class="action-stepper">
-                    <view class="btn minus" @tap.stop="handleMinus(s)">-</view>
-                    <text class="num">{{ cartStore.getSpuQty(s.id) }}</text>
-                    <view class="btn plus" @tap.stop="handlePlus(s)">+</view>
+                    <QuantityStepper
+                      :model-value="cartStore.getSpuQty(s.id)"
+                      :min="0"
+                      @minus="handleMinus(s)"
+                      @plus="handlePlus(s)"
+                    />
                   </view>
                   <view v-else class="action-add" @tap.stop="handlePlus(s)">
                     <nut-icon name="plus" size="14" color="#fff" />
@@ -89,6 +92,7 @@
 import { ref, onMounted, shallowRef } from 'vue'
 import SkuPanel from '@/components/sku-panel.vue'
 import CartPopup from '@/components/cart-popup.vue'
+import QuantityStepper from '@/components/QuantityStepper/index.vue'
 import api from '@/services/api'
 import Taro, { useRouter } from '@tarojs/taro'
 import mallService, { type Category, type Spu, type Brand, getUploadUrl } from '@/services/mall'
@@ -190,7 +194,9 @@ const openSku = async (spu: Spu, action: 'cart' | 'buy') => {
       imagePath: getCover(spu) || defaultImg,
       spuId: spu.id,
       price: Number(price) || 0,
-      stockNum
+      stockNum,
+      name: spu.name,
+      subTitle: spu.sub_title
     }
   } finally {
     skuLoading.value = false
@@ -358,8 +364,8 @@ onMounted(async () => {
       align-items: center;
       
       .brand-logo {
-        width: 48px;
-        height: 48px;
+        width: 64px;
+        height: 64px;
         border-radius: 8px;
         background: $style-color-bg;
         flex-shrink: 0;
@@ -369,6 +375,10 @@ onMounted(async () => {
       .brand-info {
         margin-left: 12px;
         flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 64px;
         
         .brand-name {
           font-size: $style-text-size-lg;
@@ -401,7 +411,7 @@ onMounted(async () => {
         position: relative;
         
         .cat-name {
-          font-size: 13px;
+          font-size: $style-text-size-base;
           color: $style-text-color-regular;
         }
         
@@ -410,7 +420,7 @@ onMounted(async () => {
           border-radius: 8px 0 0 8px;
           
           .cat-name {
-            color: $style-text-color-price;
+            color: $style-color-primary;
             font-weight: 600;
           }
           
@@ -422,7 +432,7 @@ onMounted(async () => {
             transform: translateY(-50%);
             width: 3px;
             height: 16px;
-            background: $style-text-color-price;
+            background: $style-color-primary;
             border-radius: 0 2px 2px 0;
           }
         }
@@ -504,35 +514,6 @@ onMounted(async () => {
                 display: flex;
                 align-items: center;
                 gap: 8px;
-                
-                .btn {
-                  width: 24px;
-                  height: 24px;
-                  border-radius: 50%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  font-size: $style-text-size-lg;
-                  font-weight: bold;
-                  
-                  &.minus {
-                    border: 1px solid $style-border-color;
-                    color: $style-text-color-regular;
-                    background: $style-color-white;
-                  }
-                  
-                  &.plus {
-                    background: $style-color-primary;
-                    color: $style-color-white;
-                  }
-                }
-                
-                .num {
-                  font-size: $style-text-size-base;
-                  color: $style-text-color-primary;
-                  min-width: 16px;
-                  text-align: center;
-                }
               }
             }
           }

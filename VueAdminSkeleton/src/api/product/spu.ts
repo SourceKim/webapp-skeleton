@@ -4,8 +4,8 @@ import type { CreateProductSpuDto, ProductSpu, UpdateProductSpuDto } from './spu
 
 const BASE_URL = import.meta.env.VITE_SYSTEM_BASE_URL
 
-export function getSpuList(option?: RequestOption): RestResponse<PaginatedResponse<ProductSpu>> {
-  return createAxios(option).get(`${BASE_URL}/products/spu`)
+export function getSpuList(params?: Record<string, any>, option?: RequestOption): RestResponse<PaginatedResponse<ProductSpu>> {
+  return createAxios(option).get(`${BASE_URL}/products/spu`, { params })
 }
 
 export function getSpuById(id: string, option?: RequestOption): RestResponse<ProductSpu> {

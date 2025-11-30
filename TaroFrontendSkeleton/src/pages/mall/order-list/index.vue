@@ -136,7 +136,7 @@ onMounted(load)
 .time { color: $style-text-color-secondary; font-size: $style-text-size-sm; }
 .right-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
 .total { font-size: $style-text-size-sm; color: $style-text-color-primary; display: flex; align-items: baseline; }
-.price { color: $style-text-color-primary; font-size: $style-text-size-lg; font-weight: 600; margin-left: 4px; }
+.price { color: $style-text-color-price; font-size: $style-text-size-lg; font-weight: 600; margin-left: 4px; }
 .btns { display: flex; gap: 8px; }
 
 .empty { text-align: center; color: $style-text-color-secondary; padding: 24px 0 }

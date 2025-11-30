@@ -22,7 +22,15 @@
               </text>
             </view>
           </view>
-          <nut-input-number v-model="it.quantity" min="1" @change="(val:any)=>onChangeQty(it, Number(val))" />
+          <view class="input-number-wrapper">
+            <view class="btn minus" @tap.stop="onChangeQty(it, Number(it.quantity) - 1)">
+              <nut-icon name="minus" size="10" color="#1677ff" />
+            </view>
+            <text class="num">{{ it.quantity }}</text>
+            <view class="btn plus" @tap.stop="onChangeQty(it, Number(it.quantity) + 1)">
+              <nut-icon name="plus" size="10" color="#ffffff" />
+            </view>
+          </view>
           <nut-icon name="del2" @click="remove(it)" />
         </view>
       </scroll-view>
@@ -115,8 +123,41 @@ onMounted(() => { if (visible.value) cartStore.fetchCart() })
 .cart-popup .name { font-size: $style-text-size-base; }
 .cart-popup .title { display: flex; gap: 8px; align-items: baseline; }
 .cart-popup .sub { color: $style-text-color-secondary; font-size: $style-text-size-sm; }
-.cart-popup .price { color: $style-text-color-price; font-weight: 600; margin-top: 4px; }
+.cart-popup .price { color: $style-text-color-price; font-size: $style-text-size-sm; font-weight: 600; margin-top: 4px; }
 .cart-popup .footer { border-top: 1px solid $style-border-color; padding: 10px 12px env(safe-area-inset-bottom); display: flex; align-items: center; justify-content: space-between; }
+.cart-popup .total { font-size: $style-text-size-base; color: $style-text-color-primary; font-weight: 600; }
 .attrs { margin-top: 4px; color: $style-text-color-regular; font-size: $style-text-size-sm; display: flex; flex-wrap: wrap; gap: 6px; }
 .attr { background: $style-color-bg; padding: 2px 6px; border-radius: 3px; }
+
+.input-number-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 8px;
+  
+  .btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &.minus {
+      border: 1px solid $style-color-primary;
+      background: $style-color-white;
+    }
+    
+    &.plus {
+      background: $style-color-primary;
+    }
+  }
+  
+  .num {
+    font-size: $style-text-size-base;
+    color: $style-text-color-primary;
+    min-width: 16px;
+    text-align: center;
+  }
+}
 </style>

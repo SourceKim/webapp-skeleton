@@ -153,7 +153,7 @@ const goStoreIntro = () => {
 
 .bottom-actions {
   position: absolute;
-  bottom: 20px; 
+  bottom: 130px; 
   left: 20px;
   right: 20px;
   z-index: 10;

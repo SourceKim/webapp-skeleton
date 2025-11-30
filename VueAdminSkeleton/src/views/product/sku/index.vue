@@ -2,146 +2,170 @@
   <div class="root">
     <div class="header">
       <div class="title">SKU 管理</div>
-      <div class="desc">当前 SPU：{{ spuId }}</div>
+      <div class="spu-select">
+        <el-select
+          v-model="spuId"
+          filterable
+          remote
+          placeholder="输入 SPU 名称搜索切换"
+          :remote-method="fetchSpuOptions"
+          :loading="spuLoading"
+          style="width: 300px"
+          @change="handleSpuChange"
+        >
+          <el-option
+            v-for="item in spuOptions"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          />
+        </el-select>
+      </div>
     </div>
 
-    <el-card class="group-card">
-      <template #header>
-        <div class="card-header">SPU 基本信息</div>
-      </template>
-      <div class="group-body">
-        <div style="display: flex; gap: 20px;">
-          <div style="width: 100px; height: 100px; border: 1px solid #eee; border-radius: 6px; overflow: hidden; flex-shrink: 0;">
-             <el-image 
-                v-if="spu?.main_material?.file_path"
-                :src="getUploadFileUrl(spu.main_material.file_path)"
-                style="width: 100%; height: 100%;"
-                fit="cover"
-                :preview-src-list="[getUploadFileUrl(spu.main_material.file_path)]"
-                preview-teleported
-             />
-             <div v-else style="width:100%;height:100%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;color:#999;font-size:12px;">暂无图片</div>
-          </div>
-          <div style="flex: 1;">
-            <el-descriptions :column="3" border>
-              <el-descriptions-item label="标题">{{ spu?.name || '-' }}</el-descriptions-item>
-              <el-descriptions-item label="副标题">{{ spu?.sub_title || '-' }}</el-descriptions-item>
-              <el-descriptions-item label="状态">
-                 <el-tag :type="spu?.status === 'ON_SHELF' ? 'success' : 'info'">{{ spu?.status }}</el-tag>
-              </el-descriptions-item>
-              <el-descriptions-item label="分类">{{ spu?.category?.name || '-' }}</el-descriptions-item>
-              <el-descriptions-item label="品牌">{{ spu?.brand?.name || '-' }}</el-descriptions-item>
-              <el-descriptions-item label="ID">{{ spuId }}</el-descriptions-item>
-              <el-descriptions-item label="描述" :span="3">{{ spu?.description || '-' }}</el-descriptions-item>
-            </el-descriptions>
+    <div v-if="!spuId">
+      <el-empty description="请先选择一个 SPU 进行管理" />
+    </div>
+    
+    <template v-else>
+      <el-card class="group-card">
+        <template #header>
+          <div class="card-header">SPU 基本信息</div>
+        </template>
+        <div class="group-body">
+          <div style="display: flex; gap: 20px;">
+            <div style="width: 100px; height: 100px; border: 1px solid #eee; border-radius: 6px; overflow: hidden; flex-shrink: 0;">
+               <el-image 
+                  v-if="spu?.main_material?.file_path"
+                  :src="getUploadFileUrl(spu.main_material.file_path)"
+                  style="width: 100%; height: 100%;"
+                  fit="cover"
+                  :preview-src-list="[getUploadFileUrl(spu.main_material.file_path)]"
+                  preview-teleported
+               />
+               <div v-else style="width:100%;height:100%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;color:#999;font-size:12px;">暂无图片</div>
+            </div>
+            <div style="flex: 1;">
+              <el-descriptions :column="3" border>
+                <el-descriptions-item label="标题">{{ spu?.name || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="副标题">{{ spu?.sub_title || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="状态">
+                   <el-tag :type="spu?.status === 'ON_SHELF' ? 'success' : 'info'">{{ spu?.status }}</el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item label="分类">{{ spu?.category?.name || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="品牌">{{ spu?.brand?.name || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="ID">{{ spuId }}</el-descriptions-item>
+                <el-descriptions-item label="描述" :span="3">{{ spu?.description || '-' }}</el-descriptions-item>
+              </el-descriptions>
+            </div>
           </div>
         </div>
-      </div>
-    </el-card>
+      </el-card>
 
-    <el-card class="group-card">
-      <template #header>
-        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
-          <span>SKU 属性管理</span>
-          <div>
-            <el-button size="small" @click="openKeyDialog()">新增属性键</el-button>
+      <el-card class="group-card">
+        <template #header>
+          <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>SKU 属性管理</span>
+            <div>
+              <el-button size="small" @click="openKeyDialog()">新增属性键</el-button>
+            </div>
+          </div>
+        </template>
+        <div class="group-body">
+          <div v-if="attrKeys.length === 0">
+            <el-empty description="暂无属性键" />
+          </div>
+          <div v-else>
+            <el-card v-for="k in attrKeys" :key="k.id" class="attr-card" shadow="never">
+              <template #header>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div>
+                    <b>{{ k.name }}</b>
+                    <span style="margin-left:8px;color:var(--el-text-color-secondary);">({{ k.key }})</span>
+                  </div>
+                  <div>
+                    <el-button size="small" @click="openValueDialog(k.id)">新增值</el-button>
+                    <el-button size="small" @click="openKeyDialog(k)">编辑</el-button>
+                    <el-button size="small" type="danger" @click="removeKey(k.id)">删除</el-button>
+                  </div>
+                </div>
+              </template>
+              <el-table :data="k.values || []" style="width:100%" size="small">
+                <el-table-column prop="value" label="值" width="180" />
+                <el-table-column prop="value_id" label="值ID" width="200" />
+                <el-table-column prop="color_hex" label="颜色" width="120" />
+                <el-table-column label="操作" width="200" align="center">
+                  <template #default="{ row }">
+                    <el-button size="small" @click="openValueDialog(k.id, row)">编辑</el-button>
+                    <el-button size="small" type="danger" @click="removeValue(row.id)">删除</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-card>
           </div>
         </div>
-      </template>
-      <div class="group-body">
-        <div v-if="attrKeys.length === 0">
-          <el-empty description="暂无属性键" />
-        </div>
-        <div v-else>
-          <el-card v-for="k in attrKeys" :key="k.id" class="attr-card" shadow="never">
-            <template #header>
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div>
-                  <b>{{ k.name }}</b>
-                  <span style="margin-left:8px;color:var(--el-text-color-secondary);">({{ k.key }})</span>
-                </div>
-                <div>
-                  <el-button size="small" @click="openValueDialog(k.id)">新增值</el-button>
-                  <el-button size="small" @click="openKeyDialog(k)">编辑</el-button>
-                  <el-button size="small" type="danger" @click="removeKey(k.id)">删除</el-button>
-                </div>
-              </div>
-            </template>
-            <el-table :data="k.values || []" style="width:100%" size="small">
-              <el-table-column prop="value" label="值" width="180" />
-              <el-table-column prop="value_id" label="值ID" width="200" />
-              <el-table-column prop="color_hex" label="颜色" width="120" />
-              <el-table-column label="操作" width="200" align="center">
-                <template #default="{ row }">
-                  <el-button size="small" @click="openValueDialog(k.id, row)">编辑</el-button>
-                  <el-button size="small" type="danger" @click="removeValue(row.id)">删除</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-card>
-        </div>
-      </div>
-    </el-card>
+      </el-card>
 
-    <el-card class="group-card">
-      <template #header>
-        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
-          <span>SKU 列表</span>
-          <el-button type="primary" size="small" @click="openGenerate">生成 SKU</el-button>
-          <el-button size="small" @click="generateDefaultSku" :loading="genDefaultLoading">生成默认 SKU</el-button>
+      <el-card class="group-card">
+        <template #header>
+          <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>SKU 列表</span>
+            <el-button type="primary" size="small" @click="openGenerate">生成 SKU</el-button>
+            <el-button size="small" @click="generateDefaultSku" :loading="genDefaultLoading">生成默认 SKU</el-button>
+          </div>
+        </template>
+        <div class="group-body">
+          <el-table :data="skuList" style="width:100%" row-key="id">
+            <el-table-column prop="id" label="ID" width="160">
+              <template #default="{ row }">
+                <el-tooltip :content="row.id" placement="top">
+                  <span class="ellipsis w-140">{{ row.id }}</span>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+            <el-table-column prop="sku_code" label="编码" width="160">
+              <template #default="{ row }">
+                <el-tooltip :content="row.sku_code" placement="top">
+                  <span class="ellipsis w-140">{{ row.sku_code }}</span>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+            <el-table-column label="属性" min-width="240">
+              <template #default="{ row }">
+                <span v-if="row.attributes && row.attributes.length">
+                  {{ row.attributes.map((a:any)=>`${a.key_name||a.key_id}:${a.value||a.value_id}`).join(' / ') }}
+                </span>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="价格" width="150">
+              <template #default="{ row }">
+                <el-input v-model="row.price" size="small" @change="saveRow(row)" />
+              </template>
+            </el-table-column>
+            <el-table-column label="库存" width="120">
+              <template #default="{ row }">
+                <el-input-number v-model="row.stock" :min="0" size="small" @change="saveRow(row)" />
+              </template>
+            </el-table-column>
+            <el-table-column label="状态" width="120">
+              <template #default="{ row }">
+                <el-select v-model="row.status" size="small" style="width:110px" @change="saveRow(row)">
+                  <el-option label="上架" value="ON_SHELF" />
+                  <el-option label="下架" value="OFF_SHELF" />
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="160" align="center">
+              <template #default="{ row }">
+                <el-button size="small" @click="saveRow(row)">保存</el-button>
+                <el-button size="small" type="danger" @click="delRow(row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
-      </template>
-      <div class="group-body">
-        <el-table :data="skuList" style="width:100%" row-key="id">
-          <el-table-column prop="id" label="ID" width="160">
-            <template #default="{ row }">
-              <el-tooltip :content="row.id" placement="top">
-                <span class="ellipsis w-140">{{ row.id }}</span>
-              </el-tooltip>
-            </template>
-          </el-table-column>
-          <el-table-column prop="sku_code" label="编码" width="160">
-            <template #default="{ row }">
-              <el-tooltip :content="row.sku_code" placement="top">
-                <span class="ellipsis w-140">{{ row.sku_code }}</span>
-              </el-tooltip>
-            </template>
-          </el-table-column>
-          <el-table-column label="属性" min-width="240">
-            <template #default="{ row }">
-              <span v-if="row.attributes && row.attributes.length">
-                {{ row.attributes.map((a:any)=>`${a.key_name||a.key_id}:${a.value||a.value_id}`).join(' / ') }}
-              </span>
-              <span v-else>-</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="价格" width="150">
-            <template #default="{ row }">
-              <el-input v-model="row.price" size="small" @change="saveRow(row)" />
-            </template>
-          </el-table-column>
-          <el-table-column label="库存" width="120">
-            <template #default="{ row }">
-              <el-input-number v-model="row.stock" :min="0" size="small" @change="saveRow(row)" />
-            </template>
-          </el-table-column>
-          <el-table-column label="状态" width="120">
-            <template #default="{ row }">
-              <el-select v-model="row.status" size="small" style="width:110px" @change="saveRow(row)">
-                <el-option label="上架" value="ON_SHELF" />
-                <el-option label="下架" value="OFF_SHELF" />
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="160" align="center">
-            <template #default="{ row }">
-              <el-button size="small" @click="saveRow(row)">保存</el-button>
-              <el-button size="small" type="danger" @click="delRow(row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-    </el-card>
+      </el-card>
+    </template>
 
     <el-dialog title="生成 SKU" v-model="genVisible" width="60%" append-to-body>
       <el-row :gutter="12">
@@ -180,6 +204,7 @@
         <el-button type="primary" @click="doGenerate">生成</el-button>
       </template>
     </el-dialog>
+    
     <el-dialog :title="keyForm.id ? '编辑属性键' : '新增属性键'" v-model="keyVisible" width="40%" append-to-body>
     <el-form :model="keyForm" label-width="90px">
       <el-form-item label="名称"><el-input v-model="keyForm.name" /></el-form-item>
@@ -215,17 +240,19 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getUploadFileUrl } from '@/utils/file'
 import type { ProductSpu } from '@/api/product/spu.d'
-import { getSpuById } from '@/api/product/spu'
+import { getSpuById, getSpuList } from '@/api/product/spu'
 import type { ProductSku, UpdateProductSkuDto } from '@/api/product/sku.d'
-import { getSkuList, updateSku, deleteSku, generateSkus, createSku } from '@/api/product/sku'
+import { getSkuList, updateSku, deleteSku, generateSkus } from '@/api/product/sku'
 import { getAttributeKeys, createAttributeKey, updateAttributeKey, deleteAttributeKey, createAttributeValue, updateAttributeValue, deleteAttributeValue } from '@/api/product/attribute'
 import type { ProductAttributeKey } from '@/api/product/attribute.d'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const route = useRoute()
-const spuId = (route.query.spuId as string) || ''
+const router = useRouter()
+const spuId = ref((route.query.spuId as string) || '')
 const spu = ref<ProductSpu>()
 const skuList = ref<ProductSku[]>([])
 const genVisible = ref(false)
@@ -234,19 +261,79 @@ const attrKeys = ref<ProductAttributeKey[]>([])
 const selected = ref<Record<string, string[]>>({})
 const preview = ref<any[]>([])
 
-onMounted(async () => {
-  if (spuId) {
-    const res: any = await getSpuById(spuId)
-    if (res?.code === 0) spu.value = res.data
+const spuOptions = ref<ProductSpu[]>([])
+const spuLoading = ref(false)
+
+// 远程搜索 SPU
+const fetchSpuOptions = async (query: string) => {
+  spuLoading.value = true
+  try {
+    const params: any = { page: 1, limit: 20 }
+    if (query) {
+      params.filters = { name: { like: query } }
+    }
+    const res: any = await getSpuList(params)
+    if (res?.code === 0) {
+      spuOptions.value = res.data?.items || []
+    }
+  } finally {
+    spuLoading.value = false
+  }
+}
+
+// 切换 SPU
+const handleSpuChange = async (val: string) => {
+  // 更新 URL query
+  await router.replace({ query: { ...route.query, spuId: val } })
+  
+  // 更新当前状态
+  // spuId 已经是 v-model 绑定，所以 val 已经是新的值了，这里主要是触发重新加载
+  await loadData()
+}
+
+// 加载数据逻辑封装
+const loadData = async () => {
+    if (!spuId.value) return
+    
+    // 顺便把当前选中的 SPU 放入 options，避免回显 ID
+    if (spuOptions.value.length === 0) {
+      // 如果 options 为空，尝试获取一下当前 SPU 详情并放入
+      const res: any = await getSpuById(spuId.value)
+      if (res?.code === 0) {
+        spu.value = res.data
+        spuOptions.value = [res.data]
+      }
+    } else {
+      // 如果 options 有值，尝试从中找到当前 spu 更新详情
+      const found = spuOptions.value.find(s => s.id === spuId.value)
+      if (found) spu.value = found
+      else {
+         // 没找到说明可能不在当前搜索列表里，单独查一下
+         const res: any = await getSpuById(spuId.value)
+         if (res?.code === 0) spu.value = res.data
+      }
+    }
+    
+    // 获取 SKU 列表
     await fetchSku()
-    const ar: any = await getAttributeKeys(spuId)
+    
+    // 获取属性键
+    const ar: any = await getAttributeKeys(spuId.value)
     attrKeys.value = (ar?.code === 0 ? ar.data : []) || []
     selected.value = Object.fromEntries(attrKeys.value.map(k => [k.id, []]))
+}
+
+onMounted(async () => {
+  // 初始加载 SPU 列表方便选择
+  await fetchSpuOptions('')
+  
+  if (spuId.value) {
+    await loadData()
   }
 })
 
 async function fetchSku() {
-  const res: any = await getSkuList({ filters: { spu_id: { eq: spuId } } })
+  const res: any = await getSkuList({ filters: { spu_id: { eq: spuId.value } } })
   skuList.value = (res?.code === 0 ? res.data?.items : []) || []
 }
 
@@ -278,7 +365,7 @@ function previewCombos() {
   preview.value = cartesian(groups)
 }
 async function doGenerate() {
-  if (!spuId) return
+  if (!spuId.value) return
   if (!preview.value.length) previewCombos()
   const items = preview.value.map((combo: string[]) => {
     // 用已选 value_id 组合编码与名称
@@ -286,24 +373,21 @@ async function doGenerate() {
     const sku_name = combo.join(' ')
     return { sku_code, sku_name, price: genForm.value.price, stock: genForm.value.stock, attribute_value_ids: combo }
   })
-  await generateSkus(spuId, items)
+  await generateSkus(spuId.value, items)
   genVisible.value = false
   genForm.value = { price: '0', stock: 0 }
   await fetchSku()
 }
 
-import { ElMessage, ElMessageBox } from 'element-plus'
-
-// ...
 
 const genDefaultLoading = ref(false)
 
 async function generateDefaultSku() {
-  if (!spuId) return
+  if (!spuId.value) return
   try {
     await ElMessageBox.confirm('生成默认 SKU 将清空当前所有 SKU，是否继续？', '提示', { type: 'warning' })
     genDefaultLoading.value = true
-    const res = await generateSkus(spuId, [{
+    const res = await generateSkus(spuId.value, [{
       sku_code: 'default',
       sku_name: '默认规格',
       price: '0',
@@ -332,17 +416,17 @@ function openKeyDialog(k?: ProductAttributeKey) {
   keyVisible.value = true
 }
 async function saveKey() {
-  if (!spuId) return
+  if (!spuId.value) return
   if (keyForm.value.id) await updateAttributeKey(keyForm.value.id, { name: keyForm.value.name, key: keyForm.value.key, type: keyForm.value.type, required: keyForm.value.required })
-  else await createAttributeKey({ spu_id: spuId, name: keyForm.value.name, key: keyForm.value.key, type: keyForm.value.type, required: keyForm.value.required })
+  else await createAttributeKey({ spu_id: spuId.value, name: keyForm.value.name, key: keyForm.value.key, type: keyForm.value.type, required: keyForm.value.required })
   keyVisible.value = false
-  const ar: any = await getAttributeKeys(spuId)
+  const ar: any = await getAttributeKeys(spuId.value)
   attrKeys.value = (ar?.code === 0 ? ar.data : []) || []
   selected.value = Object.fromEntries(attrKeys.value.map(k => [k.id, []]))
 }
 async function removeKey(id: string) {
   await deleteAttributeKey(id)
-  const ar: any = await getAttributeKeys(spuId)
+  const ar: any = await getAttributeKeys(spuId.value)
   attrKeys.value = (ar?.code === 0 ? ar.data : []) || []
   selected.value = Object.fromEntries(attrKeys.value.map(k => [k.id, []]))
 }
@@ -357,25 +441,24 @@ async function saveValue() {
   if (valForm.value.id) await updateAttributeValue(valForm.value.id, { value: valForm.value.value, value_id: valForm.value.value_id, color_hex: valForm.value.color_hex })
   else await createAttributeValue({ attribute_key_id: valForm.value.attribute_key_id, value: valForm.value.value, value_id: valForm.value.value_id, color_hex: valForm.value.color_hex })
   valVisible.value = false
-  const ar: any = await getAttributeKeys(spuId)
+  const ar: any = await getAttributeKeys(spuId.value)
   attrKeys.value = (ar?.code === 0 ? ar.data : []) || []
 }
 async function removeValue(id: string) {
   await deleteAttributeValue(id)
-  const ar: any = await getAttributeKeys(spuId)
+  const ar: any = await getAttributeKeys(spuId.value)
   attrKeys.value = (ar?.code === 0 ? ar.data : []) || []
 }
 </script>
 
 <style scoped>
 .root { padding: 12px; }
-.header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.header { display: flex; align-items: center; gap: 20px; margin-bottom: 12px; }
 .title { font-weight: 600; font-size: 18px; }
 .group-card { margin-bottom: 12px; }
 .card-header { font-weight: 600; }
 .attr-card { margin-bottom: 10px; }
 .ellipsis { display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
 .w-140 { max-width: 140px; }
+.spu-select { flex: 1; max-width: 400px; }
 </style>
-
-
