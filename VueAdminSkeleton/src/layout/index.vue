@@ -76,20 +76,26 @@ const sideWidth = computed(() => {
   }
 }
 
-.layout-width-shrink {
-  .left-aside {
-    z-index: 2002;
-    overflow-x: hidden;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-  }
+  .layout-width-shrink {
+    .left-aside {
+      z-index: 2002;
+      overflow-x: hidden;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+    }
 
-  .mock-view {
-    z-index: 2001;
-    position: absolute;
-    inset: 0;
-    background-color: var(--el-overlay-color-lighter);
+    .mock-view {
+      z-index: 2001;
+      position: absolute;
+      inset: 0;
+      background-color: var(--el-overlay-color-lighter);
+    }
+
+    .right-side {
+      .main {
+        padding: 5px; /* 移动端减小内边距 */
+      }
+    }
   }
-}
 </style>

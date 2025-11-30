@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { getLocale } from '@/i18n'
 import { useLocaleStore } from '@/stores/locale'
 import { useLayoutStore } from '@/stores/layout'
@@ -19,6 +19,8 @@ import { flatMenus } from '@/menu'
 import { useMenuStore } from '@/stores/menu'
 import { useRouterStore } from '@/stores/router'
 import SettingDrawer from '@/layout/SettingDrawer.vue'
+import { useWindowSize } from '@vueuse/core'
+
 // 语言包
 const localeStore = useLocaleStore()
 const locale = computed(() => {
@@ -26,6 +28,21 @@ const locale = computed(() => {
   return locale
 })
 const layoutStore = useLayoutStore()
+const { width } = useWindowSize()
+
+// 监听窗口大小变化，自动切换布局
+watch(
+  width,
+  (w) => {
+    const isSmall = w < 992
+    if (isSmall !== layoutStore.widthShrink) {
+      layoutStore.widthShrink = isSmall
+      layoutStore.menuCollapse = isSmall
+    }
+  },
+  { immediate: true }
+)
+
 const btnConfig = reactive({
   autoInsertSpace: false
 })

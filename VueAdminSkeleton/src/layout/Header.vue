@@ -69,15 +69,19 @@ import { useLayoutStore } from '@/stores/layout'
         margin-right: 15px;
         cursor: pointer;
         z-index: 2;
+        flex-shrink: 0;
+        color: var(--el-text-color-primary);
+        font-size: 18px; /* 增大图标使其更易点击 */
       }
-  
+
       .header-left {
         flex-grow: 1;
-        width: 0;
-  
+        min-width: 0; /* 修复 width: 0 可能导致的问题 */
+
         .nav-view {
-          display: inline-flex;
+          display: flex;
           align-items: center;
+          height: 100%;
         }
       }
   
@@ -93,8 +97,18 @@ import { useLayoutStore } from '@/stores/layout'
     }
   }
   
-  .width-shrink-layout,
-  .height-shrink-layout {
+.width-shrink-layout {
+  .header-top {
+    padding: 5px;
+    
+    .collapse-icon {
+      margin-right: 5px;
+    }
+  }
+}
+
+.width-shrink-layout,
+.height-shrink-layout {
     .nav-tabs {
       font-size: 12px;
     }
