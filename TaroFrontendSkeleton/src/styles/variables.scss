@@ -1,0 +1,55 @@
+// Taro Design Variables
+// 基于 750px 设计稿规范
+// Ref: https://docs.taro.zone/docs/size
+
+// --- Colors ---
+$style-color-primary: #1677ff;
+$style-color-success: #52c41a;
+$style-color-warning: #faad14;
+$style-color-danger: #ff4d4f;
+$style-color-info: #909399;
+
+$style-color-bg: #f5f5f5;
+$style-color-white: #ffffff;
+$style-color-black: #000000;
+
+// Text Colors
+$style-text-color-primary: #333333;
+$style-text-color-regular: #666666;
+$style-text-color-secondary: #999999;
+$style-text-color-placeholder: #c0c4cc;
+$style-text-color-inverse: #ffffff;
+
+// --- Typography ---
+// Font Sizes (Design Width: 750px)
+// Base rule: Web px * 2 = Taro px (rpx)
+$style-h1-text-size: 40px;      // ~20pt
+$style-h2-text-size: 36px;      // ~18pt
+$style-h3-text-size: 32px;      // ~16pt
+$style-text-size-lg: 32px;      // ~16pt
+$style-text-size-base: 28px;    // ~14pt (Standard Body)
+$style-text-size-sm: 24px;      // ~12pt (Caption/Auxiliary)
+$style-text-size-xs: 20px;      // ~10pt
+
+// Line Heights
+$style-line-height-base: 1.5;
+
+// --- Spacing ---
+$style-spacing-xs: 8px;
+$style-spacing-sm: 16px;
+$style-spacing-base: 24px;
+$style-spacing-lg: 32px;
+$style-spacing-xl: 40px;
+
+// --- Borders ---
+$style-border-radius-sm: 4px;
+$style-border-radius-base: 8px;
+$style-border-radius-lg: 16px;
+$style-border-radius-circle: 50%;
+
+$style-border-color: #ebedf0;
+$style-border-width-base: 1px; // 1px usually stays 1px in pxtransform if 1px is the smallest unit desired, or 2px for retina.
+// But Taro transforms 1px -> 1rpx which is 0.5px. 
+// Often borders need to be handled carefully (e.g. 1px transform disabled).
+// For now, let's use 2px for a solid visible border in 750 design, or rely on 1px if user wants thin borders.
+

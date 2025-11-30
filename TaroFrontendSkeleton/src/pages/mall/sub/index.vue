@@ -45,8 +45,14 @@
                 <view class="goods-name">{{ s.name }}</view>
                 <view class="goods-sub" v-if="s.sub_title">{{ s.sub_title }}</view>
                 <view class="goods-actions">
-                  <nut-button type="primary" plain size="mini" @tap.stop="openSku(s, 'cart')">加购</nut-button>
-                  <nut-button type="primary" size="mini" @tap.stop="openSku(s, 'buy')">购买</nut-button>
+                  <view v-if="cartStore.getSpuQty(s.id) > 0" class="action-stepper">
+                    <view class="btn minus" @tap.stop="handleMinus(s)">-</view>
+                    <text class="num">{{ cartStore.getSpuQty(s.id) }}</text>
+                    <view class="btn plus" @tap.stop="handlePlus(s)">+</view>
+                  </view>
+                  <view v-else class="action-add" @tap.stop="handlePlus(s)">
+                    <nut-icon name="plus" size="14" color="#fff" />
+                  </view>
                 </view>
               </view>
             </view>
@@ -86,7 +92,9 @@ import CartPopup from '@/components/cart-popup.vue'
 import api from '@/services/api'
 import Taro, { useRouter } from '@tarojs/taro'
 import mallService, { type Category, type Spu, type Brand, getUploadUrl } from '@/services/mall'
+import { useCartStore } from '@/stores/cart'
 
+const cartStore = useCartStore()
 const router = useRouter()
 const brandId = ref<string>('')
 const brand = ref<Brand | null>(null)
@@ -264,12 +272,7 @@ async function onAddCart(payload?: any) {
   const skuId = payload?.sku?.id || payload?.id || payload?.skuId
   const quantity = Number(payload?.buyNum || payload?.num || 1)
   if (!skuId) { Taro.showToast({ title: '请选择规格', icon: 'none' }); return }
-  const resp = await api.post('/cart', { sku_id: skuId, quantity })
-  if (resp.code === 0) {
-    Taro.showToast({ title: '已加入购物车', icon: 'success' })
-  } else {
-    Taro.showToast({ title: resp.message || '加入失败', icon: 'none' })
-  }
+  await cartStore.addToCart(skuId, quantity)
   skuVisible.value = false
 }
 
@@ -305,11 +308,32 @@ const goDetail = (id: string) => {
   Taro.navigateTo({ url: `/pages/mall/detail?id=${id}` })
 }
 
+const handlePlus = (spu: Spu) => {
+  const item = cartStore.getCartItemBySpu(spu.id)
+  if (item) {
+    // 购物车中已有该 SPU 且为单规格项（或只添加了一种规格），则直接 +1
+    cartStore.updateQty(item.id, Number(item.quantity) + 1)
+  } else {
+    // 购物车没有，或有多种规格，打开 SKU 面板
+    openSku(spu, 'cart')
+  }
+}
+
+const handleMinus = (spu: Spu) => {
+  const item = cartStore.getCartItemBySpu(spu.id)
+  if (item) {
+    cartStore.updateQty(item.id, Number(item.quantity) - 1)
+  } else {
+    Taro.showToast({ title: '多规格商品请在购物车调整', icon: 'none' })
+  }
+}
+
 onMounted(async () => {
   brandId.value = (router?.params?.brand_id as string) || ''
   await fetchBrand()
   await fetchCategories()
   await fetchSpus(true)
+  await cartStore.fetchCart()
 })
 </script>
 
@@ -458,14 +482,57 @@ onMounted(async () => {
             .goods-actions {
               display: flex;
               justify-content: flex-end;
+              align-items: center;
               gap: 8px;
               margin-top: 8px;
               
-              .nut-button {
-                margin: 0;
-                padding: 0 12px;
+              .action-add {
+                width: 24px;
                 height: 24px;
-                line-height: 22px;
+                background: #1677ff;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                
+                &:active {
+                  opacity: 0.8;
+                }
+              }
+              
+              .action-stepper {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                
+                .btn {
+                  width: 24px;
+                  height: 24px;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 16px;
+                  font-weight: bold;
+                  
+                  &.minus {
+                    border: 1px solid #ddd;
+                    color: #666;
+                    background: #fff;
+                  }
+                  
+                  &.plus {
+                    background: #1677ff;
+                    color: #fff;
+                  }
+                }
+                
+                .num {
+                  font-size: 14px;
+                  color: #333;
+                  min-width: 16px;
+                  text-align: center;
+                }
               }
             }
           }

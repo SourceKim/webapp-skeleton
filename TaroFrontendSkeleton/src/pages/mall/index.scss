@@ -1,16 +1,16 @@
 .mall-container {
-  padding: 20px;
+  padding: $style-spacing-base;
 }
 
 .mall-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: $style-spacing-base;
 }
 
 .mall-title {
-  font-size: 20px;
+  font-size: $style-h1-text-size;
   font-weight: bold;
 }
 
@@ -21,20 +21,20 @@
 }
 
 .mall-cart-text {
-  font-size: 14px;
-  color: #1677ff;
+  font-size: $style-text-size-base;
+  color: $style-color-primary;
 }
 
 .mall-cart-badge {
   position: absolute;
   top: -8px;
   right: -8px;
-  background-color: #ff4d4f;
-  color: #fff;
-  font-size: 12px;
+  background-color: $style-color-danger;
+  color: $style-color-white;
+  font-size: $style-text-size-sm;
   min-width: 16px;
   height: 16px;
-  border-radius: 8px;
+  border-radius: 8px; // keeping explicit px for small badge shape usually ok, or use radius variable
   display: flex;
   justify-content: center;
   align-items: center;
@@ -42,7 +42,7 @@
 }
 
 .category-scroll {
-  margin-bottom: 16px;
+  margin-bottom: $style-spacing-sm;
   white-space: nowrap;
 }
 
@@ -52,36 +52,38 @@
 }
 
 .category-item {
-  padding: 8px 16px;
-  margin-right: 8px;
-  background-color: #f5f5f5;
-  border-radius: 16px;
+  padding: 8px $style-spacing-sm;
+  margin-right: $style-spacing-xs;
+  background-color: $style-color-bg;
+  border-radius: $style-radius-md; // using variable if exists, otherwise define or keep
+  // defined $style-border-radius-lg for 16px
+  border-radius: $style-border-radius-lg;
   transition: all 0.3s;
 }
 
 .category-item-active {
-  background-color: #1677ff;
-  color: #fff;
+  background-color: $style-color-primary;
+  color: $style-color-white;
 }
 
 .category-name {
-  font-size: 14px;
+  font-size: $style-text-size-base;
 }
 
 .product-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: $style-spacing-sm;
 }
 
 .loading-products {
-  padding: 40px 0;
+  padding: $style-spacing-xl 0;
   text-align: center;
-  color: #999;
+  color: $style-text-color-secondary;
 }
 
 .empty-products {
-  padding: 40px 0;
+  padding: $style-spacing-xl 0;
   text-align: center;
-  color: #999;
-} 
+  color: $style-text-color-secondary;
+}

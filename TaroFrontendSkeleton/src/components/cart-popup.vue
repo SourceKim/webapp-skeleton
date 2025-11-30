@@ -38,35 +38,27 @@
 import { onMounted, watch, computed, ref, nextTick } from 'vue'
 import api from '@/services/api'
 import { getUploadUrl } from '@/services/mall'
-import Taro from '@tarojs/taro';
+import Taro from '@tarojs/taro'
+import { useCartStore } from '@/stores/cart'
+import { storeToRefs } from 'pinia'
 
 const props = defineProps<{ modelValue: boolean }>()
 const emit = defineEmits<{ (e: 'update:modelValue', v: boolean): void }>()
+
+const cartStore = useCartStore()
+const { items, loading, totalCount, totalPrice } = storeToRefs(cartStore)
 
 const visible = computed({
   get: () => props.modelValue,
   set: (v: boolean) => emit('update:modelValue', v)
 })
 
-const loading = ref(false)
-const items = ref<any[]>([])
 const togglingIds = ref<Set<string>>(new Set())
 const suppressIds = ref<Set<string>>(new Set())
 
 const selectedCount = computed(() => items.value.filter(i => i.selected).reduce((n, i) => n + (Number(i.quantity)||0), 0))
-const totalPrice = computed(() => items.value.filter(i => i.selected).reduce((sum, i) => sum + Number(i.sku?.price || 0) * (Number(i.quantity)||0), 0))
 
 const close = () => { visible.value = false }
-
-async function fetchList() {
-  loading.value = true
-  try {
-    const { code, data } = await api.get('/cart')
-    if (code === 0 && data) items.value = data as any[]
-  } finally {
-    loading.value = false
-  }
-}
 
 function coverOf(it: any): string | undefined {
   return getUploadUrl(it?.spu?.main_material.file_path)
@@ -84,10 +76,7 @@ function goConfirm() {
 
 async function onChangeQty(it: any, qty: number) {
   if (!qty || qty < 1) return
-  const { code, data } = await api.put(`/cart/${it.id}`, { quantity: qty })
-  if (code === 0 && data) {
-    it.quantity = (data as any).quantity
-  }
+  await cartStore.updateQty(it.id, qty)
 }
 
 async function onToggleSelected(it: any) {
@@ -108,12 +97,11 @@ async function onToggleSelected(it: any) {
 }
 
 async function remove(it: any) {
-  const { code } = await api.delete(`/cart/${it.id}`)
-  if (code === 0) items.value = items.value.filter(x => x.id !== it.id)
+  await cartStore.removeItem(it.id)
 }
 
-watch(() => props.modelValue, (v) => { if (v) fetchList() })
-onMounted(() => { if (visible.value) fetchList() })
+watch(() => props.modelValue, (v) => { if (v) cartStore.fetchCart() })
+onMounted(() => { if (visible.value) cartStore.fetchCart() })
 </script>
 
 <style lang="scss">
@@ -132,5 +120,3 @@ onMounted(() => { if (visible.value) fetchList() })
 .attrs { margin-top: 4px; color: #666; font-size: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
 .attr { background: #f6f6f6; padding: 2px 6px; border-radius: 3px; }
 </style>
-
-

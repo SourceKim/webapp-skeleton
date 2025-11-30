@@ -26,6 +26,11 @@ export default defineConfig<'vite'>(async (merge) => {
     alias: {
       '@': path.resolve(process.cwd(), 'src')
     },
+    sass: {
+      resource: [
+        path.resolve(process.cwd(), 'src/styles/variables.scss')
+      ]
+    },
     plugins: [
       vueFrameworkPlugin
     ],
