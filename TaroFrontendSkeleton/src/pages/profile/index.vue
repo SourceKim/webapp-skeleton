@@ -6,24 +6,23 @@
       <nut-cell>
         <template #title>
           <view class="user-card">
-            <image 
-              v-if="auth.user?.avatar" 
-              class="user-avatar" 
-              :src="getUploadUrl(auth.user?.avatar)" 
-              mode="aspectFill"
-            />
             <nut-avatar 
-              v-else 
               size="large" 
-              color="white" 
-              bg-color="blue" 
-              class="user-avatar-def"
+              :class="['user-avatar-component', { 'has-img': !!auth.user?.avatar }]"
+              shape="round"
+              color="#fff"
+              bg-color="#1677ff"
             >
-              {{ (auth.user?.nickname || auth.user?.username || 'U').charAt(0) }}
+              <img 
+                v-if="auth.user?.avatar" 
+                :src="getUploadUrl(auth.user?.avatar)" 
+              />
+              <text v-else class="avatar-text">{{ (auth.user?.nickname || auth.user?.username || 'U').charAt(0).toUpperCase() }}</text>
             </nut-avatar>
             <view class="user-info">
               <text class="user-nickname">{{ auth.user?.nickname || auth.user?.username }}</text>
-              <text class="user-username">@{{ auth.user?.username }}</text>
+              <text class="user-bio" v-if="auth.user?.bio">{{ auth.user.bio }}</text>
+              <text class="user-bio empty" v-else>暂无简介</text>
             </view>
           </view>
         </template>
@@ -49,6 +48,8 @@
       <nut-cell title="我的订单" is-link @click="goMyOrders" />
       <nut-cell title="地址管理" is-link @click="goAddresses" />
       <nut-cell title="编辑资料" is-link @click="goEditProfile" />
+      <nut-cell title="修改密码" is-link @click="goChangePassword" />
+      <nut-cell title="修改手机号" is-link @click="goChangePhone" />
     </nut-cell-group>
 
     <nut-cell-group title="服务">
@@ -142,6 +143,14 @@ const goAddresses = () => {
   Taro.navigateTo({ url: '/pages/address/index' })
 }
 
+const goChangePassword = () => {
+  Taro.navigateTo({ url: '/pages/profile/change-password/index' })
+}
+
+const goChangePhone = () => {
+  Taro.navigateTo({ url: '/pages/profile/change-phone/index' })
+}
+
 const goStoreIntro = () => {
   Taro.switchTab({ url: '/pages/store-intro/index' })
 }
@@ -155,9 +164,59 @@ const callPhone = () => {
 
 <style lang="scss">
 .profile-container { padding: $style-spacing-base; }
-.user-card { display: flex; align-items: center; }
-.user-avatar { width: 64px; height: 64px; border-radius: 50%; margin-right: 12px; }
-.user-avatar-def { margin-right: 12px; }
+.user-card { display: flex; align-items: center; padding: 10px 0; }
+
+/* 重写头像样式 */
+.user-avatar-component {
+  width: 80px !important;
+  height: 80px !important;
+  margin-right: 16px;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+  flex-shrink: 0;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* 文本头像字体大小 */
+  .avatar-text {
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1;
+  }
+}
+
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden; /* 防止文字溢出 */
+  
+  .user-nickname {
+    font-size: 24px; /* 增大昵称字号 */
+    font-weight: 600;
+    color: $style-text-color-primary;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  
+  .user-bio {
+    font-size: $style-text-size-sm;
+    color: $style-text-color-regular;
+    line-height: 1.4;
+    
+    &.empty {
+      color: $style-text-color-secondary;
+      font-style: italic;
+    }
+  }
+}
+
 .btn { margin-top: 16px; background: $style-color-primary; color: $style-color-white; padding: 10px; border-radius: 4px; }
 
 .stats-row {

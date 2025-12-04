@@ -27,9 +27,18 @@ const userService = {
   // 获取用户统计数据
   getStats: () => {
     return api.get<{ couponCount: number; pointCount: number; totalConsumption: string }>('/users/stats')
+  },
+
+  // 修改密码
+  changePassword: (data: any) => {
+    return api.put('/users/change-password', data)
+  },
+
+  // 修改手机号
+  changePhone: (data: any) => {
+    return api.put('/users/change-phone', data)
   }
 }
 
 export default userService
 export type { UserInfo }
-

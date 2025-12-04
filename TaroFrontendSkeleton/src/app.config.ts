@@ -12,7 +12,9 @@ export default defineAppConfig({
     'pages/profile/index',
     'pages/profile/detail/index',
     'pages/address/index',
-    'pages/address/form/index'
+    'pages/address/form/index',
+    'pages/profile/change-password/index',
+    'pages/profile/change-phone/index'
   ],
   window: {
     backgroundTextStyle: 'light',

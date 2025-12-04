@@ -5,7 +5,7 @@ import { AppDataSource } from '@/configs/database.config';
 import { HttpException } from '@/exceptions/http.exception';
 import { nanoid } from 'nanoid';
 import { PaginationQueryDto } from '@/modules/common/common.dto';
-import { CreateUserDto, UpdateUserDto, UserDTO } from '@/modules/user/user.dto';
+import { CreateUserDto, UpdateUserDto, UserDTO, ChangePasswordDto, ChangePhoneDto } from '@/modules/user/user.dto';
 import { plainToInstance } from 'class-transformer';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 import { MallOrder, OrderStatus } from '@/modules/mall/order/order.model';
@@ -77,6 +77,8 @@ export class UserService {
 
         // 显式字段映射更新，避免 undefined 覆盖
         if (rest.username !== undefined) user.username = rest.username;
+        // 注意：普通 updateUser 不应允许直接修改密码，应该走 changePassword 接口
+        // 但为了兼容性或管理员修改，这里暂时保留，但前端应避免使用
         if (rest.password !== undefined) user.password = rest.password;
         if (rest.email !== undefined) user.email = rest.email;
         if (rest.nickname !== undefined) user.nickname = rest.nickname as any;
@@ -91,6 +93,56 @@ export class UserService {
 
         // 返回用户DTO
         return plainToInstance(UserDTO, savedUser);
+    }
+
+    async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {
+        const user = await this.userRepository.findOne({ 
+            where: { id: userId },
+            select: ['id', 'password'] // 显式查出密码
+        });
+
+        if (!user) {
+            throw new HttpException(404, '用户不存在');
+        }
+
+        // 验证旧密码
+        const isMatch = await user.comparePassword(dto.oldPassword);
+        if (!isMatch) {
+            throw new HttpException(400, '旧密码错误');
+        }
+
+        // 设置新密码
+        user.password = dto.newPassword;
+        await this.userRepository.save(user);
+    }
+
+    async changePhone(userId: string, dto: ChangePhoneDto): Promise<void> {
+        const user = await this.userRepository.findOne({ 
+            where: { id: userId },
+            select: ['id', 'password', 'phone']
+        });
+
+        if (!user) {
+            throw new HttpException(404, '用户不存在');
+        }
+
+        // 验证密码
+        const isMatch = await user.comparePassword(dto.password);
+        if (!isMatch) {
+            throw new HttpException(400, '密码验证失败');
+        }
+
+        // 检查新手机号是否被占用
+        if (dto.phone !== user.phone) {
+            const existing = await this.userRepository.findOne({ where: { phone: dto.phone } });
+            if (existing) {
+                throw new HttpException(409, '该手机号已被绑定');
+            }
+        }
+
+        // 更新手机号
+        user.phone = dto.phone;
+        await this.userRepository.save(user);
     }
 
     async deleteUser(userId: string): Promise<void> {
@@ -159,4 +211,4 @@ export class UserService {
 
         return { users: userDTOs, total };
     }
-} 
+}
