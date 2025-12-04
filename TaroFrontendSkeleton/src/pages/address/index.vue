@@ -12,9 +12,9 @@
 
     <nut-address-list
       :data="listWithFullAddress"
-      @click-item="editClick"
-      @del-icon="delClick"
-      @edit-icon="editClick"
+      @click-item="onClickItem"
+      @del-icon="onDelIcon"
+      @edit-icon="onEditIcon"
       :show-bottom-button="false"
       :data-options="dataOptions"
     >
@@ -68,11 +68,49 @@ const goCreate = () => {
   Taro.navigateTo({ url: '/pages/address/form/index' })
 }
 
-const editClick = (id: string) => {
-  Taro.navigateTo({ url: `/pages/address/form/index?id=${id}` })
+// 文档说 @click-item="(item, event)"，但实际情况可能不同，需要防御性处理
+// 并且 Vue 模板如果不写参数，默认只传第一个参数。
+const onClickItem = (_: any, param2: any, param3: any) => {
+  const item = param2 || _
+  handleEdit(item)
 }
 
-const delClick = async (id: string) => {
+const onEditIcon = (_: any, param2: any, param3: any) => {
+  const item = param2 || _
+  handleEdit(item)
+}
+
+const onDelIcon = (_: any, param2: any, param3: any) => {
+  const item = param2 || _
+  handleDel(item)
+}
+
+const handleEdit = (item: any) => {
+  console.log('handleEdit item:', item)
+  // 尝试从各种可能的地方获取 ID
+  let id = item?.id
+  if (!id && item?.data?.id) id = item.data.id
+  
+  // 如果 item 是 Event 对象
+  if (!id && (item?.type === 'click' || item?.type === 'tap')) {
+     // 这种情况通常说明参数错位或者没传 item
+     console.warn('Received Event instead of Item', item)
+  }
+
+  if (id) {
+    Taro.navigateTo({ url: `/pages/address/form/index?id=${id}` })
+  } else {
+    Taro.showToast({ title: '无法获取地址ID', icon: 'none' })
+  }
+}
+
+const handleDel = async (item: any) => {
+  console.log('handleDel item:', item)
+  let id = item?.id
+  if (!id && item?.data?.id) id = item.data.id
+
+  if (!id) return
+  
   const confirm = await Taro.showModal({ title: '删除地址', content: '确认删除该地址？' })
   if (confirm.confirm) {
     const res = await addressService.remove(id)

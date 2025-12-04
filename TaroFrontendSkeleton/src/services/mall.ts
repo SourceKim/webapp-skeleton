@@ -48,6 +48,7 @@ export interface Spu {
   main_material?: Material
   sub_materials?: Material[]
   detail_content?: string
+  price?: string
 }
 
 export type SkuStatus = 'ON_SHELF' | 'OFF_SHELF'

@@ -43,6 +43,24 @@ export class ProductSpuService {
             brand_id: (s as any)?.brand?.id,
             main_material_id: (s as any)?.main_material?.id,
         }));
+
+        if (dtos.length > 0) {
+            const spuIds = dtos.map(i => i.id);
+            const prices = await this.repository.manager.createQueryBuilder(ProductSku, 'sku')
+                .select('sku.spu_id', 'spu_id')
+                .addSelect('MIN(sku.price)', 'min_price')
+                .where('sku.spu_id IN (:...ids)', { ids: spuIds })
+                .andWhere("sku.status = 'ON_SHELF'")
+                .groupBy('sku.spu_id')
+                .getRawMany();
+            
+            const priceMap = new Map(prices.map(p => [p.spu_id, p.min_price]));
+            dtos.forEach(d => {
+                const p = priceMap.get(d.id);
+                d.price = p ? String(p) : undefined;
+            });
+        }
+
         return { items: dtos, total };
     }
 

@@ -10,9 +10,16 @@
         <nut-input v-model="form.phone" placeholder="请输入手机号" />
       </nut-form-item>
       <nut-form-item label="省市区">
-        <nut-cell title="选择地址" :desc="text" is-link @click="showAddress" />
+        <nut-cell 
+          :title="text && text !== '选择地址' ? '' : '选择地址'" 
+          :desc="text" 
+          is-link 
+          @click="showAddress"
+          class="address-cell" 
+        />
         <nut-address
           v-model:visible="showPopup"
+          v-model="addressIds"
           :province="address.provinces"
           :city="address.cities"
           :country="address.countries"
@@ -61,6 +68,7 @@ const form = reactive({
 
 // 地区选择（NutUI Address）
 const showPopup = ref(false)
+const addressIds = ref<string[]>([])
 const text = ref('选择地址')
 // 地区列表容器（运行时加载自 wecatch/china_regions）
 const address = reactive({ provinces: [] , cities: [{}] as any[], countries: [{}] as any[], towns: [{}] as any[] })
@@ -120,6 +128,8 @@ const id = computed(() => router?.router?.params?.id || '')
 const isEdit = computed(() => !!id.value)
 
 onMounted(async () => {
+  address.provinces = getPronvinceList()
+  
   if (isEdit.value) {
     const res = await addressService.detail(id.value)
     if (res.code === 0 && res.data) {
@@ -135,9 +145,33 @@ onMounted(async () => {
       form.is_default = Boolean(d.is_default)
       form.tag = (d.tag || '') as any
       text.value = d.province + d.city + d.country + d.town
+      
+      // 回显省市区选中状态
+      const pList: any[] = address.provinces || []
+      const pItem = pList.find(p => p.name === d.province)
+      if (pItem) {
+        addressIds.value.push(pItem.id)
+        address.cities = getCityList(pItem.id)
+        
+        const cItem = address.cities.find((c: any) => c.name === d.city)
+        if (cItem) {
+          addressIds.value.push(cItem.id)
+          address.countries = getCountryList(cItem.id)
+          
+          const countryItem = address.countries.find((c: any) => c.name === d.country)
+          if (countryItem) {
+            addressIds.value.push(countryItem.id)
+            address.towns = getTownList(countryItem.id)
+            
+            const tItem = address.towns.find((t: any) => t.name === d.town)
+            if (tItem) {
+              addressIds.value.push(tItem.id)
+            }
+          }
+        }
+      }
     }
   }
-  address.provinces = getPronvinceList()
 })
 
 const validate = (): string | null => {
@@ -171,6 +205,26 @@ const goBack = () => {
 .address-form-page { padding: $style-spacing-sm; }
 .btns { margin: $style-spacing-sm 0; }
 .row { display: flex; gap: $style-spacing-xs; }
+
+/* 优化地址选择 Cell 样式，解决文字换行排版问题 */
+.address-cell {
+  padding: 0;
+  background: transparent;
+  
+  ::v-deep .nut-cell__value {
+    flex: 1;
+    text-align: right;
+    color: $style-text-color-primary;
+    white-space: normal; /* 允许换行 */
+    word-break: break-all;
+    line-height: 1.4;
+  }
+  
+  ::v-deep .nut-cell__title {
+    flex-shrink: 0;
+    width: 80px; /* 保持和 label 一致宽度 */
+  }
+}
 </style>
 
 

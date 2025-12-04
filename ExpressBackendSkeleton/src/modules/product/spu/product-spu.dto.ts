@@ -44,6 +44,9 @@ export class ProductSpuDTO extends BaseDTO {
 
     @Expose()
     detail_content?: string;
+
+    @Expose()
+    price?: string;
 }
 
 export class CreateProductSpuDto {

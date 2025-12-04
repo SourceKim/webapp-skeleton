@@ -40,21 +40,29 @@
               :key="s.id"
               @tap="goDetail(s.id)"
             >
-              <image class="goods-img" :src="getCover(s) || defaultImg" mode="aspectFill" />
+              <view class="goods-img-box">
+                <image class="goods-img" :src="getCover(s) || defaultImg" mode="aspectFill" />
+              </view>
               <view class="goods-info">
                 <view class="goods-name">{{ s.name }}</view>
                 <view class="goods-sub" v-if="s.sub_title">{{ s.sub_title }}</view>
-                <view class="goods-actions">
-                  <view v-if="cartStore.getSpuQty(s.id) > 0" class="action-stepper">
-                    <QuantityStepper
-                      :model-value="cartStore.getSpuQty(s.id)"
-                      :min="0"
-                      @minus="handleMinus(s)"
-                      @plus="handlePlus(s)"
-                    />
+                <view class="goods-bottom">
+                  <view class="goods-price">
+                    <text class="symbol">¥</text>
+                    <text class="num">{{ s.price || '0.00' }}</text>
                   </view>
-                  <view v-else class="action-add" @tap.stop="handlePlus(s)">
-                    <nut-icon name="plus" size="14" color="#fff" />
+                  <view class="goods-actions">
+                    <view v-if="cartStore.getSpuQty(s.id) > 0" class="action-stepper">
+                      <QuantityStepper
+                        :model-value="cartStore.getSpuQty(s.id)"
+                        :min="0"
+                        @minus="handleMinus(s)"
+                        @plus="handlePlus(s)"
+                      />
+                    </view>
+                    <view v-else class="action-add" @tap.stop="handlePlus(s)">
+                      <nut-icon name="plus" size="14" color="#fff" />
+                    </view>
                   </view>
                 </view>
               </view>
@@ -446,29 +454,38 @@ onMounted(async () => {
       border-radius: 8px 0 0 0;
       
       .goods-list {
-        .goods-card {
-          display: flex;
-          margin-bottom: 16px;
-          
-          &:last-child {
-            margin-bottom: 0;
-          }
-          
-          .goods-img {
-            width: 88px;
-            height: 88px;
-            border-radius: 6px;
-            background: #f9f9f9;
-            flex-shrink: 0;
-          }
-          
-          .goods-info {
+          .goods-card {
+            display: flex;
+            align-items: stretch;
+            margin-bottom: 16px;
+            
+            &:last-child {
+              margin-bottom: 0;
+            }
+            
+            .goods-img-box {
+              width: 110px;
+              height: 110px;
+              border-radius: 6px;
+              background: #f9f9f9;
+              flex-shrink: 0;
+              overflow: hidden;
+            }
+
+            .goods-img {
+              width: 100%;
+              height: 100%;
+              display: block;
+              object-fit: cover;
+            }
+            
+            .goods-info {
             flex: 1;
             margin-left: 10px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             padding: 2px 0;
+            position: relative;
             
             .goods-name {
               font-size: $style-text-size-base;
@@ -484,17 +501,34 @@ onMounted(async () => {
             }
             
             .goods-sub {
-              font-size: 11px;
+              font-size: $style-text-size-xs;
               color: $style-text-color-secondary;
               margin-top: 4px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+
+            .goods-bottom {
+              margin-top: auto;
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-end;
+            }
+
+            .goods-price {
+              color: $style-text-color-price;
+              font-weight: 600;
+              line-height: 1;
+              
+              .symbol { font-size: $style-text-size-xs; margin-right: 1px; }
+              .num { font-size: $style-text-size-lg; }
             }
             
             .goods-actions {
               display: flex;
-              justify-content: flex-end;
               align-items: center;
               gap: 8px;
-              margin-top: 8px;
               
               .action-add {
                 width: 24px;
