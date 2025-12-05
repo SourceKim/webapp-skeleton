@@ -11,8 +11,7 @@
       </nut-form-item>
       <nut-form-item label="省市区">
         <nut-cell 
-          :title="text && text !== '选择地址' ? '' : '选择地址'" 
-          :desc="text" 
+          :title="text" 
           is-link 
           @click="showAddress"
           class="address-cell" 
@@ -211,9 +210,14 @@ const goBack = () => {
   padding: 0;
   background: transparent;
   
+  ::v-deep .nut-cell {
+    padding: 0;
+  }
+  
   ::v-deep .nut-cell__value {
     flex: 1;
-    text-align: right;
+    text-align: left !important;
+    justify-content: flex-start !important;
     color: $style-text-color-primary;
     white-space: normal; /* 允许换行 */
     word-break: break-all;
@@ -221,8 +225,16 @@ const goBack = () => {
   }
   
   ::v-deep .nut-cell__title {
-    flex-shrink: 0;
-    width: 80px; /* 保持和 label 一致宽度 */
+    flex: 1;
+    text-align: left !important;
+    color: $style-text-color-primary;
+    white-space: normal; /* 允许换行 */
+    word-break: break-all;
+    line-height: 1.4;
+  }
+  
+  ::v-deep .nut-cell__link {
+    margin-left: auto;
   }
 }
 </style>
