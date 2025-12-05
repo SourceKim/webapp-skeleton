@@ -91,7 +91,7 @@ export class AuthService {
         
         if (!user) {
             console.log("用户不存在:", username);
-            throw new HttpException(401, '用户名或密码错误');
+            throw new HttpException(404, '用户不存在');
         }
 
         console.log(`尝试登录用户: ${username}, 输入密码: ${password}`);
@@ -102,7 +102,7 @@ export class AuthService {
         console.log(`密码验证结果: ${isValidPassword ? '成功' : '失败'}`);
         
         if (!isValidPassword) {
-            throw new HttpException(401, '用户名或密码错误');
+            throw new HttpException(400, '密码错误');
         }
 
         if (user.status == 'inactive') {

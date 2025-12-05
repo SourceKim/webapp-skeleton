@@ -92,6 +92,7 @@ export class User extends BaseEntity {
     }
 
     async comparePassword(password: string): Promise<boolean> {
+        if (!this.password) return false;
         return bcrypt.compare(password, this.password);
     }
 

@@ -103,9 +103,26 @@ const request = async <T = any>(options: RequestOptions): Promise<ApiResponse<T>
     
     // 检查响应状态码
     if (response.statusCode === 401) {
+      // 只有在非登录/注册页面才跳转登录，或者是 token 过期的情况
+      const pages = Taro.getCurrentPages()
+      const currentPage = pages[pages.length - 1]?.route
+      const isAuthPage = currentPage?.includes('login/index')
+      
+      // 如果已经在登录页，且是登录接口报错，不要重定向，直接返回错误信息给业务层处理
+      if (isAuthPage && interceptedOptions.url.includes('/auth/login')) {
+         return response.data as ApiResponse<T>
+      }
+
       handleUnauthorized()
       return { code: 401, message: '未授权', data: null as any }
     }
+    
+    // 如果是业务错误（如 400 参数错误，403 禁止，404 不存在等），直接返回后端响应体给业务层处理
+    // 前提是后端返回了标准的 { code, message, data } 结构
+    if (response.statusCode >= 400 && response.data && (response.data as any).code !== undefined) {
+       return response.data as ApiResponse<T>
+    }
+
     if (response.statusCode !== 200) {
       console.error('HTTP错误:', response.statusCode)
       return {

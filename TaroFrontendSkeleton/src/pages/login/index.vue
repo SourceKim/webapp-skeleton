@@ -21,13 +21,31 @@
             <input class="nut-input" v-model="nickname" placeholder="请输入昵称" />
           </nut-form-item>
           <nut-form-item label="性别">
-            <picker mode="selector" :range="genderOptions" :value="genderIndex" @change="onGenderChange">
-              <view class="picker-display">{{ genderOptions[genderIndex] }}</view>
+            <picker mode="selector" :range="genderOptionsCN" :value="genderIndex" @change="onGenderChange">
+              <view class="picker-display">
+                <text>{{ genderOptionsCN[genderIndex] }}</text>
+                <nut-icon name="right" size="12" color="#999" />
+              </view>
             </picker>
           </nut-form-item>
           <nut-form-item label="出生日期（可选）">
-            <input class="nut-input" v-model="birthdate" placeholder="YYYY-MM-DD" />
+            <view class="picker-display" @click="openBirthPicker">
+              <text :class="{ placeholder: !birthdate }">{{ birthdate || '请选择出生年月日' }}</text>
+              <nut-icon name="right" size="12" color="#999" />
+            </view>
           </nut-form-item>
+          <nut-popup v-model:visible="showBirthPicker" position="bottom" round>
+            <nut-date-picker
+              v-model="currentDate"
+              type="date"
+              title="选择出生日期"
+              :min-date="minBirthDate"
+              :max-date="maxBirthDate"
+              :is-show-chinese="true"
+              @confirm="applyBirth"
+              @cancel="showBirthPicker = false"
+            />
+          </nut-popup>
           <nut-form-item label="简介（可选）">
             <textarea class="nut-textarea" v-model="bio" placeholder="请输入个人简介" />
           </nut-form-item>
@@ -72,8 +90,35 @@ const nickname = ref('')
 const birthdate = ref('')
 const bio = ref('')
 const genderOptions = ['male', 'female', 'other']
+const genderOptionsCN = ['男', '女', '保密']
 const genderIndex = ref(0)
 const onGenderChange = (e: any) => { genderIndex.value = Number(e.detail.value) }
+
+// 出生日期选择器
+const showBirthPicker = ref(false)
+const currentDate = ref(new Date())
+const minBirthDate = new Date(1900, 0, 1)
+const maxBirthDate = new Date()
+
+const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`)
+const formatDate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+
+const openBirthPicker = () => {
+  if (birthdate.value) {
+    currentDate.value = new Date(birthdate.value)
+  }
+  showBirthPicker.value = true
+}
+
+const applyBirth = ({ selectedValue }: any) => {
+  if (selectedValue && selectedValue.length >= 3) {
+      const [y, m, d] = selectedValue
+      birthdate.value = `${y}-${m}-${d}`
+  } else {
+      birthdate.value = formatDate(currentDate.value)
+  }
+  showBirthPicker.value = false
+}
 
 onMounted(() => {
   Taro.setNavigationBarTitle({ title: isRegister.value ? '注册' : '登录' })
@@ -144,7 +189,26 @@ const handleSubmit = async () => {
 .login-title { display:block; font-size: 20px; font-weight: 600; margin-bottom: 12px; }
 .nut-input { width: 100%; padding: 10px 12px; border: 1px solid $style-border-color; border-radius: 8px; background: $style-color-bg; }
 .nut-textarea { width: 100%; min-height: 80px; padding: 10px 12px; border: 1px solid $style-border-color; border-radius: 8px; background: $style-color-bg; }
-.picker-display { padding: 10px 12px; border: 1px solid $style-border-color; border-radius: 8px; background: $style-color-bg; color: $style-text-color-regular; }
+.picker-display { 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px; 
+  border: 1px solid $style-border-color; 
+  border-radius: 8px; 
+  background: $style-color-bg; 
+  color: $style-text-color-primary; 
+  
+  .placeholder {
+    color: #ccc;
+  }
+}
+/* 恢复 NutUI 默认样式 */
+.nut-date-picker {
+  .nut-picker__title {
+     display: block; 
+  }
+}
 .mt-10 { margin-top: 10px; }
 </style>
 
