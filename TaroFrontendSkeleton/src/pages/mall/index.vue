@@ -1,5 +1,5 @@
 <template>
-  <view class="brand-page">
+  <view class="brand-page" v-if="!isSingleBrand">
     <nut-navbar title="选择品牌" safe-area-inset-top />
     <scroll-view class="grid" scroll-y>
       <view class="col">
@@ -34,17 +34,27 @@
       <view class="loading full-span" v-else-if="loading">加载中...</view>
     </scroll-view>
   </view>
+  <MallContent 
+    v-else 
+    :brandId="singleBrandId" 
+    :enableBack="false" 
+    title="商城" 
+  />
 </template>
 
 <script setup lang="ts">
 import Taro from '@tarojs/taro'
 import { ref, onMounted, computed } from 'vue'
 import mallService, { type Brand, getUploadUrl } from '@/services/mall'
+import MallContent from './components/MallContent.vue'
 
 const brands = ref<Brand[]>([])
 const loading = ref(false)
 const leftList = computed(() => brands.value.filter((_, idx) => idx % 2 === 0))
 const rightList = computed(() => brands.value.filter((_, idx) => idx % 2 === 1))
+
+const isSingleBrand = ref(false)
+const singleBrandId = ref('')
 
 const fetchBrands = async () => {
   loading.value = true
@@ -52,6 +62,13 @@ const fetchBrands = async () => {
   loading.value = false
   if (code === 0 && data) {
     brands.value = data.items
+    if (brands.value.length === 1) {
+      isSingleBrand.value = true
+      singleBrandId.value = brands.value[0].id
+    } else {
+      isSingleBrand.value = false
+      singleBrandId.value = ''
+    }
   }
 }
 
