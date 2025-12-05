@@ -8,16 +8,15 @@
           <view class="user-card">
             <nut-avatar 
               size="large" 
-              :class="['user-avatar-component', { 'has-img': !!auth.user?.avatar }]"
               shape="round"
-              color="#fff"
-              bg-color="#1677ff"
+              class="user-avatar"
             >
               <img 
-                v-if="auth.user?.avatar" 
                 :src="getUploadUrl(auth.user?.avatar)" 
+                mode="aspectFill"
+                v-if="auth.user?.avatar"
               />
-              <text v-else class="avatar-text">{{ (auth.user?.nickname || auth.user?.username || 'U').charAt(0).toUpperCase() }}</text>
+              <div v-else>{{ (auth.user?.nickname || auth.user?.username || 'U').charAt(0).toUpperCase() }}</div>
             </nut-avatar>
             <view class="user-info">
               <text class="user-nickname">{{ auth.user?.nickname || auth.user?.username }}</text>
@@ -166,43 +165,19 @@ const callPhone = () => {
 .profile-container { padding: $style-spacing-base; }
 .user-card { display: flex; align-items: center; padding: 10px 0; }
 
-/* 重写头像样式 */
-.user-avatar-component {
-  width: 80px !important;
-  height: 80px !important;
-  margin-right: 16px;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  overflow: hidden;
-  flex-shrink: 0;
-  
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  /* 文本头像字体大小 */
-  .avatar-text {
-    font-size: 32px;
-    font-weight: 600;
-    line-height: 1;
-  }
-}
-
 .user-info {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   overflow: hidden; /* 防止文字溢出 */
+  padding-left: 16px;
   
   .user-nickname {
-    font-size: 24px; /* 增大昵称字号 */
-    font-weight: 600;
+    font-size: $style-text-size-lg;
+    font-weight: bold;
     color: $style-text-color-primary;
-    margin-bottom: 6px;
-    line-height: 1.3;
+    margin-bottom: 4px;
   }
   
   .user-bio {
