@@ -42,8 +42,8 @@ export class MaterialService {
     constructor() {
         this.materialRepository = AppDataSource.getRepository(Material);
         this.dataSource = AppDataSource;
-        this.defaultUploadDir = path.resolve(ENV.UPLOAD_DIR || './uploads');
-        this.baseUrl = ENV.API_URL || 'http://localhost:3000';
+        this.defaultUploadDir = path.resolve(ENV.UPLOAD_DIR);
+        this.baseUrl = ENV.API_URL;
         
         // 确保上传目录存在
         createDirIfNotExists(this.defaultUploadDir);

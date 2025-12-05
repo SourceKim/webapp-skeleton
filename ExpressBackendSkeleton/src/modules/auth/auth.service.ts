@@ -3,9 +3,11 @@ import { User, UserStatus } from '@/modules/user/user.model';
 import { AppDataSource } from '@/configs/database.config';
 import { HttpException } from '@/exceptions/http.exception';
 import * as jwt from 'jsonwebtoken';
+import type { StringValue } from 'ms';
 import { RegisterDto, LoginDto } from '@/modules/auth/auth.dto';
 import { logDebug, logError } from '@/utils/logger';
 import { customAlphabet } from 'nanoid';
+import { ENV } from '@/configs/env.config';
 
 export class AuthService {
     private userRepository: Repository<User>;
@@ -130,10 +132,12 @@ export class AuthService {
     }
 
     private generateToken(user: User): string {
+        const secret: jwt.Secret = ENV.JWT_SECRET;
+        const expiresIn: StringValue | number = (ENV.JWT_EXPIRES_IN) as StringValue;
         return jwt.sign(
             { id: user.id, username: user.username },
-            process.env.JWT_SECRET || 'your-secret-key',
-            { expiresIn: '24h' }
+            secret,
+            { expiresIn }
         );
     }
 
@@ -156,12 +160,9 @@ export class AuthService {
 
     async loginWithToken(token: string): Promise<{ user: Partial<User>; access_token: string }> {
         try {
-            if (!process.env.JWT_SECRET) {
-                throw new Error('JWT_SECRET not configured');
-            }
-
             // 验证令牌
-            const decoded = jwt.verify(token, process.env.JWT_SECRET) as { id: string; username: string };
+            const secret: string = ENV.JWT_SECRET;
+            const decoded = jwt.verify(token, secret) as { id: string; username: string };
             
             // 查找用户
             const user = await this.userRepository.findOne({

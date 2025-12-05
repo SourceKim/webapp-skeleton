@@ -48,7 +48,11 @@ export const ENV = {
   MYSQL_USER: process.env.MYSQL_USER || 'root',
   MYSQL_PASSWORD: process.env.MYSQL_PASSWORD || '',
   MYSQL_DATABASE: process.env.MYSQL_DATABASE || 'database_name',
-  
+
+  // JWT配置
+  JWT_SECRET: process.env.JWT_SECRET || 'dev-jwt-secret-key-change-in-production',
+  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '24h',
+
   // 素材管理配置
   UPLOAD_DIR: process.env.UPLOAD_DIR || './uploads',
   API_URL: process.env.API_URL || 'http://localhost:3000',

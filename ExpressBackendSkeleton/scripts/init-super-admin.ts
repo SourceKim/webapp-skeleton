@@ -8,6 +8,7 @@ import * as bcrypt from 'bcryptjs';
 import * as mysql from 'mysql2/promise';
 import { DataSource } from 'typeorm';
 import * as path from 'path';
+import { ROLE_NAMES } from '../src/constants/role.constants';
 
 // 加载环境变量
 const envFile = '.env.development.local';
@@ -137,13 +138,13 @@ async function initSuperAdmin() {
         // 2. 创建超级管理员角色
         const roleRepository = dataSourceToUse.getRepository(Role);
         let role = await roleRepository.findOne({
-            where: { name: 'super_admin' }
+            where: { name: ROLE_NAMES.SUPER_ADMIN }
         });
 
         if (!role) {
             role = new Role();
             (role as any).id = nanoid(16);
-            role.name = 'super_admin';
+            role.name = ROLE_NAMES.SUPER_ADMIN;
             role.description = '超级管理员，拥有所有权限';
             role.permissions = permissions;
             role = await roleRepository.save(role);

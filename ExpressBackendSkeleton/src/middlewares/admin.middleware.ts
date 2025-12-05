@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { logDebug, logError } from '@/utils/logger';
+import { ADMIN_ROLE_NAMES } from '@/constants/role.constants';
 
 /**
  * 管理员权限中间件
@@ -15,7 +16,7 @@ export async function adminMiddleware(req: Request, res: Response, next: NextFun
 
         // 检查用户是否具有管理员角色
         const isAdmin = req.user.roles?.some(role => 
-            role.name === 'admin' || role.name === 'super_admin'
+            ADMIN_ROLE_NAMES.includes(role.name as typeof ADMIN_ROLE_NAMES[number])
         );
 
         if (!isAdmin) {

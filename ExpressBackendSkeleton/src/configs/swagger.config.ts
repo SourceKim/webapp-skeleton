@@ -1,4 +1,5 @@
 import swaggerJSDoc from 'swagger-jsdoc';
+import { ENV } from './env.config';
 
 const swaggerDefinition = {
   openapi: '3.0.0',
@@ -17,7 +18,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:3000/api/v1',
+      url: `${ENV.API_URL}${ENV.API_BASE_URL}`,
       description: '开发服务器',
     },
   ],

@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { AppDataSource } from '@/configs/database.config';
 import { User } from '@/modules/user/user.model';
 import { logDebug, logError } from '@/utils/logger';
+import { ENV } from '@/configs/env.config';
 
 interface JwtPayload {
     id: string;
@@ -17,11 +18,8 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
         }
 
         const token = authHeader.split(' ')[1];
-        if (!process.env.JWT_SECRET) {
-            throw new Error('JWT_SECRET not configured');
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
+        const secret: string = ENV.JWT_SECRET;
+        const decoded = jwt.verify(token, secret) as JwtPayload;
         const userRepository = AppDataSource.getRepository(User);
         
         const user = await userRepository.findOne({
