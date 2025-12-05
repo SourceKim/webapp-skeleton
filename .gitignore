@@ -1,0 +1,44 @@
+# System Files
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Editors / IDEs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Cursor
+.cursor/*
+!.cursor/rules/
+!.cursor/mcp.json
+
+# Build
+dist/
+build/
+coverage/
+
+# Logs
+logs/
+*.log
+
+# OS
+.Spotlight-V100
+.Trashes
+ehthumbs.db
