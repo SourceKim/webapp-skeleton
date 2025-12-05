@@ -89,7 +89,7 @@ function initMap() {
     version: '2.0', 
     plugins: ['AMap.PlaceSearch', 'AMap.AutoComplete', 'AMap.Geocoder'], 
   })
-    .then((AMap) => {
+    .then((AMap: any) => {
       const center = props.modelValue && props.modelValue.lng && props.modelValue.lat 
             ? [props.modelValue.lng, props.modelValue.lat] 
             : [116.397428, 39.90923]; // 默认北京天安门
@@ -136,7 +136,7 @@ function initMap() {
       }
 
     })
-    .catch((e) => {
+    .catch((e: any) => {
       console.error(e)
       ElMessage.error('地图加载失败，请检查 Key 配置')
     })

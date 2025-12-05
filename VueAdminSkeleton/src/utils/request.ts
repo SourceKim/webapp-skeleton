@@ -7,14 +7,10 @@ import type { MyAxiosInstance } from '@/interface/request'
 import { useAuthStore } from '@/stores/auth'
 import type { RequestOption } from '@/api/types/common'
 
-type Mutable<T> = {
-  -readonly [P in keyof T]: T[P];
-};
-
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 
 function getDefaultOption(): RequestOption {
-  const { t } = i18n.global
+  const { t } = (i18n as any).global
   return {
     showLoading: false,
     showBeforeConfirm: false,
@@ -30,7 +26,7 @@ function getDefaultOption(): RequestOption {
 }
 
 // 对请求进行增强处理
-export default function createAxios<R = any, Q = any>(opt?: RequestOption): MyAxiosInstance<R, Q> {
+export default function createAxios<R = any, Q = any>(opt?: RequestOption): any {
   const option: RequestOption = { ...getDefaultOption(), ...opt }
   let loadingInstance: { close: () => void }
 
@@ -50,7 +46,7 @@ export default function createAxios<R = any, Q = any>(opt?: RequestOption): MyAx
   // 提示错误信息
   function showErrorMsg(e: R | AxiosError) {
     if (e === 'cancel') return Promise.reject(e)
-    const param: Mutable<NotificationParams> = {
+    const param: any = {
       type: 'error',
       duration: option.errorDuration
     }
@@ -73,21 +69,21 @@ export default function createAxios<R = any, Q = any>(opt?: RequestOption): MyAx
       }
     }
     param.message ??= option.errorMsg || 'Error'
-    ElNotification(param)
+    ElNotification(param as NotificationParams)
     return Promise.reject(e)
   }
 
   // 创建axios实例
-  const service: MyAxiosInstance<R, Q> = axios.create({
+  const service = axios.create({
     // // axios中请求配置有baseURL选项，表示请求URL公共部分
     baseURL: import.meta.env.VITE_BASE_URL // 超时
-  }) as MyAxiosInstance<R, Q>
+  }) as any as MyAxiosInstance<R, Q>
 
   // request拦截器
   service.interceptors.request.use(async (config) => {
     if (option.showBeforeConfirm) {
       // 确认的提示
-      await ElMessageBox.confirm(option.confirmMsg, i18n.global.t('common.tip'), {
+      await ElMessageBox.confirm(option.confirmMsg, (i18n as any).global.t('common.tip'), {
         type: 'warning',
         confirmButtonText: option.confirmButtonText
       })

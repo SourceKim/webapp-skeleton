@@ -72,8 +72,8 @@ const i18n = createI18n({
   locale: useLocalStorage<LocaleKey>('locale', 'zh-cn').value,
   fallbackLocale: 'zh-cn',
   messages: {
-    'zh-cn': getLocale('zh-cn').locale,
-    'en': getLocale('en').locale
+    'zh-cn': getLocale('zh-cn').locale as any,
+    'en': getLocale('en').locale as any
   }
 })
 

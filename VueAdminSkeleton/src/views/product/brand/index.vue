@@ -67,7 +67,7 @@ const columns = computed((): CommonTableColumn<ProductBrand>[] => [
     label: 'Logo', width: 100, align: 'center', slots: {
       default: ({ row }: any) => {
         const url = row.material?.file_path ? getUploadFileUrl(row.material.file_path) : ''
-        if (!url) return '-'
+        if (!url) return h('span', '-')
         return h(ElImage, { src: url, style: 'width:40px;height:40px; object-fit:cover', fit: 'cover', previewSrcList: [url], previewTeleported: true })
       }
     }

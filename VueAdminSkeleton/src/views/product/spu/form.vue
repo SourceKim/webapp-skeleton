@@ -237,7 +237,7 @@ function onPickBrand(r: ProductBrand) {
   selectBrandVisible.value = false
 }
 
-function onGalleryRemove(file: any, fileList: any[]) {
+function onGalleryRemove(_file: any, fileList: any[]) {
   // 从当前文件列表同步 sub_material_ids，优先读取 response.id
   const ids: string[] = []
   for (const f of fileList) {

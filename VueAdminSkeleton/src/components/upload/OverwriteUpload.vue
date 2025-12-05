@@ -101,7 +101,7 @@ const handleHttpRequest: UploadProps['httpRequest'] = async (option) => {
     fileList.value = [{ name: file.name || 'file', url: res.url }]
     emit('update:modelValue', res.url)
     emit('uploaded', res)
-    option.onSuccess?.(res as any, file)
+    option.onSuccess?.(res as any)
   } catch (err) {
     emit('error', err)
     option.onError?.(err as any)

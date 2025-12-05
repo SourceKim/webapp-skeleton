@@ -89,11 +89,11 @@ async function fetchRoot() {
 async function fetchBrands() {
   const res = await getBrandsAll({ limit: 100, status: 'ENABLED' })
   if (res.code === 0) {
-    brandList.value = res.data.items
+    brandList.value = res.data?.items || []
   }
 }
 
-async function loadChildren(row: any, treeNode: any, resolve: (data: ProductCategory[]) => void) {
+async function loadChildren(row: any, _treeNode: any, resolve: (data: ProductCategory[]) => void) {
   const parent = row
   const res: any = await getCategories({ parent_id: parent.id })
   const list = (res?.code === 0 ? res.data?.items : []) || []

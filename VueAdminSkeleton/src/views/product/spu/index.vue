@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import MTable from '@/components/table/index.vue'
-import { reactive, ref, computed, defineAsyncComponent, h } from 'vue'
+import { ref, computed, defineAsyncComponent, h } from 'vue'
 import { useRouter } from 'vue-router'
 import type { CommonTableColumn } from '@/components/interface/table'
 import type { ProductSpu } from '@/api/product/spu.d'
@@ -53,8 +53,9 @@ function formClose(refresh?: boolean) {
 const columns = computed((): CommonTableColumn<ProductSpu>[] => [
   { prop: 'id', label: 'ID', width: 160 },
   { label: '主图', width: 100, align: 'center', slots: { default: ({ row }: any) => {
-    const url = row.main_material?.file_path ? getUploadFileUrl(row.main_material.file_path) : ''
-    return h(ElImage, { src: url, style: 'width:40px;height:40px; object-fit:cover', fit: 'cover', previewSrcList: url ? [url] : [] })
+    const url = row.main_material?.file_path ? getUploadFileUrl(row.main_material.file_path) : null
+    if (!url) return h('span', '-')
+    return h(ElImage, { src: url, style: 'width:40px;height:40px; object-fit:cover', fit: 'cover', previewSrcList: [url] })
   } } },
   { prop: 'name', label: '名称', width: 220 },
   { prop: 'sub_title', label: '副标题', width: 260 },

@@ -20,7 +20,7 @@ export type MTableProps<T extends object, F extends object> = Omit<TableProps<T>
   filterColumns?: CommonFormColumn<any>[] // 过滤column
   filterParam?: F // 过滤param
   columns?: CommonTableColumn<T>[] // 表格列定义
-  fetchData: FetchPageDataFun<T> // 请求后台数据的方法
+  fetchData?: FetchPageDataFun<T> // 请求后台数据的方法
   defaultQuery?: boolean // 是否默认查询，启动就查询一次
   data: T[] // 表格数据
   isPage?: boolean // 是否分页

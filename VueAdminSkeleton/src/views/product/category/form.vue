@@ -104,7 +104,7 @@ watch(() => props.modelValue, (v) => {
 async function fetchBrands() {
   const res = await getBrandsAll({ limit: 100, status: 'ENABLED' })
   if (res.code === 0) {
-    brandList.value = res.data.items
+    brandList.value = res.data?.items || []
   }
 }
 

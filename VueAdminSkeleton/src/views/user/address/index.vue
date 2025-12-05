@@ -20,8 +20,8 @@
 import MTable from '@/components/table/index.vue'
 import { reactive, ref, computed } from 'vue'
 import type { CommonTableColumn } from '@/components/interface/table'
-import type { PageQuery, RestResponse, PageResult } from '@/components/table/types'
-import type { UserAddress, UpdateUserAddressDto } from '@/api/user/address.d'
+import type { UserAddress } from '@/api/user/address.d'
+import type { FetchPageDataFun } from '@/interface/request'
 import { listAdminAddresses, deleteAdminAddress } from '@/api/user/address'
 
 const data = ref<UserAddress[]>([])
@@ -29,16 +29,18 @@ const tableRef = ref()
 const filterParam = reactive({})
 const selectRows = ref<UserAddress[]>([])
 
-async function fetchPage(filters?: Record<string, any>): Promise<RestResponse<PageResult<UserAddress>>> {
+const fetchPage: FetchPageDataFun<UserAddress> = (filters?: Record<string, any>) => {
   const params = { ...filters }
-  const res = await listAdminAddresses(params)
-  // 适配后端分页结构（data.items + data.meta.total）到 MTable 需要的 PageResult 结构
-  const items = (res.data as any)?.items || []
-  const total = (res.data as any)?.meta?.total ?? 0
-  return {
-    code: 0,
-    data: { items, total }
-  }
+  return listAdminAddresses(params).then(res => {
+    // 适配后端分页结构（data.items + data.meta.total）到 MTable 需要的 PageResult 结构
+    const items = (res.data as any)?.items || []
+    const total = (res.data as any)?.meta?.total ?? 0
+    return {
+      code: res.code || 0,
+      message: res.message,
+      data: { items, total }
+    } as any
+  }) as any
 }
 
 const columns = computed((): CommonTableColumn<UserAddress>[] => [

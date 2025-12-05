@@ -4,7 +4,6 @@ import { useTableData } from './useTableData'
 import { useTableSelection } from './useTableSelection'
 import { useTableColumns } from './useTableColumns'
 import type { MTableProps } from '@/components/interface/table'
-import type { TableLayoutMode } from '../types'
 
 /**
  * 表格主要逻辑组合

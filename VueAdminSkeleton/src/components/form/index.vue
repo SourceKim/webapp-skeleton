@@ -46,8 +46,7 @@ import { provide, ref, shallowRef, useAttrs, watchEffect } from 'vue'
 import { generateDynamicColumn, generateFormRules, generatePlaceholder, vModelValue } from '@/components/mutils'
 import { useElementSize } from '@vueuse/core'
 import type { UploadCtx } from '@/components/form/Upload.vue'
-import { type CommonFormColumn, mFormEmits, mFormProps } from '@/components/interface/form'
-import { useElComponentSizeCssVar } from '@/components/utils/useELComponentSizeCssVar'
+import { type CommonFormColumn, mFormEmits } from '@/components/interface/form'
 import { useLayoutStore } from '@/stores/layout'
 import { ElForm, ElFormItem, ElCol } from 'element-plus'
 
@@ -128,7 +127,6 @@ interface FormItemParam<T extends Record<string, any>> {
 
 const formItemParams = shallowRef<FormItemParam<T>[]>([])
 const uploadInstances = ref<UploadCtx[]>([])
-const elComponentSizeCssVar = useElComponentSizeCssVar()
 
 watchEffect(() => {
   let sizeWidth = 300

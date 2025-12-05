@@ -16,7 +16,7 @@ export function createPermission(data: CreateAndUpdatePermissionQueryDto, option
  * 获取所有权限
  * @returns 权限列表
  */
-export function getPermissions(option?: RequestOption): Promise<RestResponse<PaginatedResponse<Permission>>> {
+export function getPermissions(option?: RequestOption): RestResponse<PaginatedResponse<Permission>> {
     return createAxios(option).get(`${BASE_URL}/permissions/admin`);
 }
 

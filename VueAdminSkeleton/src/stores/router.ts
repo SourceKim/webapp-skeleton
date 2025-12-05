@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { Menu, TreeMenu } from '@/interface/menu.d'
+import type { Menu } from '@/interface/menu.d'
 import { useMenuStore } from './menu'
 import { useRouter, type RouteLocationNormalized, type RouteRecordRaw } from 'vue-router'
 import camelCase from 'lodash/camelCase'

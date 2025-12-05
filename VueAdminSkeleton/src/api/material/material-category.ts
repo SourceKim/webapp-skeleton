@@ -16,7 +16,7 @@ export function createMaterialCategory(data: CreateUpdateMaterialCategoryQueryDt
  * 获取素材分类列表
  * @returns 素材分类列表
  */
-export function getMaterialCategories(option?: RequestOption): Promise<RestResponse<PaginatedResponse<MaterialCategory>>> {
+export function getMaterialCategories(option?: RequestOption): RestResponse<PaginatedResponse<MaterialCategory>> {
     return createAxios(option).get(`${BASE_URL}/materials/categories/admin`);
 }
 

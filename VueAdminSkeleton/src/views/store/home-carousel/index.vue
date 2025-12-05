@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, h, onMounted } from 'vue'
+import { ref, reactive, computed, h } from 'vue'
 import MTable from '@/components/table/index.vue'
 import { getCarousels, createCarousel, updateCarousel, deleteCarousel, getSpuList } from '@/api/mall/home'
 import { uploadMaterial } from '@/api/material/material'
@@ -128,24 +128,24 @@ const columns = computed(() => [
         label: '图片', 
         width: 100,
         slots: { default: renderImage }
-    },
+    } as any,
     { 
         prop: 'spu', 
         label: '关联SPU', 
         width: 200,
         slots: { default: renderSpu }
-    },
+    } as any,
     { prop: 'sort_order', label: '排序', width: 80 },
     { prop: 'is_active', label: '状态', width: 80, formatter: (row: any) => row.is_active ? '启用' : '禁用' },
     { prop: 'created_at', label: '创建时间' },
     {
-        type: 'operation',
+        type: 'operation' as const,
         label: '操作',
-        fixed: 'right',
+        fixed: 'right' as const,
         width: 150,
         buttons: [
-            { label: '编辑', type: 'primary', onClick: (row: CarouselDTO) => openForm('edit', row) },
-            { label: '删除', type: 'danger', onClick: (row: CarouselDTO) => handleDelete(row) }
+            { label: '编辑', type: 'primary' as const, onClick: (row: CarouselDTO) => openForm('edit', row) },
+            { label: '删除', type: 'danger' as const, onClick: (row: CarouselDTO) => handleDelete(row) }
         ]
     }
 ])
@@ -158,12 +158,12 @@ function renderImage(scope: { row: CarouselDTO }) {
             style: 'width: 50px; height: 50px; object-fit: cover; border-radius: 4px;'
         })
     }
-    return '-'
+    return h('span', '-')
 }
 
 function renderSpu(scope: { row: CarouselDTO }) {
     const spu = scope.row.spu
-    if (!spu) return '-'
+    if (!spu) return h('span', '-')
     
     const children = []
     if (spu.main_material?.file_path) {

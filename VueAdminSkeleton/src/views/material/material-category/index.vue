@@ -43,9 +43,9 @@
   import { useI18n } from 'vue-i18n'
 
   // 表格
-  const data = ref([]) // 表格模型数据
+  const data = ref<any[]>([]) // 表格模型数据
   const tableRef = ref() // 表格的引用
-  const selectRows = ref([]) // 选中行
+  const selectRows = ref<any[]>([]) // 选中行
   const { t } = useI18n()
   
   // 表单
@@ -54,24 +54,24 @@
   const row = ref() // 表单数据
 
   const columns = computed(() => [
-    { prop: 'name', label: '名称', type: 'input' },
-    { prop: 'description', label: '描述', type: 'textarea' },
-    { prop: 'created_at', label: '创建时间', type: 'datetime' },
-    { prop: 'updated_at', label: '更新时间', type: 'datetime' },
+    { prop: 'name', label: '名称', type: 'input' as const },
+    { prop: 'description', label: '描述', type: 'textarea' as const },
+    { prop: 'created_at', label: '创建时间', type: 'datetime' as const },
+    { prop: 'updated_at', label: '更新时间', type: 'datetime' as const },
     {
-        type: 'operation',
-        fixed: 'right',
-        align: 'center',
+        type: 'operation' as const,
+        fixed: 'right' as const,
+        align: 'center' as const,
         buttons: [
-          { label: t('common.edit'), icon: 'edit', onClick: (row) => openForm('edit', row) },
-          { label: t('common.detail'), icon: 'document', onClick: (row) => openForm('detail', row)},
-          { label: t('common.del'), icon: 'delete', type: 'danger', onClick: (row) => del([row]) }
+          { label: t('common.edit'), icon: 'edit', onClick: (row: any) => openForm('edit', row) },
+          { label: t('common.detail'), icon: 'document', onClick: (row: any) => openForm('detail', row)},
+          { label: t('common.del'), icon: 'delete', type: 'danger' as const, onClick: (row: any) => del([row]) }
         ]
       }
   ])
   
   // 表格单元格样式
-  function cellStyle({ row, column }) {
+  function cellStyle({ row, column }: { row: any; column: any }) {
     if (column.property === 'status' && row.status === 1) {
       return {
         color: 'green'

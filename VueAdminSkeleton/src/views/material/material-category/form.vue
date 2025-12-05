@@ -52,8 +52,8 @@
   })
 
   const formColumns = computed(() => [
-    { prop: 'name', label: '名称', type: 'input' },
-    { prop: 'description', label: '描述', type: 'textarea' },
+    { prop: 'name', label: '名称', type: 'input' as const },
+    { prop: 'description', label: '描述', type: 'textarea' as const },
   ])
   
   const formData = ref({}) // 表单数据

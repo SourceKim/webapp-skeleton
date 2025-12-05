@@ -16,7 +16,7 @@ export function createMaterialTag(data: CreateUpdateMaterialTagQueryDto, option?
  * 获取素材 tag 列表
  * @returns 素材 tag 列表
  */
-export function getMaterialTags(option?: RequestOption): Promise<RestResponse<PaginatedResponse<MaterialTag>>> {
+export function getMaterialTags(option?: RequestOption): RestResponse<PaginatedResponse<MaterialTag>> {
     return createAxios(option).get(`${BASE_URL}/materials/tags/admin`);
 }
 

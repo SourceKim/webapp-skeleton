@@ -1,20 +1,18 @@
 import { defineStore } from 'pinia'
 import type { FlatMenu, TreeMenu } from '@/interface/menu.d'
-import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref } from 'vue'
 
 export const useMenuStore = defineStore('menu', () => {
     const menus = ref<FlatMenu[]>([])
     const menusObj = ref<{ [id: string]: TreeMenu }>({})
     const treeMenus = ref<TreeMenu[]>([])
-    const route = useRoute()
 
       // 当前激活的菜单组
-    const activeMenuArr = computed(() => {
-        const menu = menus.value.find((i) => i.fullPath === route.fullPath)
-        if (menu) return getMenuLevelArr(menu.id)
-        return [route.meta]
-    })
+    // const activeMenuArr = computed(() => {
+    //     const menu = menus.value.find((i) => i.fullPath === route.fullPath)
+    //     if (menu) return getMenuLevelArr(menu.id)
+    //     return [route.meta]
+    // })
 
     // 获取菜单id的层级数组
     function getMenuLevelArr(id: string): FlatMenu[] {

@@ -7,7 +7,7 @@ import type { CommonItemData } from '@/components/interface'
 import i18n from '@/i18n'
 import dayjs from 'dayjs'
 
-const { t } = i18n.global
+const { t } = (i18n as any).global
 
 /**
  * 验证必填项

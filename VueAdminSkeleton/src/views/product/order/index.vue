@@ -128,8 +128,8 @@
           :page-size="limit"
           :current-page="page"
           :total="total"
-          @size-change="(s) => { limit = s; load(true) }"
-          @current-change="(p) => { page = p; load() }"
+          @size-change="(s: number) => { limit = s; load(true) }"
+          @current-change="(p: number) => { page = p; load() }"
         />
       </div>
     </el-card>

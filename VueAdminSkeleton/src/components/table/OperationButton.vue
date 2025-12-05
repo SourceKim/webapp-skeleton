@@ -79,7 +79,7 @@ function init() {
       }
     })
   if (props.auth) {
-    buttons.filter((i) => {
+    buttons.filter(() => {
       return true
       // if (!i.auth) return true
       // return auth2(i.auth, i.authLogic)

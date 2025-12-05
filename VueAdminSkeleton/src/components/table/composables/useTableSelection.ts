@@ -20,7 +20,7 @@ export function useTableSelection<T extends object>(props: {
   }
 
   // 处理行点击事件
-  function rowClick(row: T, column: CommonTableColumn<T>, event: Event) {
+  function rowClick(row: T, _column: CommonTableColumn<T>, _event: Event) {
     if (props.selection === 'single') {
       selectionRows.value = [row]
       return selectionRows.value

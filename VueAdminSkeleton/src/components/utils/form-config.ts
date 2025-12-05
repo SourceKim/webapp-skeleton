@@ -3,7 +3,7 @@ import { useLocaleStore } from '@/stores/locale'
 import type { CommonFormColumn } from '@/components/interface/form'
 import type { CommonTableColumn } from '@/components/interface/table'
 
-const { t } = i18n.global
+const { t } = (i18n as any).global
 
 /**
  * 生成默认的placeholder

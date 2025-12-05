@@ -41,6 +41,6 @@ export interface CartsQuery {
 }
 
 export const listAdminCarts = (params: CartsQuery) =>
-  request.get<PaginatedCartsResponse>(`${apiBaseUrl}/admin/carts`, { params })
+  (request as any).get(`${apiBaseUrl}/admin/carts`, { params })
 
 

@@ -18,7 +18,7 @@ export function generateFormRules<T extends object>(
   return rules.map((i) => {
     return {
       required: i.required,
-      validator: async (rule, value, callback) => {
+      validator: async (_rule, value, callback) => {
         const errMsg = await ruleValid(
           {
             label: column.label,

@@ -9,7 +9,7 @@ import type { TableColumn } from '@/components/interface/table'
 export function generateFormatter<T extends object>(tableColumParams: TableColumn<T>) {
   // itemList需要转化一下显示
   if (tableColumParams.itemList) {
-    tableColumParams.formatter ??= (row, column, cellValue) => {
+    tableColumParams.formatter ??= (_row, _column, cellValue) => {
       const itemList = (
         isRef(tableColumParams.itemList) ? tableColumParams.itemList.value : tableColumParams.itemList
       ) as CommonItemData[]

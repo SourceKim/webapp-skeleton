@@ -108,7 +108,7 @@ const columns = computed((): CommonTableColumn<Material>[] => [
   { prop: 'original_name', label: '原文件名', width: 150 },
   { prop: 'filename', label: '文件名', width: 150 },
   { prop: 'file_path', label: '路径', width: 200 },
-  { prop: 'file_size', label: '大小', width: 100, formatter: (row, column, cellValue) => {
+  { prop: 'file_size', label: '大小', width: 100, formatter: (_row, _column, cellValue) => {
     if (!cellValue) return '-'
     const bytes = parseInt(cellValue)
     if (bytes === 0) return '0 B'
@@ -122,7 +122,7 @@ const columns = computed((): CommonTableColumn<Material>[] => [
     prop: 'material_category', 
     label: '分类', 
     width: 120, 
-    formatter: (row, column, cellValue) => {
+    formatter: (_row, _column, cellValue) => {
       return cellValue?.name || '未分类'
     }
   },
@@ -130,7 +130,7 @@ const columns = computed((): CommonTableColumn<Material>[] => [
     prop: 'material_tags', 
     label: '标签', 
     width: 150, 
-    formatter: (row, column, cellValue) => {
+    formatter: (_row, _column, cellValue) => {
       if (!cellValue || !Array.isArray(cellValue) || cellValue.length === 0) {
         return '无标签'
       }
@@ -141,7 +141,7 @@ const columns = computed((): CommonTableColumn<Material>[] => [
     prop: 'user', 
     label: '上传者', 
     width: 120, 
-    formatter: (row, column, cellValue) => {
+    formatter: (_row, _column, cellValue) => {
       return cellValue?.username || '未知用户'
     }
   },
@@ -178,26 +178,26 @@ const columns = computed((): CommonTableColumn<Material>[] => [
       { 
         label: t('common.edit'), 
         icon: 'edit', 
-        onClick: (row: Material, index: { $index: number; $fullIndex: number }) => openForm('edit', row) 
+        onClick: (row: Material, _index: { $index: number; $fullIndex: number }) => openForm('edit', row) 
       },
       { 
         label: t('common.detail'), 
         icon: 'document', 
-        onClick: (row: Material, index: { $index: number; $fullIndex: number }) => openForm('detail', row)
+        onClick: (row: Material, _index: { $index: number; $fullIndex: number }) => openForm('detail', row)
       },
       { 
         label: t('common.del'), 
         icon: 'delete', 
         type: 'danger', 
-        onClick: (row: Material, index: { $index: number; $fullIndex: number }) => del([row]) 
+        onClick: (row: Material, _index: { $index: number; $fullIndex: number }) => del([row]) 
       }
     ]
   }
 ])
 
 // 预览图片弹窗相关
-const previewVisible = ref(false)
-const previewImageUrl = ref('')
+// const previewVisible = ref(false)
+// const previewImageUrl = ref('')
 
 // 渲染预览列
 function renderPreview(row: Material) {

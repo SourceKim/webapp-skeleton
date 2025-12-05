@@ -1,5 +1,5 @@
 import { ref, computed, watch, toRef, nextTick, type Ref } from 'vue'
-import type { PageQuery, PageResult, RestResponse, TableFetchFunction } from '../types'
+import type { PageQuery, TableFetchFunction } from '../types'
 import type { TablePagination } from '@/components/interface/table'
 
 /**
@@ -81,10 +81,15 @@ export function useTableData<T extends object, F extends object>(props: {
       loadingRef.value = true
       try {
         const response = await props.fetchData(pageQuery.value.param, { loadingRef })
-        const resData = response.data!
-        data.value = resData.items
-        pagination.value.total = resData.total
-        return resData
+        const resData = response.data
+        if (resData) {
+          // 兼容 PaginatedResponse 和 PageResult
+          const items = resData.items || []
+          const total = resData.total || 0
+          data.value = items
+          pagination.value.total = total
+          return resData
+        }
       } finally {
         loadingRef.value = false
       }

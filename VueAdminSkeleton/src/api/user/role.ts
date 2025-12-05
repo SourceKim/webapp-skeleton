@@ -17,7 +17,7 @@ export function createRole(data: CreateAndUpdateRoleQueryDto, option?: RequestOp
  * 获取角色列表（获取所有角色）
  * @returns 角色列表
  */
-export function getRoles(option?: RequestOption): Promise<RestResponse<PaginatedResponse<Role>>> {
+export function getRoles(option?: RequestOption): RestResponse<PaginatedResponse<Role>> {
     return createAxios(option).get(`${BASE_URL}/roles/admin`);
 }
 

@@ -32,11 +32,11 @@
 </template>
 <script setup lang="tsx">
 import type { PropType } from 'vue'
-import { ref, watchEffect, onMounted } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getUser, updateUser, createUser } from '@/api/user/user'
+import { getUser, updateUser } from '@/api/user/user'
 import { register } from '@/api/auth'
-import type { User, CreateUserDto, RegisterDto, AdminUpdateUserDto } from '@/api/types/user'
+import type { User, RegisterDto, AdminUpdateUserDto } from '@/api/types/user'
 import type { CommonFormColumn, FormHandleType } from '@/components/interface/form'
 import mForm from '@/components/form/index.vue'
 import UserPermissionForm from './components/UserPermissionForm.vue'
@@ -109,8 +109,8 @@ watchEffect(() => {
     { prop: 'nickname', label: t('view.user.nickname'), rules: { required: true } },
     // 详情使用图片展示，新增/编辑使用上传组件
     props.handleType === 'detail'
-      ? { prop: 'avatar', label: t('view.user.avatar'), type: 'image' }
-      : { prop: 'avatar', label: t('view.user.avatar'), type: 'upload-img', single: 'object' },
+      ? { prop: 'avatar', label: t('view.user.avatar'), type: 'span' as const }
+      : { prop: 'avatar', label: t('view.user.avatar'), type: 'upload-img' as const, single: true },
     { prop: 'bio', label: t('view.user.bio') },
     { prop: 'status', label: t('common.status'), type: 'select', itemList: [{ label: 'active', value: 'active' }, { label: 'inactive', value: 'inactive' }] },
     {

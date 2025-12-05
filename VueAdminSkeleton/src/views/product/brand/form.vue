@@ -75,7 +75,8 @@ watch(() => props.modelValue, (v) => {
   form.status = v.status
   form.material_id = v.material_id
   if (v.material_id && (v as any).material?.file_path) {
-    logoUrl.value = getUploadFileUrl((v as any).material.file_path)
+    const url = getUploadFileUrl((v as any).material.file_path)
+    logoUrl.value = url || undefined
   } else {
     logoUrl.value = undefined
   }

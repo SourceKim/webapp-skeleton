@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { useLocalStorage, useCssVar, useDark } from '@vueuse/core'
-import { watchEffect, computed } from 'vue'
+import { watchEffect } from 'vue'
 import { themes } from '@/theme'
 import type { ThemeKey } from '@/interface/theme'
 

@@ -1,6 +1,5 @@
 import createAxios from '@/utils/request';
 import type {
-  CreateMaterialDto,
   UpdateMaterialDto,
   BatchDeleteMaterialsDto
 } from './material.d';

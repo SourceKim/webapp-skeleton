@@ -91,7 +91,7 @@ function renderPreview(scope: { row: Material }) {
             style: 'width: 40px; height: 40px; object-fit: cover'
         })
     }
-    return scope.row.type
+    return h('span', scope.row.type)
 }
 
 function updateVisible(val: boolean) {

@@ -64,4 +64,14 @@ export interface RequestOption {
  */
 export type RestResponse<T = any> = Promise<ApiResponse<T>>; 
 
+/**
+ * 分页结果类型（兼容表格组件）
+ */
+export interface PageResult<T = any> {
+  items: T[];
+  total: number;
+  currentPage?: number;
+  pageSize?: number;
+}
+
 export type FetchPageDataFun<T extends object> = (pageQuery: PaginationQuery, option: RequestOption) => Promise<PaginatedResponse<T>>

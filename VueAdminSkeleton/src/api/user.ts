@@ -1,7 +1,7 @@
  
-
-export async function switchLocale(data: any): Promise<any> {
-    return new Promise((resolve, reject) => {
+ 
+export async function switchLocale(_data: any): Promise<any> {
+    return new Promise((resolve) => {
         setTimeout(() => {
             resolve({
                 code: 200,

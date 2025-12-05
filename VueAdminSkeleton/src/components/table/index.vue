@@ -60,7 +60,6 @@ import TotalView from './TotalView.vue'
 import TableCore from './TableCore.vue'
 import { useTable } from './composables/useTable'
 import type { MTableProps } from '../interface/table'
-import type { PageQuery, PageResult, RestResponse } from './types'
 
 const props = withDefaults(defineProps<MTableProps<T, F>>(), {
     layout: 'auto',
@@ -93,18 +92,13 @@ const {
     pagination,
     pageData,
     selectionRows,
-    tableColumnsParams,
     sortColumnsParams,
     wrapperClass1,
     wrapperClass2,
     tableParam,
     
     // 方法
-    fetchQuery,
-    handleSelectionChange,
-    handleRowClick,
-    handleDataUpdate,
-    initTableColumnParamFun
+    fetchQuery
 } = useTable(props, emit)
 
 // 向后兼容：保持原来的变量名

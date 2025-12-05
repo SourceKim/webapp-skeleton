@@ -7,7 +7,18 @@ import type {
   AxiosInterceptorOptions,
   AxiosError
 } from 'axios'
-import type { RestResponse } from '@/api/types/common';
+import type { RestResponse, PaginatedResponse } from '@/api/types/common';
+import type { PageResult } from '@/components/table/types';
+
+/**
+ * 分页数据获取函数类型
+ * API 函数返回 RestResponse<PaginatedResponse<T>> 或 RestResponse<PageResult<T>>
+ * 即 Promise<ApiResponse<PaginatedResponse<T>>> 或 Promise<ApiResponse<PageResult<T>>>
+ */
+export type FetchPageDataFun<T> = (
+  filters?: any,
+  context?: { loadingRef?: any }
+) => RestResponse<PaginatedResponse<T>> | RestResponse<PageResult<T>>
 
 /**
  * axios实例重载定义
