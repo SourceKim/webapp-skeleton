@@ -61,7 +61,8 @@ const filterParam = reactive({})
 const selectedRows = ref<Material[]>([])
 const tableData = ref<Material[]>([])
 
-const BASE_URL = import.meta.env.VITE_FILE_BASE_URL || 'http://localhost:3000/uploads/'
+// 基础URL配置 - 使用环境变量 VITE_UPLOAD_BASE_URL
+const BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || ''
 
 function getFileUrl(filePath?: string): string | null {
   if (!filePath) return null

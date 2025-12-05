@@ -23,11 +23,15 @@ export function getDownloadFileUrl(param: DownloadParam): string {
 
 /**
  * 拼接静态上传文件访问 URL（基于 uploads 静态目录）
- * 优先使用 VITE_UPLOAD_BASE_URL，其次 VITE_FILE_BASE_URL，默认 http://localhost:3000/uploads/
+ * 使用环境变量 VITE_UPLOAD_BASE_URL 配置
  */
 export function getUploadFileUrl(filePath?: string | null): string | null {
   if (!filePath) return null
-  const base = (import.meta.env.VITE_UPLOAD_BASE_URL || import.meta.env.VITE_FILE_BASE_URL || 'http://localhost:3000/uploads/') as string
+  const base = (import.meta.env.VITE_UPLOAD_BASE_URL || '') as string
+  if (!base) {
+    console.warn('VITE_UPLOAD_BASE_URL 未配置，请检查环境变量配置')
+    return null
+  }
   const prefix = base.replace(/\/$/, '')
   const fp = String(filePath).replace(/^\//, '')
   return `${prefix}/${fp}`

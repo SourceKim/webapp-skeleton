@@ -116,8 +116,8 @@ const formLoading = ref(false) // 表单加载状态
 const saveLoading = ref(false) // 保存加载状态
 const formRef = ref()
 
-// 基础URL配置 - 可以通过环境变量配置
-const BASE_URL = import.meta.env.VITE_FILE_BASE_URL || 'http://localhost:3000/uploads/'
+// 基础URL配置 - 使用环境变量 VITE_UPLOAD_BASE_URL
+const BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || ''
 
 // 拼接完整的文件URL
 function getFileUrl(filePath?: string): string | null {

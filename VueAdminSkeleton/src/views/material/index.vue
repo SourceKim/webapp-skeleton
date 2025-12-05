@@ -54,8 +54,8 @@ const filterParam = reactive({}) // 过滤
 const selectRows = ref<Material[]>([]) // 选中行
 const { t } = useI18n()
 
-// 基础URL配置 - 可以通过环境变量配置
-const BASE_URL = import.meta.env.VITE_FILE_BASE_URL || 'http://localhost:3000/uploads/'
+// 基础URL配置 - 使用环境变量 VITE_UPLOAD_BASE_URL
+const BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || ''
 
 // 拼接完整的文件URL
 function getFileUrl(filePath?: string): string | null {

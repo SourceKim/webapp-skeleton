@@ -2,14 +2,15 @@
   <div class="footer-view">
     <div class="footer">
       <el-text>Released under the Apache License 2.0</el-text>
-      <el-text>Copyright © 2023-present sxh</el-text>
-      <el-text class="hover-view" @click="windowOpen('https://beian.miit.gov.cn/')">{{ icpCode }}</el-text>
+      <el-text v-if="copyrightText">{{ copyrightText }}</el-text>
+      <el-text v-if="icpCode" class="hover-view" @click="windowOpen('https://beian.miit.gov.cn/')">{{ icpCode }}</el-text>
       <el-text
+        v-if="psbCode"
         class="hover-view"
         @click="windowOpen(`https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=${psbCode}`)"
       >
         <img src="@/assets/image/jinghui.png" style="width: 1.2em; margin-right: 5px" alt="" />
-        {{ icpCode.substring(0, 1) }}公网安备{{ psbCode }}号
+        {{ icpCode ? icpCode.substring(0, 1) : '' }}公网安备{{ psbCode }}号
       </el-text>
     </div>
   </div>
@@ -20,10 +21,16 @@ defineOptions({
   name: 'LayoutFooter'
 })
 
-//icp备案号
-const icpCode = '皖ICP备2023021987号-1'
-//公安备案号
-const psbCode = '34180202000574'
+// ICP备案号 - 从环境变量读取
+const icpCode = import.meta.env.VITE_ICP_CODE || ''
+// 公安备案号 - 从环境变量读取
+const psbCode = import.meta.env.VITE_PSB_CODE || ''
+// 版权信息 - 从环境变量读取
+const copyrightYear = import.meta.env.VITE_COPYRIGHT_YEAR || ''
+const copyrightOwner = import.meta.env.VITE_COPYRIGHT_OWNER || ''
+const copyrightText = copyrightYear && copyrightOwner 
+  ? `Copyright © ${copyrightYear}-present ${copyrightOwner}`
+  : ''
 
 function windowOpen(url: string) {
   globalThis.open(url)
