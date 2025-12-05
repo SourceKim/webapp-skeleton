@@ -6,3 +6,8 @@ node_modules/
 .DS_Store
 .swc
 *.local
+
+# 忽略所有 .env 文件，但保留 .env.example
+.env
+.env.*
+!.env.example

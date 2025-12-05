@@ -114,7 +114,12 @@ export interface SkuQueryParams {
 
 export const getUploadUrl = (filePath?: string): string => {
   if (!filePath) return ''
-  return process.env.TARO_APP_UPLOAD_URL + filePath
+  const baseUrl = process.env.TARO_APP_UPLOAD_URL || ''
+  if (!baseUrl) {
+    console.warn('TARO_APP_UPLOAD_URL 未配置，请检查环境变量配置')
+    return ''
+  }
+  return baseUrl + filePath
 }
 
 /**

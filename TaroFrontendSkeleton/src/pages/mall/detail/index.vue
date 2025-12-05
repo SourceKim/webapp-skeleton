@@ -12,9 +12,6 @@
         <image :src="img" mode="aspectFill" />
       </swiper-item>
     </swiper>
-    <view v-else class="gallery placeholder">
-      <image class="placeholder-img" :src="defaultImg" mode="aspectFill" />
-    </view>
 
     <!-- 2. 商品信息 -->
     <view class="info-section">
@@ -84,7 +81,6 @@ import mallService, { type Spu, getUploadUrl } from '@/services/mall'
 // State
 const spu = ref<Spu | null>(null)
 const images = ref<string[]>([])
-const defaultImg = 'https://dummyimage.com/600x400/eaeaea/999.png&text=No+Image'
 const detailNodes = ref<any>(null)
 const showCart = ref(false)
 
@@ -254,7 +250,7 @@ const goBack = () => {
   min-height: 100vh;
 
   .gallery { width: 100vw; height: 100vw; background: $style-color-white; }
-  .gallery-item image, .gallery .placeholder-img { width: 100%; height: 100%; display: block; }
+  .gallery-item image { width: 100%; height: 100%; display: block; }
 
   .info-section {
     background: $style-color-white;

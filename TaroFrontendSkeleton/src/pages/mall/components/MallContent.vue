@@ -41,7 +41,7 @@
               @tap="goDetail(s.id)"
             >
               <view class="goods-img-box">
-                <image class="goods-img" :src="getCover(s) || defaultImg" mode="aspectFill" />
+                <image v-if="getCover(s)" class="goods-img" :src="getCover(s)" mode="aspectFill" />
               </view>
               <view class="goods-info">
                 <view class="goods-name">{{ s.name }}</view>
@@ -117,7 +117,6 @@ const brand = ref<Brand | null>(null)
 const categories = ref<Category[]>([])
 const activeCatId = ref<string | null>(null)
 const spus = ref<Spu[]>([])
-const defaultImg = 'https://dummyimage.com/300x200/eaeaea/999.png&text=No+Image'
 const page = ref(1)
 const limit = ref(10)
 const total = ref(0)
@@ -207,7 +206,7 @@ const openSku = async (spu: Spu, action: 'cart' | 'buy') => {
     skuTree.value = tree
     skuList.value = list
     goodsData.value = {
-      imagePath: getCover(spu) || defaultImg,
+      imagePath: getCover(spu) || '',
       spuId: spu.id,
       price: Number(price) || 0,
       stockNum,
