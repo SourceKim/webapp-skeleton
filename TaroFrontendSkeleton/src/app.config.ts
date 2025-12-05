@@ -2,13 +2,19 @@ export default defineAppConfig({
   pages: [
     'pages/general/index',
     'pages/login/index',
-    'pages/resource/index',
+    'pages/store-intro/index',
     'pages/mall/index',
+    'pages/mall/sub/index',
     'pages/mall/detail',
-    'pages/mall/order-detail/index',
+    'pages/mall/order-confirm/index',
     'pages/mall/order-list/index',
+    'pages/mall/order-detail/index',
     'pages/profile/index',
-    'pages/profile/detail/index'
+    'pages/profile/detail/index',
+    'pages/address/index',
+    'pages/address/form/index',
+    'pages/profile/change-password/index',
+    'pages/profile/change-phone/index'
   ],
   window: {
     backgroundTextStyle: 'light',
@@ -18,25 +24,33 @@ export default defineAppConfig({
   },
   tabBar: {
     color: '#8c8c8c',
-    selectedColor: '#fa2c19',
+    selectedColor: '#1677ff',
     backgroundColor: '#ffffff',
     borderStyle: 'black',
     list: [
       {
         pagePath: 'pages/general/index',
-        text: '首页'
+        text: '首页',
+        iconPath: './assets/tabbar/home.svg',
+        selectedIconPath: './assets/tabbar/home-active.svg'
       },
       {
-        pagePath: 'pages/resource/index',
-        text: '资源'
+        pagePath: 'pages/store-intro/index',
+        text: '店铺',
+        iconPath: './assets/tabbar/shop.svg',
+        selectedIconPath: './assets/tabbar/shop-active.svg'
       },
       {
         pagePath: 'pages/mall/index',
-        text: '商城'
+        text: '商城',
+        iconPath: './assets/tabbar/mall.svg',
+        selectedIconPath: './assets/tabbar/mall-active.svg'
       },
       {
         pagePath: 'pages/profile/index',
-        text: '我的'
+        text: '我的',
+        iconPath: './assets/tabbar/profile.svg',
+        selectedIconPath: './assets/tabbar/profile-active.svg'
       }
     ]
   }

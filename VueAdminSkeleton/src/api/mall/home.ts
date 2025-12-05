@@ -1,0 +1,100 @@
+import createAxios from '@/utils/request'
+import type { RequestOption, RestResponse } from '@/api/types/common'
+
+const apiBaseUrl = import.meta.env.VITE_SYSTEM_BASE_URL || '/api/v1'
+
+// --- Carousel API ---
+
+export interface CarouselDTO {
+    id: string
+    title?: string
+    material_id: string
+    material?: any // Replace with actual MaterialDTO type if available
+    spu_id?: string
+    spu?: any // Replace with ProductSpuDTO
+    sort_order: number
+    is_active: boolean
+    created_at: string
+    updated_at: string
+}
+
+export interface CreateCarouselDto {
+    title?: string
+    material_id: string
+    spu_id?: string
+    sort_order?: number
+    is_active?: boolean
+}
+
+export interface UpdateCarouselDto {
+    title?: string
+    material_id?: string
+    spu_id?: string
+    sort_order?: number
+    is_active?: boolean
+}
+
+export const getCarousels = (params?: any, option?: RequestOption): RestResponse<any> => {
+    return createAxios(option).get(`${apiBaseUrl}/mall/carousels`, { params })
+}
+
+export const getCarousel = (id: string, option?: RequestOption): RestResponse<CarouselDTO> => {
+    return createAxios(option).get(`${apiBaseUrl}/mall/carousels/${id}`)
+}
+
+export const createCarousel = (data: CreateCarouselDto, option?: RequestOption): RestResponse<CarouselDTO> => {
+    return createAxios(option).post(`${apiBaseUrl}/mall/admin/carousels`, data)
+}
+
+export const updateCarousel = (id: string, data: UpdateCarouselDto, option?: RequestOption): RestResponse<CarouselDTO> => {
+    return createAxios(option).put(`${apiBaseUrl}/mall/admin/carousels/${id}`, data)
+}
+
+export const deleteCarousel = (id: string, option?: RequestOption): RestResponse<void> => {
+    return createAxios(option).delete(`${apiBaseUrl}/mall/admin/carousels/${id}`)
+}
+
+// --- ShopIntro API ---
+
+export interface ShopIntroBannerDTO {
+    id: string
+    material_id: string
+    material?: any
+    sort_order: number
+}
+
+export interface ShopIntroDTO {
+    id: string
+    name: string
+    introduction?: string
+    detail?: string
+    contact_phone?: string
+    longitude?: number
+    latitude?: number
+    address?: string
+    banners?: ShopIntroBannerDTO[]
+}
+
+export interface UpdateShopIntroDto {
+    name?: string
+    introduction?: string
+    detail?: string
+    contact_phone?: string
+    longitude?: number
+    latitude?: number
+    address?: string
+    banner_ids?: string[]
+}
+
+export const getShopIntro = (option?: RequestOption): RestResponse<ShopIntroDTO> => {
+    return createAxios(option).get(`${apiBaseUrl}/mall/shop-intro`)
+}
+
+export const updateShopIntro = (data: UpdateShopIntroDto, option?: RequestOption): RestResponse<ShopIntroDTO> => {
+    return createAxios(option).put(`${apiBaseUrl}/mall/admin/shop-intro`, data)
+}
+
+// --- Helper for SPU Selection ---
+export const getSpuList = (params?: any, option?: RequestOption): RestResponse<any> => {
+    return createAxios(option).get(`${apiBaseUrl}/products/spu`, { params })
+}

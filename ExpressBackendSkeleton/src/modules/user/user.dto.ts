@@ -1,7 +1,7 @@
 import { Expose, Transform } from "class-transformer";
 import { BaseDTO } from "../common/common.dto";
 import { RoleDTO } from "../role/role.dto";
-import { IsString, IsEmail, IsOptional, Length, Matches, IsArray, IsBoolean, MinLength, IsEnum, IsDateString } from 'class-validator';
+import { IsString, IsEmail, IsOptional, Length, Matches, IsArray, IsBoolean, MinLength, IsEnum, IsDateString, IsNotEmpty } from 'class-validator';
 import { UserGender } from './user.model';
 
 // 用户基础的 dto
@@ -61,7 +61,7 @@ export class UpdateUserDto {
 
     @IsOptional()
     @Transform(({ value }) => (value === '' || value === null ? undefined : value))
-    @Length(2, 100, { message: '昵称长度必须在2-100个字符之间' })
+    @Length(1, 100, { message: '昵称长度必须在1-100个字符之间' })
     nickname?: string;
 
     @IsOptional()
@@ -92,4 +92,22 @@ export class UpdateUserDto {
     @IsArray()
     @IsString({ each: true })
     roles?: string[];
+}
+
+export class ChangePasswordDto {
+    @IsNotEmpty({ message: '旧密码不能为空' })
+    oldPassword!: string;
+
+    @IsNotEmpty({ message: '新密码不能为空' })
+    @MinLength(6, { message: '新密码长度不能少于6个字符' })
+    newPassword!: string;
+}
+
+export class ChangePhoneDto {
+    @IsNotEmpty({ message: '手机号不能为空' })
+    @Matches(/^1[3-9]\d{9}$/, { message: '手机号格式不正确' })
+    phone!: string;
+
+    @IsNotEmpty({ message: '密码不能为空' })
+    password!: string;
 }

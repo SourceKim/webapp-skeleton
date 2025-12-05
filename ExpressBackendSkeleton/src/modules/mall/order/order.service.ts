@@ -1,186 +1,140 @@
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { AppDataSource } from '@/configs/database.config';
-import { nanoid } from 'nanoid';
-import { Order, OrderStatus } from './order.model';
-import { OrderItem } from './order-item.model';
-import { plainToInstance } from 'class-transformer';
-import { OrderDTO, CreateOrderDto } from './order.dto';
+import { MallOrder, MallOrderItem, OrderStatus, PaymentStatus, DeliveryStatus } from './order.model';
 import { Cart } from '@/modules/mall/cart/cart.model';
-import { CartItem } from '@/modules/mall/cart/cart-item.model';
-import { Product } from '@/modules/mall/product/product.model';
-import { HttpException } from '@/exceptions/http.exception';
-import { PaginationQueryDto } from '@/modules/common/common.dto';
+import { ProductSku } from '@/modules/product/sku/product-sku.model';
+import { UserAddress } from '@/modules/user/address/user-address.model';
+import { nanoid } from 'nanoid';
+import { HttpException } from '@/exceptions/HttpException';
 
 export class OrderService {
-  private orderRepository: Repository<Order>;
-  private orderItemRepository: Repository<OrderItem>;
-  private cartRepository: Repository<Cart>;
-  private cartItemRepository: Repository<CartItem>;
-  private productRepository: Repository<Product>;
+  private orderRepo: Repository<MallOrder> = AppDataSource.getRepository(MallOrder)
+  private itemRepo: Repository<MallOrderItem> = AppDataSource.getRepository(MallOrderItem)
+  private cartRepo: Repository<Cart> = AppDataSource.getRepository(Cart)
+  private skuRepo: Repository<ProductSku> = AppDataSource.getRepository(ProductSku)
+  private addrRepo: Repository<UserAddress> = AppDataSource.getRepository(UserAddress)
 
-  constructor(dataSource: DataSource = AppDataSource) {
-    this.orderRepository = dataSource.getRepository(Order);
-    this.orderItemRepository = dataSource.getRepository(OrderItem);
-    this.cartRepository = dataSource.getRepository(Cart);
-    this.cartItemRepository = dataSource.getRepository(CartItem);
-    this.productRepository = dataSource.getRepository(Product);
+  async preview(userId: string, cartItemIds: string[]) {
+    const carts = await this.cartRepo.find({
+      where: { user: { id: userId } as any },
+      relations: ['sku', 'sku.spu', 'sku.spu.main_material', 'sku.sku_attributes', 'sku.sku_attributes.attribute_key', 'sku.sku_attributes.attribute_value']
+    })
+    const items = carts.filter(c => cartItemIds.includes(c.id)).map(c => {
+      const unit = Number((c as any).sku?.price || 0)
+      return {
+        cart_id: c.id,
+        sku_id: (c as any).sku?.id,
+        spu: { id: (c as any).sku?.spu?.id, name: (c as any).sku?.spu?.name, sub_title: (c as any).sku?.spu?.sub_title || null, main_material: (c as any).sku?.spu?.main_material ? { file_path: (c as any).sku?.spu?.main_material?.file_path } : null },
+        sku: {
+          id: (c as any).sku?.id,
+          price: unit,
+          attributes: ((c as any).sku?.sku_attributes || []).map((a: any) => ({ key_id: a?.attribute_key?.id, key_name: a?.attribute_key?.name, value_id: a?.attribute_value?.value_id || a?.attribute_value?.id, value: a?.attribute_value?.value }))
+        },
+        quantity: c.quantity,
+        total_price: unit * Number(c.quantity || 0)
+      }
+    })
+    const totalAmount = items.reduce((s, it) => s + Number(it.total_price), 0)
+    return { items, total_amount: totalAmount, discount_amount: 0, shipping_amount: 0, payable_amount: totalAmount }
   }
 
-  private async calcOrderTotal(orderId: string): Promise<number> {
-    const items = await this.orderItemRepository.find({ where: { order_id: orderId } });
-    return items.reduce((sum, it) => sum + Number(it.unit_price) * it.quantity, 0);
-  }
+  async create(userId: string, cartItemIds: string[], addressId: string, remark?: string, payment_method?: any) {
+    if (!cartItemIds?.length) throw new HttpException(400, 'cart_item_ids 不能为空')
+    const addr = await this.addrRepo.findOne({ where: { id: addressId, user: { id: userId } as any } })
+    if (!addr) throw new HttpException(400, '地址不存在')
+    const preview = await this.preview(userId, cartItemIds)
 
-  async createFromCart(userId: string, dto: CreateOrderDto): Promise<OrderDTO> {
-    const cart = await this.cartRepository.findOne({ where: { user_id: userId }, relations: { items: { product: true } } });
-    if (!cart || !cart.items || cart.items.length === 0) throw new HttpException(400, '购物车为空');
-
-    for (const it of cart.items) {
-      const product = await this.productRepository.findOne({ where: { id: it.product_id } });
-      if (!product) throw new HttpException(404, '商品不存在');
-      if (product.stock < it.quantity) throw new HttpException(400, '库存不足');
-    }
-
-    const order = this.orderRepository.create({
+    const order = this.orderRepo.create({
       id: nanoid(16),
-      user_id: userId,
-      status: OrderStatus.PENDING,
-      address: dto.address,
-      remark: dto.remark,
-      total_price: 0
-    });
-    await this.orderRepository.save(order);
+      user: { id: userId } as any,
+      total_amount: String(preview.total_amount.toFixed(2)),
+      discount_amount: '0',
+      shipping_amount: '0',
+      payable_amount: String(preview.payable_amount.toFixed(2)),
+      order_status: OrderStatus.UNPAID,
+      payment_status: PaymentStatus.UNPAID,
+      delivery_status: DeliveryStatus.PENDING,
+      payment_method: payment_method || null,
+      address_id: addr.id,
+      address_snapshot: {
+        name: addr.name,
+        phone: addr.phone,
+        province: addr.province,
+        city: addr.city,
+        country: addr.country,
+        town: addr.town,
+        detail: addr.detail,
+        postal_code: addr.postal_code
+      },
+      remark: remark || null
+    })
+    await this.orderRepo.save(order)
 
-    for (const it of cart.items) {
-      const item = this.orderItemRepository.create({
+    for (const it of preview.items) {
+      const item = this.itemRepo.create({
         id: nanoid(16),
-        order_id: order.id,
-        product_id: it.product_id,
+        order: { id: order.id } as any,
+        sku_id: it.sku_id,
+        sku_snapshot: { ...it.sku, spu: it.spu },
         quantity: it.quantity,
-        unit_price: Number(it.product?.price || 0)
-      });
-      await this.orderItemRepository.save(item);
+        unit_price: String(Number(it.sku.price).toFixed(2)),
+        total_price: String(Number(it.total_price).toFixed(2))
+      })
+      await this.itemRepo.save(item)
     }
 
-    order.total_price = await this.calcOrderTotal(order.id);
-    await this.orderRepository.save(order);
-
-    // 不在创建时扣减库存，等发货时扣减。若需下单即锁定库存，可在此处理锁定逻辑。
-
-    // 清空购物车
-    await this.cartItemRepository.delete({ cart_id: cart.id });
-
-    const created = await this.orderRepository.findOne({ where: { id: order.id }, relations: { items: { product: true } } });
-    return plainToInstance(OrderDTO, created);
+    // 清理购物车
+    await this.cartRepo.createQueryBuilder().delete().from(Cart).where('id IN (:...ids)', { ids: cartItemIds }).andWhere('user_id = :uid', { uid: userId }).execute()
+    return order
   }
 
-  async getMyOrders(userId: string, query: PaginationQueryDto): Promise<{ items: OrderDTO[]; total: number }> {
-    const qb = this.orderRepository.createQueryBuilder('o')
-      .leftJoinAndSelect('o.items', 'oi')
-      .leftJoinAndSelect('oi.product', 'p')
-      .leftJoinAndSelect('p.materials', 'pm')
-      .where('o.user_id = :uid', { uid: userId });
-
-    if (query.filters && query.filters.status) {
-      qb.andWhere('o.status = :status', { status: query.filters.status });
-    }
-
-    qb.orderBy(`o.${query.sort_by || 'created_at'}`, query.sort_order || 'DESC');
-    const total = await qb.getCount();
-    qb.skip((query.page - 1) * query.limit).take(query.limit);
-    const items = await qb.getMany();
-    const dtos = items.map(i => plainToInstance(OrderDTO, i));
-    return { items: dtos, total };
+  async list(userId: string) {
+    return this.orderRepo.find({
+      where: { user: { id: userId } as any },
+      order: { created_at: 'DESC' } as any,
+      relations: ['items']
+    })
   }
 
-  async getMyOrderDetail(userId: string, id: string): Promise<OrderDTO | null> {
-    const order = await this.orderRepository.findOne({ where: { id, user_id: userId }, relations: { items: { product: { materials: true } } } });
-    if (!order) return null;
-    const dto = plainToInstance(OrderDTO, order);
-    return dto;
+  async detail(userId: string, id: string) {
+    const order = await this.orderRepo.findOne({ where: { id, user: { id: userId } as any } })
+    if (!order) throw new HttpException(404, '订单不存在')
+    const items = await this.itemRepo.find({ where: { order: { id } as any } })
+    return { order, items }
   }
 
-  async confirm(userId: string, id: string): Promise<OrderDTO | null> {
-    const order = await this.orderRepository.findOne({ where: { id, user_id: userId } });
-    if (!order) return null;
-    if (order.status !== OrderStatus.PENDING) throw new HttpException(400, '当前状态不可确认');
-    order.status = OrderStatus.CONFIRMED;
-    order.paid_at = new Date();
-    await this.orderRepository.save(order);
-    const full = await this.orderRepository.findOne({ where: { id }, relations: { items: { product: { materials: true } } } });
-    const dto = plainToInstance(OrderDTO, full);
-    return dto;
+  async pay(userId: string, id: string, paymentMethod?: any) {
+    const order = await this.orderRepo.findOne({ where: { id, user: { id: userId } as any } })
+    if (!order) throw new HttpException(404, '订单不存在')
+    if (order.order_status !== OrderStatus.UNPAID) throw new HttpException(400, '订单状态不正确')
+    
+    order.payment_status = PaymentStatus.PAID
+    order.payment_time = new Date()
+    order.order_status = OrderStatus.TO_BE_SHIPPED
+    if (paymentMethod) order.payment_method = paymentMethod
+    
+    await this.orderRepo.save(order)
+    return order
   }
 
-  async cancel(userId: string, id: string): Promise<OrderDTO | null> {
-    const order = await this.orderRepository.findOne({ where: { id, user_id: userId } });
-    if (!order) return null;
-    if (order.status === OrderStatus.SHIPPED || order.status === OrderStatus.COMPLETED) {
-      throw new HttpException(400, '已发货或已完成，不能取消');
-    }
-    order.status = OrderStatus.CANCELED;
-    await this.orderRepository.save(order);
-    const full = await this.orderRepository.findOne({ where: { id }, relations: { items: { product: { materials: true } } } });
-    const dto = plainToInstance(OrderDTO, full);
-    return dto;
+  async receive(userId: string, id: string) {
+    const order = await this.orderRepo.findOne({ where: { id, user: { id: userId } as any } })
+    if (!order) throw new HttpException(404, '订单不存在')
+    if (order.order_status !== OrderStatus.SHIPPED) throw new HttpException(400, '订单未发货')
+
+    order.order_status = OrderStatus.COMPLETED
+    order.delivery_status = DeliveryStatus.DELIVERED
+    order.received_time = new Date()
+    await this.orderRepo.save(order)
+    return order
   }
 
-  async ship(adminUserId: string, id: string, shippingNo: string): Promise<OrderDTO | null> {
-    const order = await this.orderRepository.findOne({ where: { id } });
-    if (!order) return null;
-    if (order.status !== OrderStatus.CONFIRMED) throw new HttpException(400, '未确认不可发货');
-
-    // 扣减库存
-    const items = await this.orderItemRepository.find({ where: { order_id: id } });
-    for (const it of items) {
-      const product = await this.productRepository.findOne({ where: { id: it.product_id } });
-      if (!product) continue;
-      if (product.stock < it.quantity) throw new HttpException(400, '库存不足，无法发货');
-      product.stock -= it.quantity;
-      await this.productRepository.save(product);
-    }
-
-    order.status = OrderStatus.SHIPPED;
-    order.shipped_at = new Date();
-    order.shipping_no = shippingNo;
-    await this.orderRepository.save(order);
-    const full = await this.orderRepository.findOne({ where: { id }, relations: { items: { product: { materials: true } } } });
-    const dto = plainToInstance(OrderDTO, full);
-    return dto;
-  }
-
-  async complete(userId: string, id: string): Promise<OrderDTO | null> {
-    const order = await this.orderRepository.findOne({ where: { id, user_id: userId } });
-    if (!order) return null;
-    if (order.status !== OrderStatus.SHIPPED) throw new HttpException(400, '未发货不可完成');
-    order.status = OrderStatus.COMPLETED;
-    order.completed_at = new Date();
-    await this.orderRepository.save(order);
-    const full = await this.orderRepository.findOne({ where: { id }, relations: { items: { product: { materials: true } } } });
-    const dto = plainToInstance(OrderDTO, full);
-    return dto;
-  }
-
-  // Admin
-  async adminPaginate(query: PaginationQueryDto): Promise<{ items: OrderDTO[]; total: number }> {
-    const qb = this.orderRepository.createQueryBuilder('o')
-      .leftJoinAndSelect('o.items', 'oi')
-      .leftJoinAndSelect('oi.product', 'p')
-      .leftJoinAndSelect('p.materials', 'pm');
-
-    if (query.filters && query.filters.user_id) {
-      qb.andWhere('o.user_id = :uid', { uid: query.filters.user_id });
-    }
-    if (query.filters && query.filters.status) {
-      qb.andWhere('o.status = :status', { status: query.filters.status });
-    }
-
-    qb.orderBy(`o.${query.sort_by || 'created_at'}`, query.sort_order || 'DESC');
-    const total = await qb.getCount();
-    qb.skip((query.page - 1) * query.limit).take(query.limit);
-    const items = await qb.getMany();
-    const dtos = items.map(i => plainToInstance(OrderDTO, i));
-    return { items: dtos, total };
+  async cancel(userId: string, id: string) {
+    const order = await this.orderRepo.findOne({ where: { id, user: { id: userId } as any } })
+    if (!order) throw new HttpException(404, '订单不存在')
+    order.order_status = OrderStatus.CANCELED
+    await this.orderRepo.save(order)
+    return order
   }
 }
 

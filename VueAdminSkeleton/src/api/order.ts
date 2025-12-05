@@ -1,61 +1,22 @@
 import createAxios from '@/utils/request'
+import type { Order, OrderQuery } from './product/order.d'
+import type { RestResponse, PaginatedResponse } from './types/common'
 
 const apiBaseUrl = import.meta.env.VITE_SYSTEM_BASE_URL || '/api/v1'
 const request = createAxios({})
 
-export type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'completed' | 'canceled'
-
-export interface OrderItemRef {
-  id: string
-  order_id: string
-  product_id: string | null
-  quantity: number
-  unit_price: number
-  product?: { id: string; name: string; price: number } | null
+export function listAdminOrders(params: OrderQuery): RestResponse<PaginatedResponse<Order>> {
+  return request.get(`${apiBaseUrl}/admin/orders`, { params })
 }
 
-export interface OrderDTO {
-  id: string
-  user_id: string
-  status: OrderStatus
-  total_price: number
-  address?: string
-  shipping_no?: string
-  remark?: string
-  items?: OrderItemRef[]
-  paid_at?: string | null
-  shipped_at?: string | null
-  completed_at?: string | null
-  created_at?: string
-  updated_at?: string
+export function getAdminOrderById(id: string): RestResponse<Order> {
+  return request.get(`${apiBaseUrl}/admin/orders/${id}`)
 }
 
-export interface PaginatedMeta {
-  total: number
-  page: number
-  limit: number
-  pages: number
-  sort_by?: string
-  sort_order?: 'ASC' | 'DESC'
+export function shipOrder(id: string): RestResponse<Order> {
+  return request.put(`${apiBaseUrl}/admin/orders/${id}/delivery`)
 }
 
-export interface PaginatedOrdersResponse {
-  items: OrderDTO[]
-  meta: PaginatedMeta
+export function updateOrderStatus(id: string, status: string): RestResponse<Order> {
+  return request.put(`${apiBaseUrl}/admin/orders/${id}/status`, { status })
 }
-
-export interface OrdersQuery {
-  page?: number
-  limit?: number
-  sort_by?: string
-  sort_order?: 'ASC' | 'DESC'
-  filters?: Record<string, any>
-}
-
-export const listAdminOrders = (params: OrdersQuery) =>
-  request.get<PaginatedOrdersResponse>(`${apiBaseUrl}/admin/orders`, { params })
-
-export const shipOrder = (id: string, shipping_no: string) =>
-  request.post<OrderDTO>(`${apiBaseUrl}/admin/orders/${id}/ship`, { shipping_no })
-
-

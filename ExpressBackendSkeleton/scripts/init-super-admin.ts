@@ -7,9 +7,11 @@ import * as dotenv from 'dotenv';
 import * as bcrypt from 'bcryptjs';
 import * as mysql from 'mysql2/promise';
 import { DataSource } from 'typeorm';
+import * as path from 'path';
 
 // 加载环境变量
-dotenv.config();
+const envFile = '.env.development.local';
+dotenv.config({ path: path.resolve(process.cwd(), envFile) });
 
 const resources = [
     'user',

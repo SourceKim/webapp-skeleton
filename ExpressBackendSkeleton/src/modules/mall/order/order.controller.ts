@@ -1,128 +1,85 @@
-import { Request, Response, NextFunction } from 'express';
-import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
-import { OrderDTO, CreateOrderDto } from './order.dto';
-import { OrderService } from './order.service';
+import { Router, Request, Response } from 'express'
+import { authMiddleware } from '@/middlewares/auth.middleware'
+import { OrderService } from './order.service'
+import { OrderPreviewDto, CreateOrderDto } from './order.dto'
 
-export class OrderController {
-  private service = new OrderService();
+const router = Router()
+const service = new OrderService()
 
-  createFromCart = async (
-    req: Request,
-    res: Response<ApiResponse<OrderDTO>>,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const userId = req.user!.id;
-      const dto = await req.validate<CreateOrderDto>(CreateOrderDto, 'body');
-      const data = await this.service.createFromCart(userId, dto);
-      res.json({ code: 0, data });
-    } catch (err) {
-      next(err);
-    }
-  };
+router.use(authMiddleware)
 
-  myOrders = async (
-    req: Request,
-    res: Response<ApiResponse<PaginatedResponse<OrderDTO>>>,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const userId = req.user!.id;
-      const { items, total } = await this.service.getMyOrders(userId, req.pagination!);
-      res.pagination(items, total);
-    } catch (err) {
-      next(err);
-    }
-  };
+router.post('/preview', async (req: Request, res: Response) => {
+  try {
+    const dto = (await (req as any).validate(OrderPreviewDto, 'body')) as OrderPreviewDto
+    const data = await service.preview(req.user!.id, dto.cart_item_ids)
+    res.json({ code: 0, message: 'OK', data })
+  } catch (e: any) {
+    const status = e?.status || 500
+    res.status(status).json({ code: status, message: e?.message || '预览失败' })
+  }
+})
 
-  myOrderDetail = async (
-    req: Request,
-    res: Response<ApiResponse<OrderDTO | null>>,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const userId = req.user!.id;
-      const { id } = req.params as { id: string };
-      const data = await this.service.getMyOrderDetail(userId, id);
-      res.json({ code: data ? 0 : 404, data });
-    } catch (err) {
-      next(err);
-    }
-  };
+router.post('/', async (req: Request, res: Response) => {
+  try {
+    const dto = (await (req as any).validate(CreateOrderDto, 'body')) as CreateOrderDto
+    const order = await service.create(req.user!.id, dto.cart_item_ids, dto.address_id, dto.remark, (dto as any).payment_method)
+    res.json({ code: 0, message: 'OK', data: order })
+  } catch (e: any) {
+    const status = e?.status || 500
+    res.status(status).json({ code: status, message: e?.message || '创建失败' })
+  }
+})
 
-  confirm = async (
-    req: Request,
-    res: Response<ApiResponse<OrderDTO | null>>,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const userId = req.user!.id;
-      const { id } = req.params as { id: string };
-      const data = await this.service.confirm(userId, id);
-      res.json({ code: data ? 0 : 404, data });
-    } catch (err) {
-      next(err);
-    }
-  };
+router.get('/', async (req: Request, res: Response) => {
+  try {
+    const data = await service.list(req.user!.id)
+    res.json({ code: 0, message: 'OK', data })
+  } catch (e: any) {
+    res.status(500).json({ code: 500, message: '获取订单失败' })
+  }
+})
 
-  cancel = async (
-    req: Request,
-    res: Response<ApiResponse<OrderDTO | null>>,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const userId = req.user!.id;
-      const { id } = req.params as { id: string };
-      const data = await this.service.cancel(userId, id);
-      res.json({ code: data ? 0 : 404, data });
-    } catch (err) {
-      next(err);
-    }
-  };
+router.get('/:id', async (req: Request, res: Response) => {
+  try {
+    const data = await service.detail(req.user!.id, req.params.id)
+    res.json({ code: 0, message: 'OK', data })
+  } catch (e: any) {
+    const status = e?.status || 500
+    res.status(status).json({ code: status, message: e?.message || '获取详情失败' })
+  }
+})
 
-  // Admin
-  ship = async (
-    req: Request,
-    res: Response<ApiResponse<OrderDTO | null>>,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const { id } = req.params as { id: string };
-      const { shipping_no } = req.body as { shipping_no: string };
-      const data = await this.service.ship(req.user!.id, id, shipping_no);
-      res.json({ code: data ? 0 : 404, data });
-    } catch (err) {
-      next(err);
-    }
-  };
+router.put('/:id/cancel', async (req: Request, res: Response) => {
+  try {
+    const data = await service.cancel(req.user!.id, req.params.id)
+    res.json({ code: 0, message: 'OK', data })
+  } catch (e: any) {
+    const status = e?.status || 500
+    res.status(status).json({ code: status, message: e?.message || '取消失败' })
+  }
+})
 
-  complete = async (
-    req: Request,
-    res: Response<ApiResponse<OrderDTO | null>>,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const userId = req.user!.id;
-      const { id } = req.params as { id: string };
-      const data = await this.service.complete(userId, id);
-      res.json({ code: data ? 0 : 404, data });
-    } catch (err) {
-      next(err);
-    }
-  };
+router.put('/:id/pay', async (req: Request, res: Response) => {
+  try {
+    const { payment_method } = req.body
+    const data = await service.pay(req.user!.id, req.params.id, payment_method)
+    res.json({ code: 0, message: 'OK', data })
+  } catch (e: any) {
+    const status = e?.status || 500
+    res.status(status).json({ code: status, message: e?.message || '支付失败' })
+  }
+})
 
-  adminList = async (
-    req: Request,
-    res: Response<ApiResponse<PaginatedResponse<OrderDTO>>>,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const { items, total } = await this.service.adminPaginate(req.pagination!);
-      res.pagination(items, total);
-    } catch (err) {
-      next(err);
-    }
-  };
-}
+router.put('/:id/receive', async (req: Request, res: Response) => {
+  try {
+    const data = await service.receive(req.user!.id, req.params.id)
+    res.json({ code: 0, message: 'OK', data })
+  } catch (e: any) {
+    const status = e?.status || 500
+    res.status(status).json({ code: status, message: e?.message || '确认收货失败' })
+  }
+})
+
+export default router
 
 

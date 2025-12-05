@@ -1,31 +1,28 @@
-import { Entity, Column, OneToMany, ManyToOne, JoinColumn, Index } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
+import { IsBoolean, IsInt, IsPositive } from 'class-validator';
 import { BaseEntity } from '@/modules/common/base.model';
-import { IsNumber, IsString, Min } from 'class-validator';
 import { User } from '@/modules/user/user.model';
-import { CartItem } from './cart-item.model';
+import { ProductSku } from '@/modules/product/sku/product-sku.model';
 
-@Entity('carts')
-@Index('uniq_cart_user_id', ['user_id'], { unique: true })
+@Entity('cart')
+@Index('uniq_cart_user_sku', ['user', 'sku'], { unique: true })
 export class Cart extends BaseEntity {
-  @Column({ type: 'varchar', length: 36, name: 'user_id' })
-  @IsString()
-  user_id!: string;
+    @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'user_id' })
+    user!: User;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
-  user?: User;
+    @ManyToOne(() => ProductSku, { nullable: false, onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'sku_id' })
+    sku!: ProductSku;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0, name: 'total_price' })
-  @IsNumber()
-  @Min(0)
-  total_price!: number;
+    @Column({ type: 'int', default: 1 })
+    @IsInt()
+    @IsPositive()
+    quantity!: number;
 
-  @OneToMany(() => CartItem, (item: CartItem) => item.cart, { cascade: true })
-  items?: CartItem[];
-
-  constructor(partial: Partial<Cart> = {}) {
-    super(partial);
-  }
+    @Column({ type: 'boolean', default: true })
+    @IsBoolean()
+    selected!: boolean;
 }
 
 

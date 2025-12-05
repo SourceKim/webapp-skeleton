@@ -44,6 +44,7 @@ import { ElTable, ElTableColumn } from 'element-plus'
 import { ElScrollbar } from 'element-plus'
 import { computed, type VNode, ref } from 'vue';
 import type { CommonTableColumn, TableSelection } from '../interface/table';
+import { useLayoutStore } from '@/stores/layout'
 
 const slots = defineSlots<{
     'left-action': () => VNode
@@ -63,10 +64,13 @@ const props = defineProps<{
     sortedTableColumns: CommonTableColumn<any>[]
 }>()
 
+const layoutStore = useLayoutStore()
+
 const tableClass = computed(() => {
     return {
         'table-view': true,
-        'table-view-filter': props.isFilterTable
+        'table-view-filter': props.isFilterTable,
+        'table-view-mobile': layoutStore.widthShrink
     }
 })
 const tableViewClass = computed(() => {
@@ -99,6 +103,10 @@ const formRef = ref()
     border-color: rgba(0, 0, 0, 0);
     padding: 15px;
     border-radius: var(--el-border-radius-base);
+}
+
+.table-view-mobile.table-view-filter {
+    padding: 5px;
 }
 
 .table-top {

@@ -64,8 +64,8 @@ export class AuthController {
             }
 
             // 用户名格式验证
-            if (username.length < 3 || username.length > 20) {
-                throw new HttpException(400, '用户名长度必须在3-20个字符之间');
+            if (username.length < 2 || username.length > 20) {
+                throw new HttpException(400, '用户名长度必须在2-20个字符之间');
             }
 
             // 密码强度验证

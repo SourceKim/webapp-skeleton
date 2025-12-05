@@ -1,11 +1,15 @@
 import { defineConfig, type UserConfigExport } from '@tarojs/cli'
-import vue from '@vitejs/plugin-vue'
+import path from 'path'
+import vueFrameworkPlugin from '@tarojs/plugin-framework-vue3'
 
 import devConfig from './dev'
 import prodConfig from './prod'
 
 // https://taro-docs.jd.com/docs/next/config#defineconfig-辅助函数
 export default defineConfig<'vite'>(async (merge) => {
+  // 动态导入 ES Module 插件，避免被 TS 转译为 require()
+  const vue = (await eval('import("@vitejs/plugin-vue")')).default
+
   const baseConfig: UserConfigExport<'vite'> = {
     projectName: 'taro-frontend-skeleton',
     date: '2025-3-10',
@@ -18,7 +22,18 @@ export default defineConfig<'vite'>(async (merge) => {
     },
     sourceRoot: 'src',
     outputRoot: 'dist',
-    plugins: [],
+    // 配置路径别名，供 Vite Runner 解析
+    alias: {
+      '@': path.resolve(process.cwd(), 'src')
+    },
+    sass: {
+      resource: [
+        path.resolve(process.cwd(), 'src/styles/variables.scss')
+      ]
+    },
+    plugins: [
+      vueFrameworkPlugin
+    ],
     defineConstants: {
     },
     copy: {

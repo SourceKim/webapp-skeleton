@@ -1,115 +1,120 @@
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { AppDataSource } from '@/configs/database.config';
-import { nanoid } from 'nanoid';
 import { Cart } from './cart.model';
-import { CartItem } from './cart-item.model';
-import { AddCartItemDto, CartDTO, CartItemDTO, UpdateCartItemDto } from './cart.dto';
-import { Product } from '@/modules/mall/product/product.model';
-import { plainToInstance } from 'class-transformer';
-import { PaginationQueryDto } from '@/modules/common/common.dto';
-import { HttpException } from '@/exceptions/http.exception';
+import { ProductSku } from '@/modules/product/sku/product-sku.model';
+import { HttpException } from '@/exceptions/HttpException';
+import { nanoid } from 'nanoid';
 
 export class CartService {
-  private cartRepository: Repository<Cart>;
-  private cartItemRepository: Repository<CartItem>;
-  private productRepository: Repository<Product>;
+    private cartRepo: Repository<Cart>;
+    private skuRepo: Repository<ProductSku>;
 
-  constructor(dataSource: DataSource = AppDataSource) {
-    this.cartRepository = dataSource.getRepository(Cart);
-    this.cartItemRepository = dataSource.getRepository(CartItem);
-    this.productRepository = dataSource.getRepository(Product);
-  }
-
-  private async getOrCreateCart(userId: string): Promise<Cart> {
-    let cart = await this.cartRepository.findOne({ where: { user_id: userId }, relations: { items: { product: true } } });
-    if (!cart) {
-      cart = this.cartRepository.create({ id: nanoid(16), user_id: userId, total_price: 0 });
-      await this.cartRepository.save(cart);
-    }
-    return cart;
-  }
-
-  private calcTotal(cart: Cart): number {
-    if (!cart.items || cart.items.length === 0) return 0;
-    return cart.items.reduce((sum, it) => sum + (Number(it.product?.price || 0) * it.quantity), 0);
-  }
-
-  async getUserCart(userId: string): Promise<CartDTO> {
-    const cart = await this.getOrCreateCart(userId);
-    const full = await this.cartRepository.findOne({ where: { id: cart.id }, relations: { items: { product: true } } });
-    const total = this.calcTotal(full!);
-    if (full) {
-      full.total_price = total;
-      await this.cartRepository.save(full);
-    }
-    return plainToInstance(CartDTO, full);
-  }
-
-  async addItem(userId: string, dto: AddCartItemDto): Promise<CartDTO> {
-    const cart = await this.getOrCreateCart(userId);
-    const product = await this.productRepository.findOne({ where: { id: dto.product_id } });
-    if (!product) throw new HttpException(404, '商品不存在');
-
-    let item = await this.cartItemRepository.findOne({ where: { cart_id: cart.id, product_id: dto.product_id }, relations: { product: true } });
-    if (!item) {
-      item = this.cartItemRepository.create({ id: nanoid(16), cart_id: cart.id, product_id: dto.product_id, quantity: dto.quantity });
-    } else {
-      item.quantity += dto.quantity;
-    }
-    await this.cartItemRepository.save(item);
-
-    const full = await this.cartRepository.findOne({ where: { id: cart.id }, relations: { items: { product: true } } });
-    full!.total_price = this.calcTotal(full!);
-    await this.cartRepository.save(full!);
-    return plainToInstance(CartDTO, full);
-  }
-
-  async updateItem(userId: string, itemId: string, dto: UpdateCartItemDto): Promise<CartDTO | null> {
-    const cart = await this.getOrCreateCart(userId);
-    const item = await this.cartItemRepository.findOne({ where: { id: itemId, cart_id: cart.id }, relations: { product: true } });
-    if (!item) return null;
-    item.quantity = dto.quantity;
-    await this.cartItemRepository.save(item);
-    const full = await this.cartRepository.findOne({ where: { id: cart.id }, relations: { items: { product: true } } });
-    full!.total_price = this.calcTotal(full!);
-    await this.cartRepository.save(full!);
-    return plainToInstance(CartDTO, full);
-  }
-
-  async removeItem(userId: string, itemId: string): Promise<CartDTO | null> {
-    const cart = await this.getOrCreateCart(userId);
-    const item = await this.cartItemRepository.findOne({ where: { id: itemId, cart_id: cart.id } });
-    if (!item) return null;
-    await this.cartItemRepository.remove(item);
-    const full = await this.cartRepository.findOne({ where: { id: cart.id }, relations: { items: { product: true } } });
-    full!.total_price = this.calcTotal(full!);
-    await this.cartRepository.save(full!);
-    return plainToInstance(CartDTO, full);
-  }
-
-  async clear(userId: string): Promise<CartDTO> {
-    const cart = await this.getOrCreateCart(userId);
-    await this.cartItemRepository.delete({ cart_id: cart.id });
-    cart.total_price = 0;
-    const full = await this.cartRepository.findOne({ where: { id: cart.id }, relations: { items: { product: true } } });
-    return plainToInstance(CartDTO, full);
-  }
-
-  async adminPaginate(query: PaginationQueryDto): Promise<{ items: CartDTO[]; total: number }> {
-    const qb = this.cartRepository.createQueryBuilder('c')
-      .leftJoinAndSelect('c.items', 'ci')
-      .leftJoinAndSelect('ci.product', 'p');
-
-    if (query.filters && query.filters.user_id) {
-      qb.andWhere('c.user_id = :uid', { uid: query.filters.user_id });
+    constructor() {
+        this.cartRepo = AppDataSource.getRepository(Cart);
+        this.skuRepo = AppDataSource.getRepository(ProductSku);
     }
 
-    qb.orderBy(`c.${query.sort_by || 'created_at'}`, query.sort_order || 'DESC');
-    const total = await qb.getCount();
-    qb.skip((query.page - 1) * query.limit).take(query.limit);
-    const items = await qb.getMany();
-    return { items: items.map(i => plainToInstance(CartDTO, i)), total };
-  }
+    async listByUser(userId: string): Promise<Cart[]> {
+        return this.cartRepo.find({
+            where: { user: { id: userId } },
+            relations: ['sku'],
+            order: { created_at: 'DESC' }
+        });
+    }
+
+    /**
+     * 用户端列表（轻量字段）：包含 SPU、SKU 关键字段与购物车主字段
+     */
+    async listUserView(userId: string): Promise<Array<{ id: string; quantity: number; selected: boolean; created_at: Date; updated_at: Date; sku: { id: string; sku_name?: string | null; price: number; original_price?: number | null; attributes?: Array<{ key_id?: string; key_name?: string; value_id?: string; value?: string }> }; spu: { id: string; name: string; sub_title?: string | null } }>> {
+        const items = await this.cartRepo.find({
+            where: { user: { id: userId } },
+            relations: [
+                'sku',
+                'sku.spu',
+                'sku.spu.main_material',
+                'sku.sku_attributes',
+                'sku.sku_attributes.attribute_key',
+                'sku.sku_attributes.attribute_value',
+            ],
+            order: { created_at: 'DESC' }
+        });
+
+        return items.map((c) => ({
+            id: c.id,
+            quantity: Number(c.quantity || 0),
+            selected: Boolean(c.selected),
+            created_at: c.created_at,
+            updated_at: c.updated_at,
+            sku: {
+                id: (c as any).sku?.id,
+                sku_name: (c as any).sku?.sku_name ?? null,
+                price: Number((c as any).sku?.price ?? 0),
+                original_price: (c as any).sku?.original_price != null ? Number((c as any).sku?.original_price) : null,
+                attributes: ((c as any).sku?.sku_attributes || []).map((a: any) => ({
+                    key_id: a?.attribute_key?.id,
+                    key_name: a?.attribute_key?.name,
+                    value_id: a?.attribute_value?.value_id || a?.attribute_value?.id,
+                    value: a?.attribute_value?.value,
+                }))
+            },
+            spu: {
+                id: (c as any).sku?.spu?.id,
+                name: (c as any).sku?.spu?.name,
+                sub_title: (c as any).sku?.spu?.sub_title ?? null,
+                main_material: (c as any).sku?.spu?.main_material ? {
+                    file_path: (c as any).sku?.spu?.main_material?.file_path
+                } : null
+            }
+        }));
+    }
+
+    async addItem(userId: string, skuId: string, quantity: number): Promise<Cart> {
+        const sku = await this.skuRepo.findOne({ where: { id: skuId } });
+        if (!sku) throw new HttpException(404, 'SKU 不存在');
+
+        const existed = await this.cartRepo.findOne({ where: { user: { id: userId }, sku: { id: skuId } }, relations: ['sku'] });
+        if (existed) {
+            existed.quantity = Math.max(1, existed.quantity + quantity);
+            return this.cartRepo.save(existed);
+        }
+
+        const entity = this.cartRepo.create({
+            id: nanoid(16),
+            user: { id: userId } as any,
+            sku: { id: skuId } as any,
+            quantity,
+            selected: true
+        });
+        return this.cartRepo.save(entity);
+    }
+
+    async updateQuantity(userId: string, cartId: string, quantity: number): Promise<Cart> {
+        const entity = await this.cartRepo.findOne({ where: { id: cartId, user: { id: userId } }, relations: ['sku'] });
+        if (!entity) throw new HttpException(404, '购物车项不存在');
+
+        if (quantity <= 0) {
+            await this.cartRepo.remove(entity);
+            throw new HttpException(200, '已删除该购物车项');
+        }
+        entity.quantity = quantity;
+        return this.cartRepo.save(entity);
+    }
+
+    async remove(userId: string, cartId: string): Promise<void> {
+        const entity = await this.cartRepo.findOne({ where: { id: cartId, user: { id: userId } } });
+        if (!entity) return;
+        await this.cartRepo.remove(entity);
+    }
+
+    async updateSelected(userId: string, selected: boolean, ids: string[]): Promise<void> {
+        if (!ids || ids.length === 0) return;
+        await this.cartRepo.createQueryBuilder()
+            .update(Cart)
+            .set({ selected })
+            .where('id IN (:...ids)', { ids })
+            .andWhere('user_id = :userId', { userId })
+            .execute();
+    }
 }
 
 

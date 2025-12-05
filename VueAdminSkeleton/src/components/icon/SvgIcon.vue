@@ -59,10 +59,12 @@
   })
   </script>
   <style scoped>
-  i {
-    display: inline-block;
+  span {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
-  
+
   ::v-deep(svg) {
     display: block;
     width: 100%;

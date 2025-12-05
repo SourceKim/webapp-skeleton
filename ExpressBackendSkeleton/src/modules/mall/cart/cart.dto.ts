@@ -1,48 +1,40 @@
 import { Expose, Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
-import { BaseDTO } from '@/modules/common/common.dto';
+import { IsArray, IsBoolean, IsInt, IsOptional, IsPositive, IsString, Length, ArrayNotEmpty } from 'class-validator';
 
-export class CartItemDTO extends BaseDTO {
-  @Expose()
-  cart_id!: string;
+export class CreateCartDto {
+    @IsString()
+    @Length(1, 36)
+    sku_id!: string;
 
-  @Expose()
-  product_id!: string;
-
-  @Expose()
-  quantity!: number;
-
-  @Expose()
-  product?: { id: string; name: string; price: number };
+    @Type(() => Number)
+    @IsInt()
+    @IsPositive()
+    quantity!: number;
 }
 
-export class CartDTO extends BaseDTO {
-  @Expose()
-  user_id!: string;
-
-  @Expose()
-  total_price!: number;
-
-  @Expose()
-  items?: CartItemDTO[];
+export class UpdateCartDto {
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    @IsPositive()
+    quantity?: number;
 }
 
-export class AddCartItemDto {
-  @IsString()
-  product_id!: string;
+export class UpdateSelectedDto {
+    @IsBoolean()
+    selected!: boolean;
 
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  quantity!: number;
+    @IsArray()
+    @ArrayNotEmpty()
+    @IsString({ each: true })
+    cart_item_ids!: string[];
 }
 
-export class UpdateCartItemDto {
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  quantity!: number;
+export class CartItemDto {
+    @Expose() id!: string;
+    @Expose() quantity!: number;
+    @Expose() selected!: boolean;
+    @Expose() sku!: any;
 }
-
 
 

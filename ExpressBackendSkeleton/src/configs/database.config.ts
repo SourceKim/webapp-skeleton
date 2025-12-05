@@ -3,17 +3,23 @@ import { ENV } from './env.config';
 
 // 实体 models
 import { User } from '@/modules/user/user.model';
-import { UserSettings } from '@/modules/user/user-settings.model';
 import { Permission } from '@/modules/permission/permission.model';
 import { Role } from '@/modules/role/role.model';;
 import { Material } from '@/modules/material/material.model';
 import { MaterialCategory } from '@/modules/material/mateial-category/material-category.model';
 import { MaterialTag } from '@/modules/material/mateial-tag/material-tag.model';
-import { Product } from '@/modules/mall/product/product.model';
+import { ProductBrand } from '@/modules/product/brand/product-brand.model';
+import { ProductCategory } from '@/modules/product/category/product-category.model';
+import { ProductSpu } from '@/modules/product/spu/product-spu.model';
+import { ProductSku } from '@/modules/product/sku/product-sku.model';
+import { ProductAttributeKey } from '@/modules/product/attribute/product-attribute-key.model';
+import { ProductAttributeValue } from '@/modules/product/attribute/product-attribute-value.model';
+import { ProductSkuAttribute } from '@/modules/product/attribute/product-sku-attribute.model';
+import { UserAddress } from '@/modules/user/address/user-address.model';
 import { Cart } from '@/modules/mall/cart/cart.model';
-import { CartItem } from '@/modules/mall/cart/cart-item.model';
-import { Order } from '@/modules/mall/order/order.model';
-import { OrderItem } from '@/modules/mall/order/order-item.model';
+import { MallOrder, MallOrderItem } from '@/modules/mall/order/order.model';
+import { Carousel } from '@/modules/mall/carousel/carousel.model';
+import { ShopIntro, ShopIntroBanner } from '@/modules/mall/shop-intro/shop-intro.model';
 
 export const AppDataSource = new DataSource({
     type: 'mysql',
@@ -29,17 +35,25 @@ export const AppDataSource = new DataSource({
     },
     entities: [
         User, 
-        UserSettings, 
         Permission,
         Role,
         Material,
         MaterialCategory,
         MaterialTag,
-        Product,
-        Cart,
-        CartItem,
-        Order,
-        OrderItem
+        ProductBrand,
+        ProductCategory,
+        ProductSpu,
+        ProductSku,
+        ProductAttributeKey,
+        ProductAttributeValue,
+        ProductSkuAttribute
+        ,UserAddress
+        ,Cart
+        ,MallOrder
+        ,MallOrderItem
+        ,Carousel
+        ,ShopIntro
+        ,ShopIntroBanner
     ],
     migrations: ['migrations/*.ts'],
     subscribers: [],

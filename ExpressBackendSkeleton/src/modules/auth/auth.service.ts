@@ -1,6 +1,5 @@
 import { Repository } from 'typeorm';
 import { User, UserStatus } from '@/modules/user/user.model';
-import { UserSettings } from '@/modules/user/user-settings.model';
 import { AppDataSource } from '@/configs/database.config';
 import { HttpException } from '@/exceptions/http.exception';
 import * as jwt from 'jsonwebtoken';
@@ -10,7 +9,6 @@ import { customAlphabet } from 'nanoid';
 
 export class AuthService {
     private userRepository: Repository<User>;
-    private userSettingsRepository: Repository<UserSettings>;
     private dataSource;
     private generateId: () => string;
 
@@ -18,7 +16,6 @@ export class AuthService {
         // 根据环境选择数据源
         this.dataSource = process.env.NODE_ENV === 'test' ? AppDataSource : AppDataSource;
         this.userRepository = this.dataSource.getRepository(User);
-        this.userSettingsRepository = this.dataSource.getRepository(UserSettings);
         // 初始化 nanoid，使用数字和小写字母
         this.generateId = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 16);
         
@@ -73,15 +70,7 @@ export class AuthService {
         // 保存用户
         await this.userRepository.save(user);
 
-        // 创建用户设置
-        const userSettings = this.userSettingsRepository.create({
-            id: this.generateUserId(),
-            user: user,
-            theme: 'light',
-            language: 'zh-CN',
-            notifications_enabled: true
-        });
-        await this.userSettingsRepository.save(userSettings);
+        // 用户设置模块已移除，不再创建默认设置
 
         // 生成 token
         const accessToken = this.generateToken(user);
@@ -102,7 +91,7 @@ export class AuthService {
         
         if (!user) {
             console.log("用户不存在:", username);
-            throw new HttpException(401, '用户名或密码错误');
+            throw new HttpException(404, '用户不存在');
         }
 
         console.log(`尝试登录用户: ${username}, 输入密码: ${password}`);
@@ -113,7 +102,7 @@ export class AuthService {
         console.log(`密码验证结果: ${isValidPassword ? '成功' : '失败'}`);
         
         if (!isValidPassword) {
-            throw new HttpException(401, '用户名或密码错误');
+            throw new HttpException(400, '密码错误');
         }
 
         if (user.status == 'inactive') {

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from '@/modules/user/user.service';
 import { ApiResponse, FindByIdDto, PaginatedResponse } from '@/modules/common/common.dto';
-import { CreateUserDto, UpdateUserDto, UserDTO } from '@/modules/user/user.dto';
+import { CreateUserDto, UpdateUserDto, UserDTO, ChangePasswordDto, ChangePhoneDto } from '@/modules/user/user.dto';
 import { HttpException } from '@/exceptions/http.exception';
 
 /**
@@ -97,6 +97,26 @@ export class UserController {
     };
 
     /**
+     * 获取用户统计信息
+     * GET /api/v1/users/stats
+     */
+    getStats = async (
+        req: Request,
+        res: Response<ApiResponse<any>>,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const userId = req.user?.id;
+            if (!userId) throw new HttpException(401, '未认证');
+            
+            const stats = await this.userService.getUserStats(userId);
+            res.json({ code: 0, message: 'success', data: stats });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    /**
      * 更新当前登录用户信息
      * PUT /api/v1/users/profile
      */
@@ -116,6 +136,56 @@ export class UserController {
                 code: 0,
                 message: '更新用户成功',
                 data: user
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    /**
+     * 修改密码
+     * POST /api/v1/users/change-password
+     */
+    changePassword = async (
+        req: Request,
+        res: Response<ApiResponse<null>>,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const userId = req.user?.id;
+            if (!userId) throw new HttpException(401, '未认证');
+
+            const dto = await req.validate(ChangePasswordDto, 'body');
+            await this.userService.changePassword(userId, dto);
+            res.json({
+                code: 0,
+                message: '密码修改成功',
+                data: null
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    /**
+     * 修改手机号
+     * POST /api/v1/users/change-phone
+     */
+    changePhone = async (
+        req: Request,
+        res: Response<ApiResponse<null>>,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const userId = req.user?.id;
+            if (!userId) throw new HttpException(401, '未认证');
+
+            const dto = await req.validate(ChangePhoneDto, 'body');
+            await this.userService.changePhone(userId, dto);
+            res.json({
+                code: 0,
+                message: '手机号修改成功',
+                data: null
             });
         } catch (error) {
             next(error);
@@ -182,4 +252,4 @@ export class UserController {
             next(error);
         }
     };
-} 
+}
