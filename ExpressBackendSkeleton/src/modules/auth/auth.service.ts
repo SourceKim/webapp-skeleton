@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { User, UserStatus } from '@/modules/user/user.model';
+import { User } from '@/modules/user/user.model';
 import { AppDataSource } from '@/configs/database.config';
 import { HttpException } from '@/exceptions/http.exception';
 import * as jwt from 'jsonwebtoken';
@@ -16,7 +16,7 @@ export class AuthService {
 
     constructor() {
         // 根据环境选择数据源
-        this.dataSource = process.env.NODE_ENV === 'test' ? AppDataSource : AppDataSource;
+        this.dataSource = ENV.NODE_ENV === 'test' ? AppDataSource : AppDataSource;
         this.userRepository = this.dataSource.getRepository(User);
         // 初始化 nanoid，使用数字和小写字母
         this.generateId = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 16);
@@ -92,16 +92,16 @@ export class AuthService {
         });
         
         if (!user) {
-            console.log("用户不存在:", username);
+            logDebug("用户不存在", undefined, { username });
             throw new HttpException(404, '用户不存在');
         }
 
-        console.log(`尝试登录用户: ${username}, 输入密码: ${password}`);
-        console.log(`数据库中的密码哈希: ${user.password.substring(0, 10)}...`);
+        logDebug(`尝试登录用户: ${username}`, undefined, { username });
+        logDebug(`数据库中的密码哈希: ${user.password.substring(0, 10)}...`, undefined, { userId: user.id });
 
         // 使用实体的 comparePassword 方法验证密码
         const isValidPassword = await user.comparePassword(password);
-        console.log(`密码验证结果: ${isValidPassword ? '成功' : '失败'}`);
+        logDebug(`密码验证结果: ${isValidPassword ? '成功' : '失败'}`, undefined, { username, isValidPassword });
         
         if (!isValidPassword) {
             throw new HttpException(400, '密码错误');

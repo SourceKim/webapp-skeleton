@@ -42,3 +42,4 @@ logs/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
+.DS_Store

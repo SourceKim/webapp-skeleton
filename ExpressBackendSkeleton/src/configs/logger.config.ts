@@ -1,6 +1,7 @@
 import winston from 'winston';
 import path from 'path';
 import fs from 'fs';
+import { ENV } from './env.config';
 
 // 使用 process.cwd() 获取项目根目录
 const logDir = path.join(process.cwd(), 'logs/app');
@@ -19,17 +20,11 @@ const levels = {
   debug: 4,
 };
 
-// 根据环境选择日志级别
-const getLogLevel = () => {
-  const env = process.env.NODE_ENV || 'development';
-  const configuredLevel = process.env.LOG_LEVEL;
-  
-  if (configuredLevel && Object.keys(levels).includes(configuredLevel)) {
-    return configuredLevel;
-  }
-  
-  return env === 'development' ? 'debug' : 'info';
-};
+// 验证日志级别是否有效
+const logLevel = ENV.LOG_LEVEL;
+if (!Object.keys(levels).includes(logLevel)) {
+  throw new Error(`环境变量 LOG_LEVEL 值无效: "${logLevel}"，必须是以下之一: ${Object.keys(levels).join(', ')}`);
+}
 
 // 自定义序列化函数，确保显示 undefined 值
 const customStringify = (obj: any): string => {
@@ -97,7 +92,7 @@ const transports = [
 
 // 导出日志配置
 export const loggerConfig = {
-  level: getLogLevel(),
+  level: logLevel,
   levels,
   format,
   transports,

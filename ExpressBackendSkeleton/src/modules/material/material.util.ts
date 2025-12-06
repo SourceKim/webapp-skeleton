@@ -2,6 +2,7 @@ import { MaterialType } from "./material.model";
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import { logError } from '@/utils/logger';
 
 /**
  * 根据MIME类型确定素材类型
@@ -89,7 +90,7 @@ export const writeFile = async (destPath: string, originalPath: string): Promise
             writeStream.on('finish', () => {
                 // 删除临时文件
                 fs.unlink(originalPath, (err) => {
-                    if (err) console.error('删除临时文件失败:', err);
+                    if (err) logError('删除临时文件失败', undefined, { error: err, filePath: originalPath });
                 });
                 
                 resolve();
@@ -233,7 +234,7 @@ export const deleteFileIfExists = async (filePath: string): Promise<boolean> => 
         }
         return false;
     } catch (error) {
-        console.error('删除文件失败:', error);
+        logError('删除文件失败', undefined, { error, filePath });
         return false;
     }
 }
@@ -247,7 +248,7 @@ export const getFileStats = async (filePath: string): Promise<fs.Stats | null> =
     try {
         return await fs.promises.stat(filePath);
     } catch (error) {
-        console.error('获取文件信息失败:', error);
+        logError('获取文件信息失败', undefined, { error, filePath });
         return null;
     }
 }

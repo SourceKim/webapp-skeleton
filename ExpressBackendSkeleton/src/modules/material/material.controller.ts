@@ -17,9 +17,10 @@ import {
     isAllowedFileType,
     generateUniqueFilename,
     decodeLatin1ToUtf8,
-    getSubDirByType
+    getSubDirByType,
+    getMaterialTypeFromMimetype
 } from '@/modules/material/material.util';
-import { getMaterialTypeFromMimetype } from '@/modules/material/material.util';
+import { logError, logInfo } from '@/utils/logger';
 
 /**
  * 素材控制器
@@ -84,7 +85,7 @@ export class MaterialController {
             this.upload.single('file')(req, res, async (err) => {
                 try {
                     if (err) {
-                        console.error('文件上传错误:', err);
+                        logError('文件上传错误', undefined, { error: err });
                         
                         if (err instanceof multer.MulterError) {
                             switch (err.code) {
@@ -156,7 +157,7 @@ export class MaterialController {
                     // 如果出错且文件已上传，清理文件
                     if (req.file && req.file.path) {
                         await deleteFileIfExists(req.file.path);
-                        console.log('已清理上传失败的文件:', req.file.path);
+                        logInfo('已清理上传失败的文件', undefined, { filePath: req.file.path });
                     }
                     next(error);
                 }

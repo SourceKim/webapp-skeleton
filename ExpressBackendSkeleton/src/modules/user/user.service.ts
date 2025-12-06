@@ -9,6 +9,7 @@ import { CreateUserDto, UpdateUserDto, UserDTO, ChangePasswordDto, ChangePhoneDt
 import { plainToInstance } from 'class-transformer';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 import { MallOrder, OrderStatus } from '@/modules/mall/order/order.model';
+import { ENV } from '@/configs/env.config';
 
 export class UserService {
     private userRepository: Repository<User>;
@@ -17,7 +18,7 @@ export class UserService {
     private dataSource;
 
     constructor() {
-        this.dataSource = process.env.NODE_ENV === 'test' ? AppDataSource : AppDataSource;
+        this.dataSource = ENV.NODE_ENV === 'test' ? AppDataSource : AppDataSource;
         this.userRepository = this.dataSource.getRepository(User);
         this.roleRepository = this.dataSource.getRepository(Role);
         this.orderRepository = this.dataSource.getRepository(MallOrder);

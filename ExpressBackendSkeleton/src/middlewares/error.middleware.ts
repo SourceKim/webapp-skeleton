@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { HttpException } from '@/exceptions/http.exception';
 import { logError } from '@/utils/logger';
+import { ENV } from '@/configs/env.config';
 
 interface ErrorResponse {
     code: number;
@@ -50,7 +51,7 @@ export const errorMiddleware = (
         };
 
         // 在开发环境下或明确指定要显示错误详情时，添加错误详情
-        if (process.env.NODE_ENV === 'development' || err.error) {
+        if (ENV.NODE_ENV === 'development' || err.error) {
             response.error = err.error;
         }
 
@@ -65,7 +66,7 @@ export const errorMiddleware = (
     };
 
     // 在开发环境下显示详细错误信息
-    if (process.env.NODE_ENV === 'development') {
+    if (ENV.NODE_ENV === 'development') {
         response.error = {
             name: err.name,
             message: err.message,

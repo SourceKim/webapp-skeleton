@@ -18,6 +18,7 @@ import { AppDataSource } from '@/configs/database.config';
 import { ENV } from '@/configs/env.config';
 import { PaginationQueryDto } from '@/modules/common/common.dto';
 import { plainToInstance } from 'class-transformer';
+import { logError, logDebug } from '@/utils/logger';
 import { MaterialCategory } from '@/modules/material/mateial-category/material-category.model';
 import { CreateMaterialDto, MaterialDTO } from '@/modules/material/material.dto';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
@@ -121,7 +122,7 @@ export class MaterialService {
 
                 // 处理分类关联
                 if (options?.categoryId) {
-                    console.log('接收到分类ID:', options.categoryId);
+                    logDebug('接收到分类ID', undefined, { categoryId: options.categoryId });
                     const categoryRepository = queryRunner.manager.getRepository(MaterialCategory);
                     
                     const category = await categoryRepository.findOne({
@@ -129,10 +130,10 @@ export class MaterialService {
                     });
 
                     if (category) {
-                        console.log('找到对应分类:', category.name);
+                        logDebug('找到对应分类', undefined, { categoryId: options.categoryId, categoryName: category.name });
                         material.material_category = category;
                     } else {
-                        console.log('未找到对应分类ID');
+                        logDebug('未找到对应分类ID', undefined, { categoryId: options.categoryId });
                     }
                 }
 
@@ -141,7 +142,7 @@ export class MaterialService {
 
                 // 处理标签关联
                 if (options?.tags && options.tags.length > 0) {
-                    console.log('接收到标签ID列表:', options.tags);
+                    logDebug('接收到标签ID列表', undefined, { tagIds: options.tags });
                     const tagRepository = queryRunner.manager.getRepository(MaterialTag);
                     const materialTags: MaterialTag[] = [];
 
@@ -150,7 +151,10 @@ export class MaterialService {
                         where: { id: In(options.tags) }
                     });
                     
-                    console.log(`已找到${foundTags.length}个标签，总共${options.tags.length}个ID`);
+                    logDebug(`已找到${foundTags.length}个标签，总共${options.tags.length}个ID`, undefined, { 
+                        foundCount: foundTags.length, 
+                        totalCount: options.tags.length 
+                    });
                     
                     // 创建标签关联
                     foundTags.forEach(tag => {
@@ -161,14 +165,14 @@ export class MaterialService {
                     const foundTagIds = foundTags.map(tag => tag.id);
                     const notFoundTagIds = options.tags.filter(id => !foundTagIds.includes(id));
                     if (notFoundTagIds.length > 0) {
-                        console.log('未找到的标签ID:', notFoundTagIds);
+                        logDebug('未找到的标签ID', undefined, { notFoundTagIds });
                     }
 
                     // 设置素材的标签关联
                     if (materialTags.length > 0) {
                         savedMaterial.material_tags = materialTags;
                         await queryRunner.manager.save(savedMaterial);
-                        console.log('已保存标签关联, 数量:', materialTags.length);
+                        logDebug('已保存标签关联', undefined, { tagCount: materialTags.length });
                     }
                 }
 
@@ -196,7 +200,7 @@ export class MaterialService {
                 await queryRunner.release();
             }
         } catch (error) {
-            console.error('上传文件失败:', error);
+            logError('上传文件失败', undefined, { error });
             // 确保在任何错误情况下都清理文件
             if (file?.path) {
                 await deleteFileIfExists(file.path);
@@ -236,7 +240,7 @@ export class MaterialService {
                 total
             };
         } catch (error) {
-            console.error('获取素材列表失败:', error);
+            logError('获取素材列表失败', undefined, { error });
             throw new HttpException(500, '获取素材列表失败', error);
         }
     }
@@ -263,7 +267,7 @@ export class MaterialService {
             
             return material;
         } catch (error) {
-            console.error('获取素材详情失败:', error);
+            logError('获取素材详情失败', undefined, { error, materialId: id });
             throw error instanceof HttpException ? error : new HttpException(500, '获取素材详情失败');
         }
     }
@@ -297,7 +301,7 @@ export class MaterialService {
                 relations: ['material_category', 'material_tags', 'user']
             }) || savedMaterial;
         } catch (error) {
-            console.error('更新素材失败:', error);
+            logError('更新素材失败', undefined, { error, materialId: id });
             throw error instanceof HttpException ? error : new HttpException(500, '更新素材失败');
         }
     }
@@ -326,7 +330,7 @@ export class MaterialService {
             
             return true;
         } catch (error) {
-            console.error('删除素材失败:', error);
+            logError('删除素材失败', undefined, { error, materialId: id });
             throw error instanceof HttpException ? error : new HttpException(500, '删除素材失败');
         }
     }
@@ -345,7 +349,7 @@ export class MaterialService {
             
             return duplicateMaterial;
         } catch (error) {
-            console.error('检查重复文件失败:', error);
+            logError('检查重复文件失败', undefined, { error, fileHash });
             return null;
         }
     }
