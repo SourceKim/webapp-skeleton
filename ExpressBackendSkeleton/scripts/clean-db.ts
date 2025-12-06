@@ -1,21 +1,18 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
+import { getEnv } from '../src/configs/env.config';
 
-// 加载环境变量
-const envFile = '.env.development.local';
-dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+// 注意：env.config.ts 已经加载了环境变量，这里不需要再次加载
 
 async function cleanDatabase() {
   console.log('Cleaning database...');
   
   const config: DataSourceOptions = {
     type: 'mysql',
-    host: process.env.MYSQL_HOST || '127.0.0.1',
-    port: Number(process.env.MYSQL_PORT) || 3306,
-    username: process.env.MYSQL_USER || 'root',
-    password: process.env.MYSQL_PASSWORD || '',
-    database: process.env.MYSQL_DATABASE || 'skeleton',
+    host: getEnv('MYSQL_HOST', 'MySQL 数据库主机地址'),
+    port: Number(getEnv('MYSQL_PORT', 'MySQL 数据库端口号')),
+    username: getEnv('MYSQL_USER', 'MySQL 数据库用户名'),
+    password: getEnv('MYSQL_PASSWORD', 'MySQL 数据库密码', true), // 允许空密码
+    database: getEnv('MYSQL_DATABASE', 'MySQL 数据库名称'),
   };
 
   try {

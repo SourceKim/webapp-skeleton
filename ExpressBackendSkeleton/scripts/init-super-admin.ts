@@ -3,16 +3,13 @@ import { User, UserStatus, UserGender } from '../src/modules/user/user.model';
 import { Role } from '../src/modules/role/role.model';
 import { Permission } from '../src/modules/permission/permission.model';
 import { nanoid } from 'nanoid';
-import * as dotenv from 'dotenv';
 import * as bcrypt from 'bcryptjs';
 import * as mysql from 'mysql2/promise';
 import { DataSource } from 'typeorm';
-import * as path from 'path';
 import { ROLE_NAMES } from '../src/constants/role.constants';
+import { getEnv, getEnvOptional, ENV } from '../src/configs/env.config';
 
-// 加载环境变量
-const envFile = '.env.development.local';
-dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+// 注意：env.config.ts 已经加载了环境变量，这里不需要再次加载
 
 const resources = [
     'user',
@@ -29,15 +26,11 @@ const actions = [
 
 // 检查数据库是否存在，不存在则创建
 async function checkAndCreateDatabase() {
-    const host = process.env.MYSQL_HOST || 'localhost';
-    const port = parseInt(process.env.MYSQL_PORT || '3306');
-    const user = process.env.MYSQL_USER || 'root';
-    const password = process.env.MYSQL_PASSWORD || '';
-    const database = process.env.MYSQL_DATABASE || '';
-
-    if (!database) {
-        throw new Error('数据库名称未设置，请检查环境变量 MYSQL_DATABASE');
-    }
+    const host = getEnv('MYSQL_HOST', 'MySQL 数据库主机地址');
+    const port = parseInt(getEnv('MYSQL_PORT', 'MySQL 数据库端口号'));
+    const user = getEnv('MYSQL_USER', 'MySQL 数据库用户名');
+    const password = getEnv('MYSQL_PASSWORD', 'MySQL 数据库密码', true); // 允许空密码
+    const database = getEnv('MYSQL_DATABASE', 'MySQL 数据库名称');
 
     console.log(`正在检查数据库 ${database} 是否存在...`);
     console.log(`连接信息: host=${host}, port=${port}, user=${user}, password=${password ? '已设置' : '未设置'}`);
@@ -85,7 +78,7 @@ async function initSuperAdmin() {
         // 使用 127.0.0.1 替代 localhost 来避免 socket 连接问题
         let dataSourceToUse = AppDataSource;
         
-        if (process.env.MYSQL_HOST === 'localhost') {
+        if (ENV.MYSQL_HOST === 'localhost') {
             
             // 创建一个新的 DataSource，使用与 AppDataSource 相同的配置，但将 host 改为 127.0.0.1
             customDataSource = new DataSource({
@@ -159,13 +152,13 @@ async function initSuperAdmin() {
         const userRepository = dataSourceToUse.getRepository(User);
         
         // 从环境变量获取超级管理员用户名和密码
-        const adminUsername = process.env.ADMIN_USERNAME || 'super_admin';
-        const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
-        const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@123';
-        const adminNickname = process.env.ADMIN_NICKNAME || '超级管理员';
-        const adminPhone = process.env.ADMIN_PHONE || '13800000000';
-        const adminGender: UserGender = (process.env.ADMIN_GENDER as UserGender) || UserGender.MALE;
-        const adminBirthdate = process.env.ADMIN_BIRTHDATE || null; // 可选 YYYY-MM-DD
+        const adminUsername = getEnv('ADMIN_USERNAME', '超级管理员用户名');
+        const adminEmail = getEnv('ADMIN_EMAIL', '超级管理员邮箱');
+        const adminPassword = getEnv('ADMIN_PASSWORD', '超级管理员密码');
+        const adminNickname = getEnvOptional('ADMIN_NICKNAME') || '超级管理员';
+        const adminPhone = getEnvOptional('ADMIN_PHONE') || '13800000000';
+        const adminGender: UserGender = (getEnvOptional('ADMIN_GENDER') as UserGender) || UserGender.MALE;
+        const adminBirthdate = getEnvOptional('ADMIN_BIRTHDATE') || null; // 可选 YYYY-MM-DD
         
         let user = await userRepository.findOne({
             where: { username: adminUsername }

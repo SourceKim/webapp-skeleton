@@ -3,16 +3,11 @@ import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 
 // 环境变量加载优先级：
-// 1. .env (基础配置，必须包含 NODE_ENV)
-// 2. .env.local (本地所有环境通用配置，不提交到版本控制)
-// 3. .env.${NODE_ENV} (环境特定配置)
-// 4. .env.${NODE_ENV}.local (本地开发环境特定配置，不提交到版本控制)
-
-// 先加载基础 .env 文件（用于获取 NODE_ENV）
-const baseEnvPath = path.resolve(process.cwd(), '.env');
-if (fs.existsSync(baseEnvPath)) {
-  dotenv.config({ path: baseEnvPath });
-}
+// 1. 系统环境变量（最高优先级）
+// 2. .env (基础配置)
+// 3. .env.local (本地所有环境通用配置，不提交到版本控制)
+// 4. .env.${NODE_ENV} (环境特定配置)
+// 5. .env.${NODE_ENV}.local (本地开发环境特定配置，不提交到版本控制)
 
 /**
  * 获取环境变量，如果未赋值则直接报错
@@ -47,19 +42,55 @@ export function getEnvOptional(key: string): string | undefined {
   return value === '' ? undefined : value;
 }
 
-// 获取 NODE_ENV（必须在加载其他环境文件之前）
-const NODE_ENV = getEnv('NODE_ENV', '运行环境，如 development、production');
+// 先尝试从系统环境变量获取 NODE_ENV
+let NODE_ENV = process.env.NODE_ENV;
+const loadedEnvFiles = new Set<string>();
 
-// 定义可能的环境变量文件路径（按优先级）
+// 如果系统环境变量中没有 NODE_ENV，尝试从环境文件中加载
+if (!NODE_ENV) {
+  // 按优先级加载所有可能的环境文件，直到找到 NODE_ENV
+  const possibleEnvFiles = [
+    path.resolve(process.cwd(), '.env'),
+    path.resolve(process.cwd(), '.env.local'),
+    // 尝试常见的环境文件
+    path.resolve(process.cwd(), '.env.development'),
+    path.resolve(process.cwd(), '.env.development.local'),
+    path.resolve(process.cwd(), '.env.production'),
+    path.resolve(process.cwd(), '.env.production.local'),
+  ];
+
+  for (const envPath of possibleEnvFiles) {
+    if (fs.existsSync(envPath)) {
+      dotenv.config({ path: envPath });
+      loadedEnvFiles.add(envPath);
+      if (process.env.NODE_ENV) {
+        NODE_ENV = process.env.NODE_ENV;
+        break;
+      }
+    }
+  }
+}
+
+// 如果仍然没有找到 NODE_ENV，抛出错误
+if (!NODE_ENV) {
+  throw new Error(
+    '缺少必需的环境变量: NODE_ENV (运行环境，如 development、production)\n' +
+    '请在系统环境变量或 .env 文件中配置此环境变量'
+  );
+}
+
+// 根据 NODE_ENV 加载对应的环境文件（如果之前没有加载过）
 const envPaths = [
+  path.resolve(process.cwd(), '.env'),
   path.resolve(process.cwd(), '.env.local'),
   path.resolve(process.cwd(), `.env.${NODE_ENV}`),
   path.resolve(process.cwd(), `.env.${NODE_ENV}.local`),
 ];
 
-// 按优先级加载存在的环境变量文件
+// 按优先级加载存在的环境变量文件（dotenv.config 会自动覆盖已存在的变量）
+// 跳过已经加载过的文件，避免重复加载
 envPaths.forEach(envPath => {
-  if (fs.existsSync(envPath)) {
+  if (fs.existsSync(envPath) && !loadedEnvFiles.has(envPath)) {
     dotenv.config({ path: envPath });
   }
 });
