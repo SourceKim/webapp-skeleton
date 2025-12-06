@@ -97,7 +97,7 @@ watch(() => props.modelValue, (v) => {
   form.status = v.status
   form.material_id = v.material_id
   form.brand_id = v.brand_id
-  imageUrl.value = v.image_url
+  imageUrl.value = v.material?.file_path ? getUploadFileUrl(v.material.file_path) || undefined : undefined
   parentName.value = v.parent_id ? v.parent_id : '顶级分类'
 }, { immediate: true })
 

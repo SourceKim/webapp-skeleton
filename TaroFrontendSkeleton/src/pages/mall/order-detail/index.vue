@@ -232,7 +232,7 @@ useLoad(async (options) => {
 <style lang="scss">
 .order-detail {
   min-height: 100vh;
-  background: $style-color-bg;
+  background: #f7f7f7;
   padding-bottom: calc(env(safe-area-inset-bottom) + 60px); // 增加底部 padding 防止遮挡
 }
 
@@ -241,8 +241,8 @@ useLoad(async (options) => {
   bottom: 0;
   left: 0;
   right: 0;
-  background: $style-color-white;
-  padding: 10px $style-spacing-sm;
+  background: #fff;
+  padding: 10px 16px;
   padding-bottom: env(safe-area-inset-bottom);
   display: flex;
   justify-content: flex-end;
@@ -253,26 +253,26 @@ useLoad(async (options) => {
 
 .status-bar {
   background: linear-gradient(135deg, #fa2c19 0%, #fa6419 100%);
-  color: $style-color-white;
-  padding: 20px $style-spacing-sm;
+  color: #fff;
+  padding: 20px 16px;
   
   .status-text {
-    font-size: $style-h1-text-size;
+    font-size: 20px;
     font-weight: 600;
     margin-bottom: 4px;
   }
   
   .status-desc {
-    font-size: $style-text-size-sm;
+    font-size: 12px;
     opacity: 0.9;
   }
 }
 
 .card {
-  background: $style-color-white;
-  border-radius: $style-border-radius-base;
+  background: #fff;
+  border-radius: 12px;
   margin: 12px;
-  padding: $style-spacing-sm;
+  padding: 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.02);
 }
 
@@ -298,29 +298,29 @@ useLoad(async (options) => {
     margin-bottom: 6px;
     
     .name {
-      font-size: $style-text-size-lg;
+      font-size: 16px;
       font-weight: 600;
-      color: $style-text-color-primary;
+      color: #333;
       margin-right: 8px;
     }
     
     .phone {
-      font-size: $style-text-size-base;
-      color: $style-text-color-regular;
+      font-size: 14px;
+      color: #666;
     }
   }
   
   .address-text {
-    font-size: $style-text-size-base;
-    color: $style-text-color-regular;
+    font-size: 13px;
+    color: #666;
     line-height: 1.5;
   }
 }
 
 .card-title {
-  font-size: $style-text-size-lg;
+  font-size: 15px;
   font-weight: 600;
-  color: $style-text-color-primary;
+  color: #333;
   margin-bottom: 12px;
 }
 
@@ -362,24 +362,23 @@ useLoad(async (options) => {
     
     .goods-name {
       flex: 1;
-      font-size: $style-text-size-base;
-      color: $style-text-color-primary;
+      font-size: 14px;
+      color: #333;
       line-height: 1.4;
       margin-right: 12px;
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
       -webkit-line-clamp: 2;
-      line-clamp: 2;
       -webkit-box-orient: vertical;
     }
     
     .goods-price {
       font-weight: 600;
-      color: $style-text-color-primary;
-      font-size: $style-text-size-sm;
+      color: #333;
+      font-size: 14px;
       
-      .symbol { font-size: $style-text-size-xs; }
+      .symbol { font-size: 12px; }
     }
   }
   
@@ -393,13 +392,13 @@ useLoad(async (options) => {
       background: #f9f9f9;
       padding: 2px 6px;
       border-radius: 4px;
-      font-size: $style-text-size-xs;
-      color: $style-text-color-secondary;
+      font-size: 11px;
+      color: #999;
     }
     
     .goods-qty {
-      font-size: $style-text-size-sm;
-      color: $style-text-color-secondary;
+      font-size: 12px;
+      color: #999;
     }
   }
 }
@@ -408,8 +407,8 @@ useLoad(async (options) => {
   .summary-row {
     display: flex;
     justify-content: space-between;
-    font-size: $style-text-size-sm;
-    color: $style-text-color-regular;
+    font-size: 13px;
+    color: #666;
     margin-bottom: 8px;
     
     &:last-child {
@@ -424,13 +423,13 @@ useLoad(async (options) => {
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid #f5f5f5;
-    font-size: $style-text-size-base;
-    color: $style-text-color-primary;
+    font-size: 14px;
+    color: #333;
     
     .total-price {
-      font-size: $style-text-size-lg;
+      font-size: 18px;
       font-weight: 600;
-      color: $style-text-color-price;
+      color: #fa2c19;
       margin-left: 6px;
     }
   }
@@ -440,7 +439,7 @@ useLoad(async (options) => {
   .info-row {
     display: flex;
     justify-content: space-between;
-    font-size: $style-text-size-sm;
+    font-size: 13px;
     margin-bottom: 12px;
     
     &:last-child {
@@ -448,11 +447,11 @@ useLoad(async (options) => {
     }
     
     .label {
-      color: $style-text-color-regular;
+      color: #666;
     }
     
     .value {
-      color: $style-text-color-primary;
+      color: #333;
       flex: 1;
       text-align: right;
       margin-left: 20px;
@@ -465,3 +464,5 @@ useLoad(async (options) => {
   height: 20px;
 }
 </style>
+
+

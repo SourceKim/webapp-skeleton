@@ -1,3 +1,5 @@
+import type { Material } from '../material/material.d'
+
 export interface ProductCategory {
   id: string
   name: string
@@ -5,9 +7,9 @@ export interface ProductCategory {
   parent_id?: string
   level: number
   material_id?: string
+  material?: Material
   brand_id?: string
   brand_name?: string
-  image_url?: string
   status: 'ENABLED' | 'DISABLED'
   createdAt?: string | Date
   updatedAt?: string | Date

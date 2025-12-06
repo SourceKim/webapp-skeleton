@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { ENV } from '@/configs/env.config';
 import authRoutes from '@/modules/auth/auth.routes';
 import permissionRoutes from '@/modules/permission/permission.routes';
 import roleRoutes from '@/modules/role/role.routes';
@@ -20,8 +21,8 @@ import shopIntroRoutes from '@/modules/mall/shop-intro/shop-intro.routes';
 
 const router = Router();
 
-// API 版本控制
-const API_VERSION = '/api/v1';
+// API 版本控制（从环境变量读取，默认 /api/v1）
+const API_VERSION = ENV.API_VERSION;
 
 // 注册所有路由
 router.use(`${API_VERSION}/auth`, authRoutes);

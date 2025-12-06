@@ -18,7 +18,13 @@
       <el-table-column prop="brand_name" label="所属品牌" width="150" />
       <el-table-column label="图片" width="100" align="center">
         <template #default="{ row }">
-          <el-image :src="row.image_url" style="width:40px;height:40px;object-fit:cover" :preview-src-list="row.image_url ? [row.image_url] : []" />
+          <el-image 
+            v-if="row.material?.file_path" 
+            :src="getFileUrl(row.material.file_path)" 
+            style="width:40px;height:40px;object-fit:cover" 
+            :preview-src-list="row.material?.file_path ? [getFileUrl(row.material.file_path)] : []" 
+          />
+          <span v-else>-</span>
         </template>
       </el-table-column>
       <el-table-column prop="level" label="层级" width="80" />
@@ -44,6 +50,12 @@ import type { ProductCategory } from '@/api/product/category.d'
 import type { ProductBrand } from '@/api/product/brand.d'
 import { getCategories, deleteCategory } from '@/api/product/category'
 import { getBrandsAll } from '@/api/product/brand'
+import { getUploadFileUrl } from '@/utils/file'
+
+// 获取文件 URL
+function getFileUrl(filePath?: string | null): string {
+  return getUploadFileUrl(filePath) || ''
+}
 
 const CategoryForm = defineAsyncComponent(() => import('./form.vue'))
 

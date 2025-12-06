@@ -32,8 +32,6 @@ export class MaterialService {
     private materialRepository: Repository<Material>;
     /** 默认上传目录 */
     private readonly defaultUploadDir: string;
-    /** 基础URL */
-    private readonly baseUrl: string;
     /** 数据源 */
     private readonly dataSource: DataSource;
 
@@ -43,8 +41,9 @@ export class MaterialService {
     constructor() {
         this.materialRepository = AppDataSource.getRepository(Material);
         this.dataSource = AppDataSource;
-        this.defaultUploadDir = path.resolve(ENV.UPLOAD_DIR);
-        this.baseUrl = ENV.API_URL;
+        // 从 UPLOADS_PATH 推导出文件系统目录路径（移除前导斜杠）
+        const uploadsPath = ENV.UPLOADS_PATH.replace(/^\/+/, ''); // 移除前导斜杠，如 /uploads -> uploads
+        this.defaultUploadDir = path.join(process.cwd(), uploadsPath); // 使用项目根目录
         
         // 确保上传目录存在
         createDirIfNotExists(this.defaultUploadDir);

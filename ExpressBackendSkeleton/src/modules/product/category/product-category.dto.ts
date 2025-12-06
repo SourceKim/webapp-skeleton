@@ -1,7 +1,8 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, MaxLength, IsInt, Min } from 'class-validator';
 import { BaseDTO } from '@/modules/common/common.dto';
 import { ProductCategoryStatus } from './product-category.model';
+import { MaterialDTO } from '@/modules/material/material.dto';
 
 export class ProductCategoryDTO extends BaseDTO {
     @Expose()
@@ -20,13 +21,14 @@ export class ProductCategoryDTO extends BaseDTO {
     material_id?: string;
 
     @Expose()
+    @Type(() => MaterialDTO)
+    material?: MaterialDTO;
+
+    @Expose()
     brand_id?: string;
 
     @Expose()
     brand_name?: string;
-
-    @Expose()
-    image_url?: string;
 
     @Expose()
     status: ProductCategoryStatus = ProductCategoryStatus.ENABLED;

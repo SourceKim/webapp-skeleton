@@ -102,7 +102,7 @@ PORT=4000
 NODE_ENV=development
 
 # 文件上传配置
-UPLOAD_DIR=./uploads
+UPLOADS_PATH=/uploads  # 上传文件访问路径
 MAX_FILE_SIZE=10485760  # 10MB
 ```
 

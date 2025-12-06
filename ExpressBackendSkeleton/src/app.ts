@@ -30,8 +30,11 @@ app.use(requestTracingMiddleware);
 app.use(httpLoggerMiddleware);
 
 // 静态文件服务
-app.use(ENV.UPLOADS_PATH, express.static(path.join(__dirname, '../uploads')));
-app.use(ENV.PUBLIC_PATH, express.static(path.join(__dirname, '../public')));
+// 从 UPLOADS_PATH 推导出文件系统目录路径（移除前导斜杠）
+const uploadsPath = ENV.UPLOADS_PATH.replace(/^\/+/, ''); // 移除前导斜杠，如 /uploads -> uploads
+const publicPath = ENV.PUBLIC_PATH.replace(/^\/+/, ''); // 移除前导斜杠，如 /public -> public
+app.use(ENV.UPLOADS_PATH, express.static(path.join(process.cwd(), uploadsPath)));
+app.use(ENV.PUBLIC_PATH, express.static(path.join(process.cwd(), publicPath)));
 
 // API 文档
 app.get(ENV.API_DOCS_JSON_PATH, (req, res) => {

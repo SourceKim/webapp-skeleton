@@ -160,7 +160,6 @@ function parseCorsOrigins(): string[] {
 export const ENV = {
   NODE_ENV,
   PORT: getEnv('PORT', '服务器端口号'),
-  API_BASE_URL: getEnv('API_BASE_URL', 'API 基础路径，如 /api/v1'),
   CORS_ORIGINS: parseCorsOrigins(),
   CORS_METHODS: getEnvOptional('CORS_METHODS')?.split(',').map(s => s.trim()).filter(Boolean) || ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   CORS_HEADERS: getEnvOptional('CORS_HEADERS')?.split(',').map(s => s.trim()).filter(Boolean) || ['Content-Type', 'Authorization'],
@@ -168,6 +167,7 @@ export const ENV = {
   PUBLIC_PATH: getEnv('PUBLIC_PATH', '静态文件访问路径，如 /public'),
   API_DOCS_JSON_PATH: getEnv('API_DOCS_JSON_PATH', 'API 文档 JSON 路径，如 /api-docs.json'),
   API_DOCS_PATH: getEnv('API_DOCS_PATH', 'API 文档访问路径，如 /api-docs'),
+  API_VERSION: getEnvOptional('API_VERSION') || '/api/v1', // API 版本路径，默认 /api/v1
   LOG_LEVEL: getEnv('LOG_LEVEL', '日志级别，如 debug、info、warn、error'),
   
   // 数据库配置
@@ -182,8 +182,6 @@ export const ENV = {
   JWT_EXPIRES_IN: getEnv('JWT_EXPIRES_IN', 'JWT token 过期时间，如 24h、7d'),
 
   // 素材管理配置
-  UPLOAD_DIR: getEnv('UPLOAD_DIR', '文件上传存储目录路径'),
-  API_URL: getEnv('API_URL', 'API 服务完整 URL，如 http://localhost:3000'),
   MAX_FILE_SIZE: parseInt(getEnv('MAX_FILE_SIZE', '最大文件上传大小（字节），如 10485760（10MB）')),
   ALLOWED_MIME_TYPES: getEnvOptional('ALLOWED_MIME_TYPES')?.split(',').map(s => s.trim()).filter(Boolean) || ['image/*', 'audio/*', 'video/*', 'application/pdf', 'text/plain'],
 };

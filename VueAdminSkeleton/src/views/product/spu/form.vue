@@ -57,7 +57,12 @@
     <el-table :data="categoryList" @row-click="onPickCategory" height="400">
       <el-table-column label="图片" width="80">
         <template #default="{ row }">
-          <el-image :src="row.image_url" style="width:40px;height:40px;object-fit:cover" />
+          <el-image 
+            v-if="row.material?.file_path" 
+            :src="getFileUrl(row.material.file_path)" 
+            style="width:40px;height:40px;object-fit:cover" 
+          />
+          <span v-else>-</span>
         </template>
       </el-table-column>
       <el-table-column prop="name" label="名称" />
@@ -93,6 +98,11 @@ import { getUploadFileUrl } from '@/utils/file'
 
 const props = defineProps<{ handleType?: string, modelValue?: ProductSpu }>()
 const emit = defineEmits<{ (e: 'close', refresh?: boolean): void }>()
+
+// 获取文件 URL
+function getFileUrl(filePath?: string | null): string {
+  return getUploadFileUrl(filePath) || ''
+}
 
 const isDetail = computed(() => props.handleType === 'detail')
 const isEdit = computed(() => props.handleType === 'edit')

@@ -35,8 +35,9 @@ export class MaterialController {
      * 构造函数
      */
     constructor() {
-        // 使用环境变量中配置的上传目录
-        this.uploadDir = path.resolve(ENV.UPLOAD_DIR);
+        // 从 UPLOADS_PATH 推导出文件系统目录路径（移除前导斜杠）
+        const uploadsPath = ENV.UPLOADS_PATH.replace(/^\/+/, ''); // 移除前导斜杠，如 /uploads -> uploads
+        this.uploadDir = path.join(process.cwd(), uploadsPath); // 使用项目根目录
         createDirIfNotExists(this.uploadDir);
         this.upload = multer({ 
             storage: multer.diskStorage({

@@ -12,8 +12,7 @@ AppDataSource.initialize()
         
         // 启动服务器
         app.listen(ENV.PORT, () => {
-            const serverUrl = ENV.API_URL.replace(/\/api\/v1$/, '').replace(/\/$/, '') || `http://localhost:${ENV.PORT}`;
-            logInfo(`服务器运行在 ${serverUrl}`);
+            logInfo(`服务器运行在端口 ${ENV.PORT}`);
         });
     })
     .catch((error: Error) => {

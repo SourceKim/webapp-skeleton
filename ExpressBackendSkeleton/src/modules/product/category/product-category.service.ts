@@ -7,21 +7,11 @@ import { PaginationQueryDto } from '@/modules/common/common.dto';
 import { plainToInstance } from 'class-transformer';
 import { CreateProductCategoryDto, ProductCategoryDTO, UpdateProductCategoryDto } from './product-category.dto';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
-import { ENV } from '@/configs/env.config';
 
 export class ProductCategoryService {
     private repository: Repository<ProductCategory>;
     constructor() {
         this.repository = AppDataSource.getRepository(ProductCategory);
-    }
-
-    private buildImageUrl(material?: { file_path?: string } | null): string | undefined {
-        const filePath = material?.file_path;
-        if (!filePath) return undefined;
-        const base = (ENV.API_URL || '').replace(/\/$/, '');
-        const mount = (ENV.UPLOADS_PATH || '/uploads');
-        const rel = filePath.startsWith('/') ? filePath : `/${filePath}`;
-        return `${base}${mount}${rel}`;
     }
 
     async findAll(query: PaginationQueryDto, parentId?: string, level?: number): Promise<{ items: ProductCategoryDTO[]; total: number }> {
@@ -56,8 +46,7 @@ export class ProductCategoryService {
             parent_id: (c as any)?.parent?.id,
             material_id: (c as any)?.material?.id,
             brand_id: (c as any)?.brand?.id,
-            brand_name: (c as any)?.brand?.name,
-            image_url: this.buildImageUrl((c as any)?.material)
+            brand_name: (c as any)?.brand?.name
         }));
         return { items: dtos, total };
     }
@@ -70,8 +59,7 @@ export class ProductCategoryService {
             parent_id: (c as any)?.parent?.id,
             material_id: (c as any)?.material?.id,
             brand_id: (c as any)?.brand?.id,
-            brand_name: (c as any)?.brand?.name,
-            image_url: this.buildImageUrl((c as any)?.material)
+            brand_name: (c as any)?.brand?.name
         });
     }
 

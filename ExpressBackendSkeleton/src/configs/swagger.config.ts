@@ -18,7 +18,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: `${ENV.API_URL}${ENV.API_BASE_URL}`,
+      url: `localhost:${ENV.PORT}`,
       description: '开发服务器',
     },
   ],
