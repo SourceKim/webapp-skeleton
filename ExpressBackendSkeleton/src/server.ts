@@ -6,22 +6,27 @@ import { logInfo, logError, logDebug } from '@/utils/logger';
 import { AppDataSource } from '@/configs/database.config';
 
 // 初始化数据库连接
+logDebug("数据库配置", "", {
+    host: ENV.MYSQL_HOST,
+    port: ENV.MYSQL_PORT,
+    username: ENV.MYSQL_USER,
+    password: ENV.MYSQL_PASSWORD,
+    database: ENV.MYSQL_DATABASE
+});
 AppDataSource.initialize()
     .then(() => {
         logInfo('数据库连接成功');
-        
         // 启动服务器
         app.listen(ENV.PORT, () => {
             logInfo(`服务器运行在端口 ${ENV.PORT}`);
         });
     })
     .catch((error: Error) => {
-        logError('数据库连接失败', "", error);
-        logDebug("数据库配置", "", {
-            host: ENV.MYSQL_HOST,
-            port: ENV.MYSQL_PORT,
-            username: ENV.MYSQL_USER,
-            password: ENV.MYSQL_PASSWORD,
-            database: ENV.MYSQL_DATABASE
+        logError('数据库连接失败', "", {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            cause: (error as any).cause
         });
+        process.exit(1);
     }); 
