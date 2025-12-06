@@ -73,7 +73,7 @@ export class CreateHomeTables1755669901000 implements MigrationInterface {
                     {
                         columnNames: ['spu_id'],
                         referencedColumnNames: ['id'],
-                        referencedTableName: 'product_spus',
+                        referencedTableName: 'product_spu',
                         onDelete: 'SET NULL'
                     }
                 ]
