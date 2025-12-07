@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "yarn build && rsync -av --delete dist/ /opt/1panel/www/sites/skeleton-admin.kimsu.fun/index/"
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "^1.0.1",
