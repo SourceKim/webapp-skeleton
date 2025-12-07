@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table, TableForeignKey, TableIndex } from 'typeorm';
 
-export class CreateMallOrdersTables1752669901001 implements MigrationInterface {
+export class CreateMallOrdersTables1753669910000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(new Table({
       name: 'mall_orders',
@@ -52,6 +52,11 @@ export class CreateMallOrdersTables1752669901001 implements MigrationInterface {
     await queryRunner.createForeignKey('mall_order_items', new TableForeignKey({
       columnNames: ['order_id'], referencedTableName: 'mall_orders', referencedColumnNames: ['id'], onDelete: 'CASCADE'
     }))
+
+    // 添加 sku_id 的外键约束，指向 product_sku 表
+    await queryRunner.createForeignKey('mall_order_items', new TableForeignKey({
+      columnNames: ['sku_id'], referencedTableName: 'product_sku', referencedColumnNames: ['id'], onDelete: 'SET NULL'
+    }))
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -64,11 +69,3 @@ export class CreateMallOrdersTables1752669901001 implements MigrationInterface {
     await queryRunner.dropTable('mall_orders', true)
   }
 }
-
-
-
-
-
-
-
-

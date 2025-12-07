@@ -55,7 +55,7 @@ export const AppDataSource = new DataSource({
         ,ShopIntro
         ,ShopIntroBanner
     ],
-    migrations: [], // 迁移文件通过命令行工具手动运行，不在应用启动时自动加载
+    migrations: ['migrations/**/*.ts'], // 迁移文件路径，支持 ts-node 运行时加载
     subscribers: [],
     charset: 'utf8mb4'
 }); 
