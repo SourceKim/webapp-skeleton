@@ -36,6 +36,7 @@ import { useLayoutStore } from '@/stores/layout'
   import { useClipboard, usePermission } from '@vueuse/core'
   import { ElMessage } from 'element-plus'
   import ToggleMenu from '@/layout/ToggleMenu.vue'
+  import { ENV } from '@/utils/env'
   
 
   defineOptions({
@@ -54,7 +55,7 @@ import { useLayoutStore } from '@/stores/layout'
     })
   }
   
-  const isDev = import.meta.env.DEV
+  const isDev = ENV.DEV
   const layoutStore = useLayoutStore()
   const route = useRoute()
   </script>

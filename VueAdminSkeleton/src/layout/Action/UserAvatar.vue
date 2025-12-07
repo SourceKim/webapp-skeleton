@@ -35,9 +35,10 @@ import { useAuthStore } from '@/stores/auth'
 import { logout } from '@/api/auth'
 import defaultAvatar from '@/assets/image/avatar-default.png'
 import { computed, ref } from 'vue'
-import { getDownloadFileUrl } from '@/utils/file'
+import { getUploadFileUrl } from '@/utils/file'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { ENV } from '@/utils/env'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
@@ -45,9 +46,7 @@ const router = useRouter()
 
 const avatar = computed(() => {
   if (authStore.user?.avatar)
-    return getDownloadFileUrl({
-      object: authStore.user?.avatar
-    })
+    return getUploadFileUrl(authStore.user?.avatar)
   return defaultAvatar
 })
 
@@ -55,7 +54,7 @@ const drawerVisible = ref(false)
 
 function handleCommand(key) {
   if (key === 'user') {
-    router.push(`/${import.meta.env.VITE_LAYOUT_ROUTE_NAME}/personal-center`)
+    router.push(`/${ENV.LAYOUT_ROUTE_NAME}/personal-center`)
   }
   if (key === 'switchRole') {
     drawerVisible.value = true

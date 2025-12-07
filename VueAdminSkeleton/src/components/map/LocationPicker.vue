@@ -21,6 +21,7 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import { ElMessage } from 'element-plus'
+import { ENV } from '@/utils/env'
 
 const props = defineProps({
   modelValue: {
@@ -39,9 +40,9 @@ let marker: any = null
 let placeSearch: any = null
 let autoComplete: any = null
 
-// 请替换为您的高德地图 Key 和 SecurityJsCode
-const AMAP_KEY = import.meta.env.VITE_AMAP_KEY 
-const AMAP_SECURITY_CODE = import.meta.env.VITE_AMAP_SECURITY_CODE 
+// 高德地图 Key 和 SecurityJsCode
+const AMAP_KEY = ENV.AMAP_KEY
+const AMAP_SECURITY_CODE = ENV.AMAP_SECURITY_CODE 
 
 // 设置安全密钥
 ;(window as any)._AMapSecurityConfig = {

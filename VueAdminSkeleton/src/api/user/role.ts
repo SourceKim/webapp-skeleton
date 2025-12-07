@@ -3,14 +3,12 @@ import type { Permission } from './permission.d';
 import type { PaginatedResponse, RequestOption, RestResponse } from '../types/common';
 import createAxios from '@/utils/request';
 
-const BASE_URL = import.meta.env.VITE_SYSTEM_BASE_URL
-
 /**
  * 创建角色
  * @returns 创建的角色
  */
 export function createRole(data: CreateAndUpdateRoleQueryDto, option?: RequestOption): Promise<RestResponse<Role>> {
-    return createAxios(option).post(`${BASE_URL}/roles/admin`, data);
+    return createAxios(option).post(`/roles/admin`, data);
 }
 
 /**
@@ -18,7 +16,7 @@ export function createRole(data: CreateAndUpdateRoleQueryDto, option?: RequestOp
  * @returns 角色列表
  */
 export function getRoles(option?: RequestOption): RestResponse<PaginatedResponse<Role>> {
-    return createAxios(option).get(`${BASE_URL}/roles/admin`);
+    return createAxios(option).get(`/roles/admin`);
 }
 
 /**
@@ -28,7 +26,7 @@ export function getRoles(option?: RequestOption): RestResponse<PaginatedResponse
  * @returns 角色详情（包含权限）
  */
 export function getRoleDetail(roleId: string, option?: RequestOption): Promise<RestResponse<Role & { permissions: Permission[] }>> {
-    return createAxios(option).get(`${BASE_URL}/roles/admin/${roleId}`);
+    return createAxios(option).get(`/roles/admin/${roleId}`);
 }
 
 /**
@@ -36,7 +34,7 @@ export function getRoleDetail(roleId: string, option?: RequestOption): Promise<R
  * @returns 更新后的角色
  */
 export function updateRole(id: string, data: CreateAndUpdateRoleQueryDto, option?: RequestOption): Promise<RestResponse<Role>> {
-    return createAxios(option).put(`${BASE_URL}/roles/admin/${id}`, data);
+    return createAxios(option).put(`/roles/admin/${id}`, data);
 }
 
 /**
@@ -44,7 +42,7 @@ export function updateRole(id: string, data: CreateAndUpdateRoleQueryDto, option
  * @returns 删除后的角色
  */
 export function deleteRole(id: string, option?: RequestOption): Promise<RestResponse<Role>> {
-    return createAxios(option).delete(`${BASE_URL}/roles/admin/${id}`)
+    return createAxios(option).delete(`/roles/admin/${id}`)
 }
 
 /**
@@ -59,7 +57,7 @@ export function assignPermissionsToRole(
     permissionIds: string[], 
     option?: RequestOption
 ): Promise<RestResponse<{ roleId: string; permissionIds: string[] }>> {
-    return createAxios(option).post(`${BASE_URL}/roles/admin/${roleId}/permissions`, {
+    return createAxios(option).post(`/roles/admin/${roleId}/permissions`, {
         permissionIds
     });
 }
@@ -76,7 +74,7 @@ export function assignRolesToUser(
     roleIds: string[], 
     option?: RequestOption
 ): Promise<RestResponse<{ userId: string; roleIds: string[] }>> {
-    return createAxios(option).post(`${BASE_URL}/users/admin/${userId}/roles`, {
+    return createAxios(option).post(`/users/admin/${userId}/roles`, {
         roleIds
     });
 }
@@ -93,7 +91,7 @@ export function removePermissionsFromRole(
     permissionIds: string[], 
     option?: RequestOption
 ): Promise<RestResponse<{ roleId: string; permissionIds: string[] }>> {
-    return createAxios(option).delete(`${BASE_URL}/roles/admin/${roleId}/permissions`, {
+    return createAxios(option).delete(`/roles/admin/${roleId}/permissions`, {
         data: { permissionIds }
     });
 }

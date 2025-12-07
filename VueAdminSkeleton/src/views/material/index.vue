@@ -46,6 +46,7 @@ import type { Material } from '@/api/material/material.d'
 import type { CommonTableColumn } from '@/components/interface/table'
 import { Document, VideoPlay, Microphone, CopyDocument, TopRight } from '@element-plus/icons-vue'
 import { ElMessage, ElButton, ElIcon, ElMessageBox } from 'element-plus'
+import { getUploadFileUrl } from '@/utils/file'
 
 // 表格
 const data = ref<Material[]>([]) // 表格模型数据
@@ -54,13 +55,9 @@ const filterParam = reactive({}) // 过滤
 const selectRows = ref<Material[]>([]) // 选中行
 const { t } = useI18n()
 
-// 基础URL配置 - 使用环境变量 VITE_UPLOAD_BASE_URL
-const BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || ''
-
-// 拼接完整的文件URL
+// 拼接完整的文件URL - 使用统一的工具函数
 function getFileUrl(filePath?: string): string | null {
-  if (!filePath) return null
-  return BASE_URL + filePath
+  return getUploadFileUrl(filePath)
 }
 
 // 表单

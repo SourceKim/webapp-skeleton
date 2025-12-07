@@ -1,8 +1,6 @@
 import createAxios from '@/utils/request'
 import type { RequestOption, RestResponse, PaginatedResponse } from './types/common'
 
-const BASE_URL = import.meta.env.VITE_SYSTEM_BASE_URL
-
 /**
  * 上传文件
  * @param file 要上传的文件
@@ -12,7 +10,7 @@ const BASE_URL = import.meta.env.VITE_SYSTEM_BASE_URL
 export function uploadFile(file: File, option?: RequestOption): Promise<RestResponse<any>> {
   const formData = new FormData()
   formData.append('file', file)
-  return createAxios(option).post(`${BASE_URL}/file/operation/upload`, formData, {
+  return createAxios(option).post(`/file/operation/upload`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
@@ -26,5 +24,5 @@ export function uploadFile(file: File, option?: RequestOption): Promise<RestResp
  * @returns 文件列表（分页）
  */
 export function queryFileList(params?: any, option?: RequestOption): Promise<RestResponse<PaginatedResponse<any>>> {
-  return createAxios(option).get(`${BASE_URL}/file/operation/list`, { params })
+  return createAxios(option).get(`/file/operation/list`, { params })
 }

@@ -1,6 +1,4 @@
 import createAxios from '@/utils/request'
-
-const apiBaseUrl = import.meta.env.VITE_SYSTEM_BASE_URL || '/api/v1'
 const request = createAxios({})
 
 export interface CartItemDTO {
@@ -41,6 +39,6 @@ export interface CartsQuery {
 }
 
 export const listAdminCarts = (params: CartsQuery) =>
-  (request as any).get(`${apiBaseUrl}/admin/carts`, { params })
+  (request as any).get(`/admin/carts`, { params })
 
 

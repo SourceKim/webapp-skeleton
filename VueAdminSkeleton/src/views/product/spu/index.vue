@@ -30,6 +30,7 @@ import type { ProductSpu } from '@/api/product/spu.d'
 import { getSpuList, deleteSpu } from '@/api/product/spu'
 import { ElImage } from 'element-plus'
 import { getUploadFileUrl } from '@/utils/file'
+import { ENV } from '@/utils/env'
 
 const SpuForm = defineAsyncComponent(() => import('./form.vue'))
 
@@ -70,7 +71,7 @@ const columns = computed((): CommonTableColumn<ProductSpu>[] => [
     buttons: [
       { label: '编辑', icon: 'edit', onClick: (r: ProductSpu) => openForm('edit', r) },
       { label: '详情', icon: 'document', onClick: (r: ProductSpu) => openForm('detail', r) },
-      { label: 'SKU管理', icon: 'setting', onClick: (r: ProductSpu) => router.push({ path: `/${import.meta.env.VITE_LAYOUT_ROUTE_NAME}/mall-manager/sku-manager`, query: { spuId: r.id } }) },
+      { label: 'SKU管理', icon: 'setting', onClick: (r: ProductSpu) => router.push({ path: `/${ENV.LAYOUT_ROUTE_NAME}/mall-manager/sku-manager`, query: { spuId: r.id } }) },
       { label: '删除', icon: 'delete', type: 'danger', onClick: async (r: ProductSpu) => { await deleteSpu(r.id); tableRef.value?.fetchQuery?.() } }
     ]
   }

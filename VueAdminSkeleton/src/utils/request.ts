@@ -6,6 +6,7 @@ import i18n from '@/i18n'
 import type { MyAxiosInstance } from '@/interface/request'
 import { useAuthStore } from '@/stores/auth'
 import type { RequestOption } from '@/api/types/common'
+import { ENV } from './env'
 
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 
@@ -74,9 +75,11 @@ export default function createAxios<R = any, Q = any>(opt?: RequestOption): any 
   }
 
   // 创建axios实例
+  // baseURL = VITE_BASE_URL + VITE_SYSTEM_API_PATH
+  // 确保路径格式正确，避免双斜杠（但保留协议后的双斜杠，如 http://）
+  const fullBaseURL = `${ENV.BASE_URL}${ENV.SYSTEM_BASE_URL}`.replace(/([^:]\/)\/+/g, '$1')
   const service = axios.create({
-    // // axios中请求配置有baseURL选项，表示请求URL公共部分
-    baseURL: import.meta.env.VITE_BASE_URL // 超时
+    baseURL: fullBaseURL
   }) as any as MyAxiosInstance<R, Q>
 
   // request拦截器
@@ -99,7 +102,7 @@ export default function createAxios<R = any, Q = any>(opt?: RequestOption): any 
       })
     }
     // 添加token
-    config.headers[import.meta.env.VITE_SYS_TOKEN_KEY] = 'bearer ' + useAuthStore().token
+    config.headers[ENV.SYS_TOKEN_KEY] = 'bearer ' + useAuthStore().token
     return config
   })
 

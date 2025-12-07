@@ -93,6 +93,7 @@ import type { MaterialCategory } from '@/api/material/material-category.d'
 import type { MaterialTag } from '@/api/material/material-tags.d'
 import { formColumnTypes } from '@/components/mutils'
 import { Document, TopRight } from '@element-plus/icons-vue'
+import { getUploadFileUrl } from '@/utils/file'
 
 const emit = defineEmits<{
   (e: 'close', needRefresh: boolean): void
@@ -116,13 +117,9 @@ const formLoading = ref(false) // 表单加载状态
 const saveLoading = ref(false) // 保存加载状态
 const formRef = ref()
 
-// 基础URL配置 - 使用环境变量 VITE_UPLOAD_BASE_URL
-const BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || ''
-
-// 拼接完整的文件URL
+// 拼接完整的文件URL - 使用统一的工具函数
 function getFileUrl(filePath?: string): string | null {
-  if (!filePath) return null
-  return BASE_URL + filePath
+  return getUploadFileUrl(filePath)
 }
 
 // 获取当前文件的完整URL

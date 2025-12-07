@@ -6,15 +6,13 @@ import type {
 import type { PaginatedResponse, RequestOption, RestResponse } from '../types/common';
 import type { Material } from './material.d';
 
-const BASE_URL = import.meta.env.VITE_SYSTEM_BASE_URL
-
 /**
  * 获取素材列表
  * @param params 查询参数
  * @returns 素材列表（分页）
  */
 export function getMaterials(option?: RequestOption): RestResponse<PaginatedResponse<Material>> {
-  return createAxios(option).get(`${BASE_URL}/materials/admin`);
+  return createAxios(option).get(`/materials/admin`);
 }
 
 /**
@@ -23,7 +21,7 @@ export function getMaterials(option?: RequestOption): RestResponse<PaginatedResp
  * @returns 素材详情
  */
 export function getMaterialById(id: string, option?: RequestOption): RestResponse<Material> {
-  return createAxios(option).get(`${BASE_URL}/materials/admin/${id}`);
+  return createAxios(option).get(`/materials/admin/${id}`);
 }
 
 /**
@@ -32,7 +30,7 @@ export function getMaterialById(id: string, option?: RequestOption): RestRespons
  * @returns 上传的素材
  */
 export function uploadMaterial(formData: FormData, option?: RequestOption) {
-  return createAxios(option).post(`${BASE_URL}/materials/admin/upload`, formData, {
+  return createAxios(option).post(`/materials/admin/upload`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
@@ -46,7 +44,7 @@ export function uploadMaterial(formData: FormData, option?: RequestOption) {
  * @returns 更新后的素材
  */
 export function updateMaterial(id: string, data: UpdateMaterialDto, option?: RequestOption) {
-  return createAxios(option).put(`${BASE_URL}/materials/admin/${id}`, data);
+  return createAxios(option).put(`/materials/admin/${id}`, data);
 }
 
 /**
@@ -55,7 +53,7 @@ export function updateMaterial(id: string, data: UpdateMaterialDto, option?: Req
  * @returns 删除结果
  */
 export function deleteMaterial(id: string, option?: RequestOption) {
-  return createAxios(option).delete(`${BASE_URL}/materials/admin/${id}`);
+  return createAxios(option).delete(`/materials/admin/${id}`);
 }
 
 /**
@@ -64,5 +62,5 @@ export function deleteMaterial(id: string, option?: RequestOption) {
  * @returns 删除结果
  */
 export function batchDeleteMaterials(data: BatchDeleteMaterialsDto, option?: RequestOption) {
-  return createAxios(option).post(`${BASE_URL}/materials/admin/batch/delete`, data);
+  return createAxios(option).post(`/materials/admin/batch/delete`, data);
 }

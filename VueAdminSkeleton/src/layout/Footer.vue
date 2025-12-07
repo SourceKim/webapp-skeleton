@@ -17,17 +17,19 @@
 </template>
 
 <script setup lang="ts">
+import { ENV } from '@/utils/env'
+
 defineOptions({
   name: 'LayoutFooter'
 })
 
 // ICP备案号 - 从环境变量读取
-const icpCode = import.meta.env.VITE_ICP_CODE || ''
+const icpCode = ENV.ICP_CODE || ''
 // 公安备案号 - 从环境变量读取
-const psbCode = import.meta.env.VITE_PSB_CODE || ''
+const psbCode = ENV.PSB_CODE || ''
 // 版权信息 - 从环境变量读取
-const copyrightYear = import.meta.env.VITE_COPYRIGHT_YEAR || ''
-const copyrightOwner = import.meta.env.VITE_COPYRIGHT_OWNER || ''
+const copyrightYear = ENV.COPYRIGHT_YEAR || ''
+const copyrightOwner = ENV.COPYRIGHT_OWNER || ''
 const copyrightText = copyrightYear && copyrightOwner 
   ? `Copyright © ${copyrightYear}-present ${copyrightOwner}`
   : ''

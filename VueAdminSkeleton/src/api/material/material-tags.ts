@@ -2,14 +2,12 @@ import type { CreateUpdateMaterialTagQueryDto, MaterialTag } from './material-ta
 import type { PaginatedResponse, RequestOption, RestResponse } from '../types/common';
 import createAxios from '@/utils/request';
 
-const BASE_URL = import.meta.env.VITE_SYSTEM_BASE_URL
-
 /**
  * 创建素材 tag
  * @returns 创建的文本素材
  */
 export function createMaterialTag(data: CreateUpdateMaterialTagQueryDto, option?: RequestOption): Promise<MaterialTag> {
-    return createAxios(option).post(`${BASE_URL}/materials/tags/admin`, data);
+    return createAxios(option).post(`/materials/tags/admin`, data);
 }
 
 /**
@@ -17,7 +15,7 @@ export function createMaterialTag(data: CreateUpdateMaterialTagQueryDto, option?
  * @returns 素材 tag 列表
  */
 export function getMaterialTags(option?: RequestOption): RestResponse<PaginatedResponse<MaterialTag>> {
-    return createAxios(option).get(`${BASE_URL}/materials/tags/admin`);
+    return createAxios(option).get(`/materials/tags/admin`);
 }
 
 /**
@@ -25,7 +23,7 @@ export function getMaterialTags(option?: RequestOption): RestResponse<PaginatedR
  * @returns 更新后的素材 tag
  */
 export function updateMaterialTag(id: string, data: CreateUpdateMaterialTagQueryDto, option?: RequestOption): Promise<MaterialTag> {
-    return createAxios(option).put(`${BASE_URL}/materials/tags/admin/${id}`, data);
+    return createAxios(option).put(`/materials/tags/admin/${id}`, data);
 }
 
 /**
@@ -33,5 +31,5 @@ export function updateMaterialTag(id: string, data: CreateUpdateMaterialTagQuery
  * @returns 删除后的素材 tag
  */
 export function deleteMaterialTag(id: string, option?: RequestOption): Promise<MaterialTag> {
-    return createAxios(option).delete(`${BASE_URL}/materials/tags/admin/${id}`)
+    return createAxios(option).delete(`/materials/tags/admin/${id}`)
 }

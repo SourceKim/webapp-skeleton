@@ -91,6 +91,7 @@ import MaterialSelector from '@/components/material/MaterialSelector.vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules, UploadProps } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import { getUploadFileUrl } from '@/utils/file'
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -114,11 +115,9 @@ const formData = reactive({
 
 const locationData = ref({ lng: 0, lat: 0, address: '' })
 
-// 基础URL配置 - 使用环境变量 VITE_UPLOAD_BASE_URL
-const BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || ''
-function getFileUrl(path?: string) {
-    if (!path) return ''
-    return BASE_URL + path
+// 拼接完整的文件URL - 使用统一的工具函数
+function getFileUrl(path?: string): string {
+    return getUploadFileUrl(path) || ''
 }
 
 const rules: FormRules = {

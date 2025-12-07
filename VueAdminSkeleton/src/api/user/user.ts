@@ -5,8 +5,6 @@ import createAxios from '@/utils/request';
 import type { PaginatedResponse, RequestOption, RestResponse } from '../types/common';
 import type { User, CreateUserDto, AdminUpdateUserDto } from '../types/user';
 
-const apiBaseUrl = import.meta.env.VITE_SYSTEM_BASE_URL || '/api/v1';
-
 /**
  * 获取所有用户
  * @param params 查询参数
@@ -14,7 +12,7 @@ const apiBaseUrl = import.meta.env.VITE_SYSTEM_BASE_URL || '/api/v1';
  * @returns 用户列表
  */
 export function getUserList(option?: RequestOption): RestResponse<PaginatedResponse<User>> {
-  return createAxios(option).get(`${apiBaseUrl}/users/admin`);
+  return createAxios(option).get(`/users/admin`);
 }
 
 /**
@@ -24,7 +22,7 @@ export function getUserList(option?: RequestOption): RestResponse<PaginatedRespo
  * @returns 用户信息
  */
 export function getUser(id: string, option?: RequestOption): RestResponse<User> {
-  return createAxios(option).get(`${apiBaseUrl}/users/admin/${id}`);
+  return createAxios(option).get(`/users/admin/${id}`);
 }
 
 /**
@@ -34,7 +32,7 @@ export function getUser(id: string, option?: RequestOption): RestResponse<User> 
  * @returns 创建的用户
  */
 export function createUser(data: CreateUserDto, option?: RequestOption): RestResponse<User> {
-  return createAxios(option).post(`${apiBaseUrl}/users/admin`, data);
+  return createAxios(option).post(`/users/admin`, data);
 }
 
 /**
@@ -45,7 +43,7 @@ export function createUser(data: CreateUserDto, option?: RequestOption): RestRes
  * @returns 更新后的用户
  */
 export function updateUser(id: string, data: AdminUpdateUserDto, option?: RequestOption): RestResponse<User> {
-  return createAxios(option).put(`${apiBaseUrl}/users/admin/${id}`, data);
+  return createAxios(option).put(`/users/admin/${id}`, data);
 }
 
 /**
@@ -55,7 +53,7 @@ export function updateUser(id: string, data: AdminUpdateUserDto, option?: Reques
  * @returns 删除结果
  */
 export function deleteUser(id: string, option?: RequestOption): RestResponse<{ id: string }> {
-  return createAxios(option).delete(`${apiBaseUrl}/users/admin/${id}`);
+  return createAxios(option).delete(`/users/admin/${id}`);
 }
 
 /**
@@ -65,7 +63,7 @@ export function deleteUser(id: string, option?: RequestOption): RestResponse<{ i
  * @returns 删除结果
  */
 export function delUserByIds(ids: string[], option?: RequestOption): RestResponse<{ id: string }> {
-  return createAxios(option).delete(`${apiBaseUrl}/users/admin/batch`, { data: { ids } });
+  return createAxios(option).delete(`/users/admin/batch`, { data: { ids } });
 }
 
 /**
@@ -76,7 +74,7 @@ export function delUserByIds(ids: string[], option?: RequestOption): RestRespons
  * @returns 分配结果
  */
 export function assignRolesToUser(userId: string, roleIds: string[], option?: RequestOption): RestResponse<{ userId: string; roleIds: string[] }> {
-  return createAxios(option).post(`${apiBaseUrl}/users/admin/${userId}/roles`, { roleIds });
+  return createAxios(option).post(`/users/admin/${userId}/roles`, { roleIds });
 }
 
 /**
@@ -85,7 +83,7 @@ export function assignRolesToUser(userId: string, roleIds: string[], option?: Re
  * @returns 用户信息
  */
 export function getCurrentUser(option?: RequestOption): RestResponse<User> {
-  return createAxios(option).get(`${apiBaseUrl}/users/profile`);
+  return createAxios(option).get(`/users/profile`);
 }
 
 /**
@@ -95,5 +93,5 @@ export function getCurrentUser(option?: RequestOption): RestResponse<User> {
  * @returns 更新后的用户信息
  */
 export function updateCurrentUser(data: AdminUpdateUserDto, option?: RequestOption): RestResponse<User> {
-  return createAxios(option).put(`${apiBaseUrl}/users/profile`, data);
+  return createAxios(option).put(`/users/profile`, data);
 } 

@@ -7,11 +7,12 @@ import { useAuthStore } from './auth'
 import type { NavTab } from '@/interface/navTab'
 import { useNavTabStore } from './navTab'
 import { useTitle } from '@vueuse/core'
+import { ENV } from '@/utils/env'
 
 export const useRouterStore = defineStore('router', () => {
 
     // 使用固定的布局路由名称，与 static.ts 中一致
-    const layoutRouteName = import.meta.env.VITE_LAYOUT_ROUTE_NAME
+    const layoutRouteName = ENV.LAYOUT_ROUTE_NAME
     const router = useRouter()
     const navTabs = useNavTabStore().navTabs
 
@@ -69,7 +70,7 @@ export const useRouterStore = defineStore('router', () => {
         const fullPath = guard.fullPath
         const tab = navTabs.find((i: NavTab) => i.fullPath === fullPath)
         // 如果不存在，则添加tab
-        if (!tab && guard.fullPath.startsWith(`/${import.meta.env.VITE_LAYOUT_ROUTE_NAME}/`))
+        if (!tab && guard.fullPath.startsWith(`/${ENV.LAYOUT_ROUTE_NAME}/`))
         navTabs.push({
             title: guard.meta.title as string,
             fullPath: guard.fullPath,
@@ -78,7 +79,7 @@ export const useRouterStore = defineStore('router', () => {
             icon: guard.meta.icon as string
         })
         // 设置浏览器标题
-        let tit = import.meta.env.VITE_TITLE
+        let tit = ENV.TITLE
         if (guard.meta.title) tit = guard.meta.title + '-' + tit
         useTitle(tit)
     })

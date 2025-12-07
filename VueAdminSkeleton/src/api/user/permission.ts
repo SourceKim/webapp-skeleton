@@ -2,14 +2,12 @@ import type { CreateAndUpdatePermissionQueryDto, Permission } from './permission
 import type { PaginatedResponse, RequestOption, RestResponse } from '../types/common';
 import createAxios from '@/utils/request';
 
-const BASE_URL = import.meta.env.VITE_SYSTEM_BASE_URL
-
 /**
  * 创建权限
  * @returns 创建的权限
  */
 export function createPermission(data: CreateAndUpdatePermissionQueryDto, option?: RequestOption): Promise<RestResponse<Permission>> {
-    return createAxios(option).post(`${BASE_URL}/permissions/admin`, data);
+    return createAxios(option).post(`/permissions/admin`, data);
 }
 
 /**
@@ -17,7 +15,7 @@ export function createPermission(data: CreateAndUpdatePermissionQueryDto, option
  * @returns 权限列表
  */
 export function getPermissions(option?: RequestOption): RestResponse<PaginatedResponse<Permission>> {
-    return createAxios(option).get(`${BASE_URL}/permissions/admin`);
+    return createAxios(option).get(`/permissions/admin`);
 }
 
 /**
@@ -27,7 +25,7 @@ export function getPermissions(option?: RequestOption): RestResponse<PaginatedRe
  * @returns 权限详情
  */
 export function getPermission(id: string, option?: RequestOption): Promise<RestResponse<Permission>> {
-    return createAxios(option).get(`${BASE_URL}/permissions/admin/${id}`);
+    return createAxios(option).get(`/permissions/admin/${id}`);
 }
 
 /**
@@ -35,7 +33,7 @@ export function getPermission(id: string, option?: RequestOption): Promise<RestR
  * @returns 更新后的权限
  */
 export function updatePermission(id: string, data: CreateAndUpdatePermissionQueryDto, option?: RequestOption): Promise<RestResponse<Permission>> {
-    return createAxios(option).put(`${BASE_URL}/permissions/admin/${id}`, data);
+    return createAxios(option).put(`/permissions/admin/${id}`, data);
 }
 
 /**
@@ -43,5 +41,5 @@ export function updatePermission(id: string, data: CreateAndUpdatePermissionQuer
  * @returns 删除后的权限
  */
 export function deletePermission(id: string, option?: RequestOption): Promise<RestResponse<Permission>> {
-    return createAxios(option).delete(`${BASE_URL}/permissions/admin/${id}`)
+    return createAxios(option).delete(`/permissions/admin/${id}`)
 }

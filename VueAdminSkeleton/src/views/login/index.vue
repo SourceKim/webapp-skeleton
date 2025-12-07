@@ -57,6 +57,7 @@
   import { useLayoutStore } from '@/stores/layout'
   import { useMenuStore } from '@/stores/menu'
   import { useAuthStore } from '@/stores/auth'
+  import { ENV } from '@/utils/env'
 
   defineOptions({
     name: 'SystemLogin'
@@ -64,7 +65,7 @@
   
   const { t } = useI18n()
   
-  const title = import.meta.env.VITE_TITLE
+  const title = ENV.TITLE
   const layoutStore = useLayoutStore()
   const router = useRouter()
   

@@ -1,4 +1,5 @@
 import Layout from '@/layout/index.vue'
+import { ENV } from '@/utils/env'
 
 export const staticRoutes = [
     {
@@ -14,7 +15,7 @@ export const staticRoutes = [
         }
     },
     {
-        path: '/' + import.meta.env.VITE_LAYOUT_ROUTE_NAME + '/personal-center',
+        path: '/' + ENV.LAYOUT_ROUTE_NAME + '/personal-center',
         name: 'personal-center',
         component: () => import('@/views/personal-center/index.vue'),
         meta: {

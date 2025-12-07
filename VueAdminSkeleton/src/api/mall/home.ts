@@ -1,8 +1,6 @@
 import createAxios from '@/utils/request'
 import type { RequestOption, RestResponse } from '@/api/types/common'
 
-const apiBaseUrl = import.meta.env.VITE_SYSTEM_BASE_URL || '/api/v1'
-
 // --- Carousel API ---
 
 export interface CarouselDTO {
@@ -35,23 +33,23 @@ export interface UpdateCarouselDto {
 }
 
 export const getCarousels = (params?: any, option?: RequestOption): RestResponse<any> => {
-    return createAxios(option).get(`${apiBaseUrl}/mall/carousels`, { params })
+    return createAxios(option).get(`/mall/carousels`, { params })
 }
 
 export const getCarousel = (id: string, option?: RequestOption): RestResponse<CarouselDTO> => {
-    return createAxios(option).get(`${apiBaseUrl}/mall/carousels/${id}`)
+    return createAxios(option).get(`/mall/carousels/${id}`)
 }
 
 export const createCarousel = (data: CreateCarouselDto, option?: RequestOption): RestResponse<CarouselDTO> => {
-    return createAxios(option).post(`${apiBaseUrl}/mall/admin/carousels`, data)
+    return createAxios(option).post(`/mall/admin/carousels`, data)
 }
 
 export const updateCarousel = (id: string, data: UpdateCarouselDto, option?: RequestOption): RestResponse<CarouselDTO> => {
-    return createAxios(option).put(`${apiBaseUrl}/mall/admin/carousels/${id}`, data)
+    return createAxios(option).put(`/mall/admin/carousels/${id}`, data)
 }
 
 export const deleteCarousel = (id: string, option?: RequestOption): RestResponse<void> => {
-    return createAxios(option).delete(`${apiBaseUrl}/mall/admin/carousels/${id}`)
+    return createAxios(option).delete(`/mall/admin/carousels/${id}`)
 }
 
 // --- ShopIntro API ---
@@ -87,14 +85,14 @@ export interface UpdateShopIntroDto {
 }
 
 export const getShopIntro = (option?: RequestOption): RestResponse<ShopIntroDTO> => {
-    return createAxios(option).get(`${apiBaseUrl}/mall/shop-intro`)
+    return createAxios(option).get(`/mall/shop-intro`)
 }
 
 export const updateShopIntro = (data: UpdateShopIntroDto, option?: RequestOption): RestResponse<ShopIntroDTO> => {
-    return createAxios(option).put(`${apiBaseUrl}/mall/admin/shop-intro`, data)
+    return createAxios(option).put(`/mall/admin/shop-intro`, data)
 }
 
 // --- Helper for SPU Selection ---
 export const getSpuList = (params?: any, option?: RequestOption): RestResponse<any> => {
-    return createAxios(option).get(`${apiBaseUrl}/products/spu`, { params })
+    return createAxios(option).get(`/products/spu`, { params })
 }
