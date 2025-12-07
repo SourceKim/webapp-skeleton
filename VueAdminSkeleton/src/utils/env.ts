@@ -47,7 +47,7 @@ export function getEnvOptional(key: string): string | undefined {
  */
 export const ENV = {
   // 基础配置
-  BASE_URL: getEnv('VITE_BASE_URL', '基础 URL（完整地址，包含协议和端口），如 http://localhost:3000'),
+  BASE_URL: getEnv('VITE_BASE_URL', '基础 URL（完整地址，包含协议和端口），如 http://localhost:3000。为空时使用相对路径，避免跨域问题', ''),
   SYSTEM_BASE_URL: getEnv('VITE_SYSTEM_API_PATH', 'API 基础路径（相对路径），如 /api/v1', '/api/v1'),
   UPLOAD_BASE_URL: getEnv('VITE_SYSTEM_UPLOAD_PATH', '上传文件访问路径（相对路径），如 /uploads', '/uploads'),
   SYS_TOKEN_KEY: getEnv('VITE_SYS_TOKEN_KEY', 'Token 存储的 key', 'Authorization'),
