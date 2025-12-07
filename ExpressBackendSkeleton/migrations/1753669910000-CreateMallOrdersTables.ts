@@ -38,7 +38,7 @@ export class CreateMallOrdersTables1753669910000 implements MigrationInterface {
       columns: [
         { name: 'id', type: 'varchar', length: '36', isPrimary: true },
         { name: 'order_id', type: 'varchar', length: '36' },
-        { name: 'sku_id', type: 'varchar', length: '36' },
+        { name: 'sku_id', type: 'varchar', length: '36', isNullable: true }, // 允许为空，因为外键使用 SET NULL
         { name: 'sku_snapshot', type: 'json' },
         { name: 'quantity', type: 'int', default: 1 },
         { name: 'unit_price', type: 'decimal', precision: 10, scale: 2 },
