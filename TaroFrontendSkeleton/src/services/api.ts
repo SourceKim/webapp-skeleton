@@ -1,7 +1,8 @@
 import Taro from '@tarojs/taro'
+import { getApiUrl } from '../utils/env'
 
 // API基础URL
-export const BASE_URL = process.env.TARO_APP_API_URL
+export const BASE_URL = getApiUrl()
 
 // 请求方法类型
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'

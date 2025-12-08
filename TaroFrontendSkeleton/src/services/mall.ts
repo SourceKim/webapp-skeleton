@@ -1,5 +1,6 @@
 import api from './api'
 import { Material } from './material'
+import { getUploadUrl as getEnvUploadUrl } from '../utils/env'
 
 export interface PaginatedMeta {
   total: number
@@ -113,13 +114,12 @@ export interface SkuQueryParams {
 }
 
 export const getUploadUrl = (filePath?: string): string => {
-  if (!filePath) return ''
-  const baseUrl = process.env.TARO_APP_UPLOAD_URL || ''
-  if (!baseUrl) {
-    console.warn('TARO_APP_UPLOAD_URL 未配置，请检查环境变量配置')
+  try {
+    return getEnvUploadUrl(filePath)
+  } catch (error) {
+    console.error('获取上传文件 URL 失败:', error)
     return ''
   }
-  return baseUrl + filePath
 }
 
 /**

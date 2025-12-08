@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+echo "🚀 开始构建 H5 项目..."
+yarn build:h5
+
+echo "📦 开始部署..."
+
+# 检查是否需要 sudo
+if [ -w "/opt/1panel/www/sites/skeleton-web.kimsu.fun/index" ]; then
+    rsync -av --delete dist/ /opt/1panel/www/sites/skeleton-web.kimsu.fun/index/
+else
+    echo "需要管理员权限，使用 sudo..."
+    sudo rsync -av --chown=www-data:www-data --delete dist/ /opt/1panel/www/sites/skeleton-web.kimsu.fun/index/
+fi
+
+echo "✅ 部署完成！"

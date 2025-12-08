@@ -22,7 +22,22 @@ declare namespace NodeJS {
      * @description 若不同环境有不同的小程序，可通过在 env 文件中配置环境变量`TARO_APP_ID`来方便快速切换 appid， 而不必手动去修改 dist/project.config.json 文件
      * @see https://taro-docs.jd.com/docs/next/env-mode-config#特殊环境变量-taro_app_id
      */
-    TARO_APP_ID: string
+    TARO_APP_ID?: string
+    /**
+     * 基础 URL（完整地址，包含协议和端口）
+     * @description 如 http://localhost:3000
+     */
+    TARO_APP_BASE_URL?: string
+    /**
+     * API 基础路径（相对路径）
+     * @description 如 /api/v1
+     */
+    TARO_APP_SYSTEM_API_PATH?: string
+    /**
+     * 上传文件访问路径（相对路径）
+     * @description 如 /uploads
+     */
+    TARO_APP_SYSTEM_UPLOAD_PATH?: string
   }
 }
 
