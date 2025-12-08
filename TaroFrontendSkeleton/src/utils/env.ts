@@ -8,6 +8,18 @@
  */
 
 /**
+ * 获取环境变量对象（兼容浏览器和 Node.js 环境）
+ */
+function getProcessEnv(): Record<string, string | undefined> {
+  // 浏览器环境：使用全局 process.env（由 Vite define 注入）或空对象
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env
+  }
+  // 如果 process 不存在，返回空对象（会在构建时被 Vite define 替换）
+  return (typeof process !== 'undefined' ? (process as any).env : {}) as Record<string, string | undefined>
+}
+
+/**
  * 获取环境变量，如果未赋值则直接报错
  * @param key 环境变量键名
  * @param description 环境变量的描述信息（用于错误提示）
@@ -16,7 +28,8 @@
  * @throws Error 如果环境变量未设置且没有默认值
  */
 export function getEnv(key: string, description?: string, defaultValue?: string): string {
-  const value = process.env[key]
+  const env = getProcessEnv()
+  const value = env[key]
   
   if (value === undefined || value === '') {
     if (defaultValue !== undefined) {
@@ -39,7 +52,8 @@ export function getEnv(key: string, description?: string, defaultValue?: string)
  * @returns 环境变量的值或 undefined
  */
 export function getEnvOptional(key: string): string | undefined {
-  const value = process.env[key]
+  const env = getProcessEnv()
+  const value = env[key]
   return value === '' ? undefined : value
 }
 

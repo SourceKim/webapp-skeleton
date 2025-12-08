@@ -10,6 +10,30 @@ export default defineConfig<'vite'>(async (merge) => {
   // 动态导入 ES Module 插件，避免被 TS 转译为 require()
   const vue = (await eval('import("@vitejs/plugin-vue")')).default
 
+  // 获取环境变量，构建时注入到 process.env
+  const getEnvVars = () => {
+    const envVars: Record<string, string> = {}
+    // 读取所有以 TARO_APP_ 开头的环境变量
+    Object.keys(process.env).forEach((key) => {
+      if (key.startsWith('TARO_APP_')) {
+        envVars[key] = process.env[key] || ''
+      }
+    })
+    return envVars
+  }
+
+  const envVars = getEnvVars()
+  
+  // 创建 define 对象，用于 Vite 构建时替换
+  const define: Record<string, string> = {
+    'process.env': JSON.stringify(envVars)
+  }
+  
+  // 为每个环境变量单独定义，确保可以正常访问
+  Object.keys(envVars).forEach((key) => {
+    define[`process.env.${key}`] = JSON.stringify(envVars[key])
+  })
+
   const baseConfig: UserConfigExport<'vite'> = {
     projectName: 'taro-frontend-skeleton',
     date: '2025-3-10',
@@ -79,7 +103,19 @@ export default defineConfig<'vite'>(async (merge) => {
               isCustomElement: (tag: string) => tag === 'view' || tag === 'text' || tag === 'image'
             }
           }
-        })
+        }),
+        // 自定义插件：定义 process.env 供浏览器环境使用
+        {
+          name: 'define-process-env',
+          config(config) {
+            // 在配置阶段添加 define
+            if (!config.define) {
+              config.define = {}
+            }
+            Object.assign(config.define, define)
+            return config
+          }
+        }
       ],
       postcss: {
         autoprefixer: {
