@@ -1,7 +1,8 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, MaxLength, IsUrl } from 'class-validator';
 import { BaseDTO } from '@/modules/common/common.dto';
 import { ProductBrandStatus } from './product-brand.model';
+import { convertEnabledStatusToChinese } from '@/utils/status.util';
 
 export class ProductBrandDTO extends BaseDTO {
     @Expose()
@@ -17,7 +18,8 @@ export class ProductBrandDTO extends BaseDTO {
     website?: string;
 
     @Expose()
-    status: ProductBrandStatus = ProductBrandStatus.ENABLED;
+    @Transform(({ value }) => convertEnabledStatusToChinese(value))
+    status: string = ProductBrandStatus.ENABLED;
 }
 
 export class CreateProductBrandDto {

@@ -1,8 +1,9 @@
-import { Expose, Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, MaxLength, IsInt, Min } from 'class-validator';
 import { BaseDTO } from '@/modules/common/common.dto';
 import { ProductCategoryStatus } from './product-category.model';
 import { MaterialDTO } from '@/modules/material/material.dto';
+import { convertEnabledStatusToChinese } from '@/utils/status.util';
 
 export class ProductCategoryDTO extends BaseDTO {
     @Expose()
@@ -31,7 +32,8 @@ export class ProductCategoryDTO extends BaseDTO {
     brand_name?: string;
 
     @Expose()
-    status: ProductCategoryStatus = ProductCategoryStatus.ENABLED;
+    @Transform(({ value }) => convertEnabledStatusToChinese(value))
+    status: string = ProductCategoryStatus.ENABLED;
 }
 
 export class CreateProductCategoryDto {

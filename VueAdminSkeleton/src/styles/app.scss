@@ -31,6 +31,7 @@ body {
   //--el-table-border-color: var(--el-border-color);
   --el-table-header-bg-color: var(--el-color-primary-light-9);
   --el-table-header-text-color: var(--el-text-color-regular);
+  width: 100% !important;
 
   thead.is-group th.el-table__cell {
     background: var(--el-table-header-bg-color);

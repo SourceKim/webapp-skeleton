@@ -2,6 +2,7 @@ import { Expose, Transform } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsNumberString, IsOptional, IsString, MaxLength } from 'class-validator';
 import { BaseDTO } from '@/modules/common/common.dto';
 import { ProductSkuStatus } from './product-sku.model';
+import { convertSkuStatusToChinese } from '@/utils/status.util';
 
 export class ProductSkuDTO extends BaseDTO {
     @Expose() spu_id!: string;
@@ -11,7 +12,9 @@ export class ProductSkuDTO extends BaseDTO {
     @Expose() original_price?: string;
     @Expose() cost_price?: string;
     @Expose() stock!: number;
-    @Expose() status!: ProductSkuStatus;
+    @Expose()
+    @Transform(({ value }) => convertSkuStatusToChinese(value))
+    status!: string;
     @Expose() is_default!: boolean;
     @Expose() attributes?: Array<{ key_id: string; value_id: string; key_name?: string; value?: string }>;
 }

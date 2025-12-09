@@ -1,8 +1,9 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, MaxLength, IsArray } from 'class-validator';
 import { BaseDTO } from '@/modules/common/common.dto';
 import { ProductSpuStatus } from './product-spu.model';
 import { MaterialDTO } from '@/modules/material/material.dto';
+import { convertSpuStatusToChinese } from '@/utils/status.util';
 
 import { ProductCategoryDTO } from '../category/product-category.dto';
 import { ProductBrandDTO } from '../brand/product-brand.dto';
@@ -30,7 +31,8 @@ export class ProductSpuDTO extends BaseDTO {
     brand?: ProductBrandDTO;
 
     @Expose()
-    status: ProductSpuStatus = ProductSpuStatus.DRAFT;
+    @Transform(({ value }) => convertSpuStatusToChinese(value))
+    status: string = ProductSpuStatus.DRAFT;
 
     @Expose()
     main_material_id?: string;

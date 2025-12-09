@@ -21,7 +21,8 @@
               v-bind="tableParam"
               ref="tableRef"
               :class="tableViewClass"
-              :data="props.data">
+              :data="props.data"
+              style="width: 100%">
               <template #default>
                 <template v-for="column in props.sortedTableColumns" :key="column._id">
                     <!-- 隐藏列不渲染 -->

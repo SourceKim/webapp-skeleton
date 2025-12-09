@@ -7,7 +7,7 @@ export interface ProductSku {
   original_price?: string | null
   cost_price?: string | null
   stock: number
-  status: 'ON_SHELF' | 'OFF_SHELF'
+  status: string // 后端返回中文：上架、下架
   is_default: boolean
   attributes?: Array<{ key_id: string; value_id: string; key_name?: string; value?: string }>
   created_at?: string | Date

@@ -93,7 +93,13 @@ async function fetchRoot() {
     params.parent_id = null
     const res: any = await getCategories(params)
     if (res?.code === 0) {
-      rootData.value = (res.data?.items || []).map((i: any) => ({ ...i, hasChildren: true }))
+      // 检查每个根分类是否有子分类
+      const items = await Promise.all((res.data?.items || []).map(async (i: any) => {
+        const childrenRes: any = await getCategories({ parent_id: i.id })
+        const hasChildren = (childrenRes?.code === 0 && childrenRes.data?.items?.length > 0) || false
+        return { ...i, hasChildren }
+      }))
+      rootData.value = items
     }
   }
 }
@@ -109,7 +115,13 @@ async function loadChildren(row: any, _treeNode: any, resolve: (data: ProductCat
   const parent = row
   const res: any = await getCategories({ parent_id: parent.id })
   const list = (res?.code === 0 ? res.data?.items : []) || []
-  resolve(list.map((i: any) => ({ ...i, hasChildren: true })))
+  // 检查每个子分类是否还有子分类
+  const items = await Promise.all(list.map(async (i: any) => {
+    const childrenRes: any = await getCategories({ parent_id: i.id })
+    const hasChildren = (childrenRes?.code === 0 && childrenRes.data?.items?.length > 0) || false
+    return { ...i, hasChildren }
+  }))
+  resolve(items)
 }
 
 async function del(r: ProductCategory) {

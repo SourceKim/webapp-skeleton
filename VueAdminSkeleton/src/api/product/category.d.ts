@@ -10,7 +10,7 @@ export interface ProductCategory {
   material?: Material
   brand_id?: string
   brand_name?: string
-  status: 'ENABLED' | 'DISABLED'
+  status: string // 后端返回中文：启用、禁用
   createdAt?: string | Date
   updatedAt?: string | Date
 }

@@ -50,7 +50,7 @@
                 <el-descriptions-item label="标题">{{ spu?.name || '-' }}</el-descriptions-item>
                 <el-descriptions-item label="副标题">{{ spu?.sub_title || '-' }}</el-descriptions-item>
                 <el-descriptions-item label="状态">
-                   <el-tag :type="spu?.status === 'ON_SHELF' ? 'success' : 'info'">{{ spu?.status }}</el-tag>
+                   <el-tag :type="spu?.status === '上架' ? 'success' : 'info'">{{ spu?.status }}</el-tag>
                 </el-descriptions-item>
                 <el-descriptions-item label="分类">{{ spu?.category?.name || '-' }}</el-descriptions-item>
                 <el-descriptions-item label="品牌">{{ spu?.brand?.name || '-' }}</el-descriptions-item>
@@ -150,7 +150,12 @@
             </el-table-column>
             <el-table-column label="状态" width="120">
               <template #default="{ row }">
-                <el-select v-model="row.status" size="small" style="width:110px" @change="saveRow(row)">
+                <el-select 
+                  :model-value="getStatusValue(row.status)" 
+                  @update:model-value="(val) => { row.status = val; saveRow(row) }"
+                  size="small" 
+                  style="width:110px"
+                >
                   <el-option label="上架" value="ON_SHELF" />
                   <el-option label="下架" value="OFF_SHELF" />
                 </el-select>
@@ -337,14 +342,41 @@ async function fetchSku() {
   skuList.value = (res?.code === 0 ? res.data?.items : []) || []
 }
 
+// 状态转换：中文转英文（用于提交）
+function convertStatusToEnglish(status: string): 'ON_SHELF' | 'OFF_SHELF' {
+  const statusMap: Record<string, 'ON_SHELF' | 'OFF_SHELF'> = {
+    '上架': 'ON_SHELF',
+    '下架': 'OFF_SHELF',
+  }
+  return statusMap[status] || (status as 'ON_SHELF' | 'OFF_SHELF')
+}
+
+// 状态转换：英文转中文（用于显示）
+function convertStatusToChinese(status: string): string {
+  const statusMap: Record<string, string> = {
+    'ON_SHELF': '上架',
+    'OFF_SHELF': '下架',
+  }
+  return statusMap[status] || status
+}
+
+// 获取状态下拉框的值（如果是中文则转换为英文）
+function getStatusValue(status: string): 'ON_SHELF' | 'OFF_SHELF' {
+  if (status === '上架') return 'ON_SHELF'
+  if (status === '下架') return 'OFF_SHELF'
+  return status as 'ON_SHELF' | 'OFF_SHELF'
+}
+
 async function saveRow(row: ProductSku) {
   const payload: UpdateProductSkuDto = {
     price: row.price,
     stock: row.stock,
-    status: row.status,
+    status: convertStatusToEnglish(row.status),
     sku_name: row.sku_name,
   }
   await updateSku(row.id, payload)
+  // 重新加载数据以获取最新的中文状态
+  await fetchSku()
 }
 
 async function delRow(row: ProductSku) {

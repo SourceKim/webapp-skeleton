@@ -4,7 +4,7 @@ export interface ProductBrand {
   description?: string
   material_id?: string
   website?: string
-  status: 'ENABLED' | 'DISABLED'
+  status: string // 后端返回中文：启用、禁用
   createdAt?: string | Date
   updatedAt?: string | Date
 }

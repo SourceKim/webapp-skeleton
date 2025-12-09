@@ -9,7 +9,7 @@ export interface ProductSpu {
   category?: { name: string }
   brand_id?: string
   brand?: { name: string }
-  status: 'DRAFT' | 'ON_SHELF' | 'OFF_SHELF'
+  status: string // 后端返回中文：草稿、上架、下架
   main_material_id?: string
   main_material?: Material
   sub_materials?: Material[]
