@@ -7,7 +7,7 @@
       :autoplay="true" 
       :interval="5000" 
       :duration="500"
-      circular
+      :circular="banners.length > 1"
     >
       <swiper-item v-for="(item, idx) in banners" :key="item.id" @tap="handleBannerClick(item)">
         <image :src="getBannerUrl(item)" class="slide-image" mode="aspectFill" />

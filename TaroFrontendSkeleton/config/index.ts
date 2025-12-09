@@ -113,6 +113,22 @@ export default defineConfig<'vite'>(async (merge) => {
               config.define = {}
             }
             Object.assign(config.define, define)
+            
+            // 配置 optimizeDeps，排除 core-js-pure 避免 ESM 导入问题
+            if (!config.optimizeDeps) {
+              config.optimizeDeps = {}
+            }
+            if (!config.optimizeDeps.exclude) {
+              config.optimizeDeps.exclude = []
+            }
+            // 排除所有 core-js 相关模块
+            const coreJsModules = ['core-js-pure', 'core-js', '@babel/runtime']
+            coreJsModules.forEach(module => {
+              if (!config.optimizeDeps.exclude.includes(module)) {
+                config.optimizeDeps.exclude.push(module)
+              }
+            })
+            
             return config
           }
         }

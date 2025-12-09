@@ -7,7 +7,12 @@
     </nut-navbar>
 
     <!-- 1. 头图占满，不留白 -->
-    <swiper class="gallery" circular indicator-dots v-if="images.length">
+    <swiper 
+      class="gallery" 
+      :circular="images.length > 1" 
+      indicator-dots 
+      v-if="images.length"
+    >
       <swiper-item v-for="(img, idx) in images" :key="idx" class="gallery-item">
         <image :src="img" mode="aspectFill" />
       </swiper-item>

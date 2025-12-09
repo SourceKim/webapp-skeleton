@@ -10,7 +10,7 @@
         :indicator-dots="true" 
         :autoplay="true" 
         :interval="4000" 
-        circular
+        :circular="info.banners.length > 1"
       >
         <swiper-item v-for="(banner, idx) in info.banners" :key="idx">
           <image :src="getBannerUrl(banner)" class="slide-image" mode="aspectFill" />
