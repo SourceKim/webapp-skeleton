@@ -1,6 +1,6 @@
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from '@/modules/common/base.model';
-import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsString, MaxLength } from 'class-validator';
 import { ProductAttributeKey } from './product-attribute-key.model';
 import { Material } from '@/modules/material/material.model';
 
@@ -23,11 +23,6 @@ export class ProductAttributeValue extends BaseEntity {
     @ManyToOne(() => Material, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'image_id' })
     image?: Material | null;
-
-    @Column({ type: 'varchar', length: 7, nullable: true })
-    @IsOptional()
-    @IsString()
-    color_hex?: string | null;
 }
 
 

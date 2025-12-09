@@ -93,7 +93,6 @@
               <el-table :data="k.values || []" style="width:100%" size="small">
                 <el-table-column prop="value" label="值" width="180" />
                 <el-table-column prop="value_id" label="值ID" width="200" />
-                <el-table-column prop="color_hex" label="颜色" width="120" />
                 <el-table-column label="操作" width="200" align="center">
                   <template #default="{ row }">
                     <el-button size="small" @click="openValueDialog(k.id, row)">编辑</el-button>
@@ -213,15 +212,10 @@
     <el-dialog :title="keyForm.id ? '编辑属性键' : '新增属性键'" v-model="keyVisible" width="40%" append-to-body>
     <el-form :model="keyForm" label-width="90px">
       <el-form-item label="名称"><el-input v-model="keyForm.name" /></el-form-item>
-      <el-form-item label="键名"><el-input v-model="keyForm.key" /></el-form-item>
-      <el-form-item label="类型">
-        <el-select v-model="keyForm.type" style="width: 200px">
-          <el-option label="TEXT" value="TEXT" />
-          <el-option label="COLOR" value="COLOR" />
-          <el-option label="IMAGE" value="IMAGE" />
-        </el-select>
-      </el-form-item>
       <el-form-item label="必选"><el-switch v-model="keyForm.required" /></el-form-item>
+      <el-alert v-if="keyForm.key" type="info" :closable="false" style="margin-top: 10px;">
+        <template #title>键名：{{ keyForm.key }}（由系统自动生成）</template>
+      </el-alert>
     </el-form>
     <template #footer>
       <el-button @click="keyVisible=false">取消</el-button>
@@ -232,8 +226,9 @@
   <el-dialog :title="valForm.id ? '编辑属性值' : '新增属性值'" v-model="valVisible" width="40%" append-to-body>
     <el-form :model="valForm" label-width="90px">
       <el-form-item label="值"><el-input v-model="valForm.value" /></el-form-item>
-      <el-form-item label="值ID"><el-input v-model="valForm.value_id" /></el-form-item>
-      <el-form-item label="颜色"><el-input v-model="valForm.color_hex" placeholder="#000000" /></el-form-item>
+      <el-alert v-if="valForm.value_id" type="info" :closable="false" style="margin-top: 10px;">
+        <template #title>值ID：{{ valForm.value_id }}（由系统自动生成）</template>
+      </el-alert>
     </el-form>
     <template #footer>
       <el-button @click="valVisible=false">取消</el-button>
@@ -442,15 +437,15 @@ async function generateDefaultSku() {
 
 // 属性键/值管理
 const keyVisible = ref(false)
-const keyForm = ref<{ id?: string; name: string; key: string; type: 'TEXT'|'COLOR'|'IMAGE'; required: boolean }>({ name: '', key: '', type: 'TEXT', required: false })
+const keyForm = ref<{ id?: string; name: string; key: string; required: boolean }>({ name: '', key: '', required: false })
 function openKeyDialog(k?: ProductAttributeKey) {
-  keyForm.value = k ? { id: k.id, name: k.name, key: k.key, type: k.type as any, required: k.required } : { name: '', key: '', type: 'TEXT', required: false }
+  keyForm.value = k ? { id: k.id, name: k.name, key: k.key, required: k.required } : { name: '', key: '', required: false }
   keyVisible.value = true
 }
 async function saveKey() {
   if (!spuId.value) return
-  if (keyForm.value.id) await updateAttributeKey(keyForm.value.id, { name: keyForm.value.name, key: keyForm.value.key, type: keyForm.value.type, required: keyForm.value.required })
-  else await createAttributeKey({ spu_id: spuId.value, name: keyForm.value.name, key: keyForm.value.key, type: keyForm.value.type, required: keyForm.value.required })
+  if (keyForm.value.id) await updateAttributeKey(keyForm.value.id, { name: keyForm.value.name, required: keyForm.value.required })
+  else await createAttributeKey({ spu_id: spuId.value, name: keyForm.value.name, required: keyForm.value.required })
   keyVisible.value = false
   const ar: any = await getAttributeKeys(spuId.value)
   attrKeys.value = (ar?.code === 0 ? ar.data : []) || []
@@ -464,14 +459,14 @@ async function removeKey(id: string) {
 }
 
 const valVisible = ref(false)
-const valForm = ref<{ id?: string; attribute_key_id: string; value: string; value_id: string; color_hex?: string }>({ attribute_key_id: '', value: '', value_id: '' })
+const valForm = ref<{ id?: string; attribute_key_id: string; value: string; value_id: string }>({ attribute_key_id: '', value: '', value_id: '' })
 function openValueDialog(attribute_key_id: string, v?: any) {
-  valForm.value = v ? { id: v.id, attribute_key_id, value: v.value, value_id: v.value_id, color_hex: v.color_hex } : { attribute_key_id, value: '', value_id: '' }
+  valForm.value = v ? { id: v.id, attribute_key_id, value: v.value, value_id: v.value_id } : { attribute_key_id, value: '', value_id: '' }
   valVisible.value = true
 }
 async function saveValue() {
-  if (valForm.value.id) await updateAttributeValue(valForm.value.id, { value: valForm.value.value, value_id: valForm.value.value_id, color_hex: valForm.value.color_hex })
-  else await createAttributeValue({ attribute_key_id: valForm.value.attribute_key_id, value: valForm.value.value, value_id: valForm.value.value_id, color_hex: valForm.value.color_hex })
+  if (valForm.value.id) await updateAttributeValue(valForm.value.id, { value: valForm.value.value })
+  else await createAttributeValue({ attribute_key_id: valForm.value.attribute_key_id, value: valForm.value.value })
   valVisible.value = false
   const ar: any = await getAttributeKeys(spuId.value)
   attrKeys.value = (ar?.code === 0 ? ar.data : []) || []
