@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware } from '@/middlewares/auth.middleware';
-import { adminMiddleware } from '@/middlewares/admin.middleware';
+import { roleMiddleware } from '@/middlewares/role.middleware';
+import { ADMIN_ROLE_NAMES } from '@/constants/role.constants';
 import { paginationQuery } from '@/middlewares/paginationQuery';
 import { paginationResponse } from '@/middlewares/paginationResponse';
 import { ProductSkuController } from './product-sku.controller';
@@ -13,7 +14,7 @@ router.use(authMiddleware);
 router.get('/sku', paginationQuery(), paginationResponse, controller.list);
 router.get('/sku/:id', controller.detail);
 
-router.use('/sku/admin', adminMiddleware);
+router.use('/sku/admin', roleMiddleware(ADMIN_ROLE_NAMES));
 router.post('/sku/admin', controller.create);
 router.put('/sku/admin/:id', controller.update);
 router.delete('/sku/admin/:id', controller.remove);

@@ -1,14 +1,15 @@
 import { Router } from 'express';
 import { MaterialTagController } from './material-tag.controller';
 import { authMiddleware } from '@/middlewares/auth.middleware';
-import { adminMiddleware } from '@/middlewares/admin.middleware';
+import { roleMiddleware } from '@/middlewares/role.middleware';
+import { ADMIN_ROLE_NAMES } from '@/constants/role.constants';
 import { paginationQuery } from '@/middlewares/paginationQuery';
 import { paginationResponse } from '@/middlewares/paginationResponse';
 
 const router = Router();
 const controller = new MaterialTagController();
 router.use(authMiddleware);
-router.use(adminMiddleware);
+router.use(roleMiddleware(ADMIN_ROLE_NAMES));
 
 // 管理员分类管理API - CRUD
 router.get('/admin/', paginationQuery(), paginationResponse, controller.findAllMaterialTags);

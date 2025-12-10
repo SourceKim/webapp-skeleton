@@ -7,7 +7,7 @@ import { logDebug, logError } from '@/utils/logger';
  * @param requiredRoles 需要的角色列表，用户至少需要拥有其中一个角色
  * @returns 中间件函数
  */
-export const roleMiddleware = (requiredRoles: string[]) => {
+export const roleMiddleware = (requiredRoles: readonly string[]) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       // 检查是否需要角色验证
@@ -43,9 +43,12 @@ export const roleMiddleware = (requiredRoles: string[]) => {
 
       if (!hasRequiredRole) {
         logError(`用户 ${req.user.id} 尝试访问需要角色 ${requiredRoles.join(', ')} 的接口但没有权限`);
+        // 如果是管理员角色检查，使用更友好的消息
+        const isAdminCheck = requiredRoles.includes('super_admin') || requiredRoles.includes('admin');
+        const errorMessage = isAdminCheck ? '没有管理员权限' : '没有足够的角色权限执行此操作';
         res.status(403).json({
           code: 403,
-          message: '没有足够的角色权限执行此操作',
+          message: errorMessage,
           data: null
         });
         return;

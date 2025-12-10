@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { CarouselController } from './carousel.controller';
 import { authMiddleware } from '../../../middlewares/auth.middleware';
-import { adminMiddleware } from '../../../middlewares/admin.middleware';
+import { roleMiddleware } from '../../../middlewares/role.middleware';
+import { ADMIN_ROLE_NAMES } from '../../../constants/role.constants';
 import { paginationQuery } from '../../../middlewares/paginationQuery';
 import { paginationResponse } from '../../../middlewares/paginationResponse';
 
@@ -25,21 +26,21 @@ router.get(
 router.post(
     '/admin/carousels',
     authMiddleware,
-    adminMiddleware,
+    roleMiddleware(ADMIN_ROLE_NAMES),
     controller.createCarousel
 );
 
 router.put(
     '/admin/carousels/:id',
     authMiddleware,
-    adminMiddleware,
+    roleMiddleware(ADMIN_ROLE_NAMES),
     controller.updateCarousel
 );
 
 router.delete(
     '/admin/carousels/:id',
     authMiddleware,
-    adminMiddleware,
+    roleMiddleware(ADMIN_ROLE_NAMES),
     controller.deleteCarousel
 );
 

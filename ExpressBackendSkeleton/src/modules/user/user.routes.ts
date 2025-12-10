@@ -1,7 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { UserController } from '@/modules/user/user.controller';
 import { authMiddleware } from '@/middlewares/auth.middleware';
-import { adminMiddleware } from '@/middlewares/admin.middleware';
+import { roleMiddleware } from '@/middlewares/role.middleware';
+import { ADMIN_ROLE_NAMES } from '@/constants/role.constants';
 import { paginationQuery } from '@/middlewares/paginationQuery';
 import { paginationResponse } from '@/middlewares/paginationResponse';
 
@@ -26,7 +27,7 @@ router.get('/stats', authMiddleware, userController.getStats); // 获取用户�
 router.put('/profile/:id', authMiddleware, ensureSelf, userController.updateUser); // 更新当前用户信息（由前端传入 id）
 
 // 管理员 API - 需要管理员权限
-router.use('/admin', authMiddleware, adminMiddleware);
+router.use('/admin', authMiddleware, roleMiddleware(ADMIN_ROLE_NAMES));
 
 router.get('/admin', paginationQuery(), paginationResponse, userController.getUsers); // 获取所有用户
 router.get('/admin/:id', userController.getUser); // 获取指定用户

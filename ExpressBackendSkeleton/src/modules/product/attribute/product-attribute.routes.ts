@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware } from '@/middlewares/auth.middleware';
-import { adminMiddleware } from '@/middlewares/admin.middleware';
+import { roleMiddleware } from '@/middlewares/role.middleware';
+import { ADMIN_ROLE_NAMES } from '@/constants/role.constants';
 import { ProductAttributeController } from './product-attribute.controller';
 
 const router = Router();
@@ -12,7 +13,7 @@ router.use(authMiddleware);
 router.get('/attributes/keys', controller.listKeysBySpu);
 
 // 管理员操作
-router.use('/attributes/admin', adminMiddleware);
+router.use('/attributes/admin', roleMiddleware(ADMIN_ROLE_NAMES));
 router.post('/attributes/admin/keys', controller.createKey);
 router.put('/attributes/admin/keys/:id', controller.updateKey);
 router.delete('/attributes/admin/keys/:id', controller.deleteKey);

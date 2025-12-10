@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '@/configs/database.config';
 import { Cart } from './cart.model';
 import { ProductSku } from '@/modules/product/sku/product-sku.model';
-import { HttpException } from '@/exceptions/HttpException';
+import { HttpException } from '@/exceptions/http.exception';
 import { nanoid } from 'nanoid';
 
 export class CartService {

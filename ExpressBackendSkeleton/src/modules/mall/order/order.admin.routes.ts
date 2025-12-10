@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware } from '@/middlewares/auth.middleware';
-import { adminMiddleware } from '@/middlewares/admin.middleware';
+import { roleMiddleware } from '@/middlewares/role.middleware';
+import { ADMIN_ROLE_NAMES } from '@/constants/role.constants';
 import { paginationQuery } from '@/middlewares/paginationQuery';
 import { paginationResponse } from '@/middlewares/paginationResponse';
 import { AppDataSource } from '@/configs/database.config';
@@ -10,9 +11,9 @@ import { HttpException } from '@/exceptions/http.exception';
 const router = Router();
 
 // 移除全局 use，防止污染挂载路径下的其他路由
-// router.use(authMiddleware, adminMiddleware);
+// router.use(authMiddleware, roleMiddleware(ADMIN_ROLE_NAMES));
 
-router.get('/admin/orders', authMiddleware, adminMiddleware, paginationQuery(), paginationResponse, async (req, res) => {
+router.get('/admin/orders', authMiddleware, roleMiddleware(ADMIN_ROLE_NAMES), paginationQuery(), paginationResponse, async (req, res) => {
   const repo = AppDataSource.getRepository(MallOrder);
   const { page, limit, sort_by, sort_order, filters } = req.pagination;
 
@@ -36,7 +37,7 @@ router.get('/admin/orders', authMiddleware, adminMiddleware, paginationQuery(), 
   res.pagination(items, total);
 });
 
-router.get('/admin/orders/:id', authMiddleware, adminMiddleware, async (req, res) => {
+router.get('/admin/orders/:id', authMiddleware, roleMiddleware(ADMIN_ROLE_NAMES), async (req, res) => {
   const repo = AppDataSource.getRepository(MallOrder);
   const order = await repo.findOne({
     where: { id: req.params.id },
@@ -53,7 +54,7 @@ router.get('/admin/orders/:id', authMiddleware, adminMiddleware, async (req, res
 });
 
 // 发货
-router.put('/admin/orders/:id/delivery', authMiddleware, adminMiddleware, async (req, res) => {
+router.put('/admin/orders/:id/delivery', authMiddleware, roleMiddleware(ADMIN_ROLE_NAMES), async (req, res) => {
   const repo = AppDataSource.getRepository(MallOrder);
   const order = await repo.findOne({ where: { id: req.params.id } });
   if (!order) throw new HttpException(404, 'Order not found');
@@ -70,7 +71,7 @@ router.put('/admin/orders/:id/delivery', authMiddleware, adminMiddleware, async 
 });
 
 // 更新状态
-router.put('/admin/orders/:id/status', authMiddleware, adminMiddleware, async (req, res) => {
+router.put('/admin/orders/:id/status', authMiddleware, roleMiddleware(ADMIN_ROLE_NAMES), async (req, res) => {
     const repo = AppDataSource.getRepository(MallOrder);
     const order = await repo.findOne({ where: { id: req.params.id } });
     if (!order) throw new HttpException(404, 'Order not found');

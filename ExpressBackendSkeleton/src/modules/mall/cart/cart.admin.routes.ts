@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware } from '@/middlewares/auth.middleware';
-import { adminMiddleware } from '@/middlewares/admin.middleware';
+import { roleMiddleware } from '@/middlewares/role.middleware';
+import { ADMIN_ROLE_NAMES } from '@/constants/role.constants';
 import { paginationQuery } from '@/middlewares/paginationQuery';
 import { paginationResponse } from '@/middlewares/paginationResponse';
 import { AppDataSource } from '@/configs/database.config';
@@ -9,9 +10,9 @@ import { Cart } from './cart.model';
 const router = Router();
 
 // 管理端购物车列表（分页）
-// router.use(authMiddleware, adminMiddleware); 移除全局使用
+// router.use(authMiddleware, roleMiddleware(ADMIN_ROLE_NAMES)); 移除全局使用
 
-router.get('/admin/carts', authMiddleware, adminMiddleware, paginationQuery(), paginationResponse, async (req, res) => {
+router.get('/admin/carts', authMiddleware, roleMiddleware(ADMIN_ROLE_NAMES), paginationQuery(), paginationResponse, async (req, res) => {
   const repo = AppDataSource.getRepository(Cart);
   const { page, limit, sort_by, sort_order, filters } = req.pagination;
 

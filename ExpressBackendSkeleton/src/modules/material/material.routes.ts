@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { MaterialController } from '@/modules/material/material.controller';
 import { authMiddleware } from '@/middlewares/auth.middleware';
-import { adminMiddleware } from '@/middlewares/admin.middleware';
+import { roleMiddleware } from '@/middlewares/role.middleware';
+import { ADMIN_ROLE_NAMES } from '@/constants/role.constants';
 import materialCategoryRoutes from '@/modules/material/mateial-category/material-category.routes';
 import materialTagRoutes from './mateial-tag/material-tag.routes';
 import { paginationQuery } from '@/middlewares/paginationQuery';
@@ -17,7 +18,7 @@ router.use(authMiddleware);
 router.post('/upload', controller.uploadMaterial);
 
 // 管理员接口
-router.use('/admin', adminMiddleware);
+router.use('/admin', roleMiddleware(ADMIN_ROLE_NAMES));
 router.post('/admin/upload', controller.uploadMaterial); // 兼容旧路径：管理员上传
 router.get('/admin/', paginationQuery(), paginationResponse, controller.getMaterials);
 router.get('/admin/:id', controller.getMaterialById); // 获取单个素材

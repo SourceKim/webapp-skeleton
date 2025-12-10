@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware } from '@/middlewares/auth.middleware';
-import { adminMiddleware } from '@/middlewares/admin.middleware';
+import { roleMiddleware } from '@/middlewares/role.middleware';
+import { ADMIN_ROLE_NAMES } from '@/constants/role.constants';
 import { paginationQuery } from '@/middlewares/paginationQuery';
 import { paginationResponse } from '@/middlewares/paginationResponse';
 import { UserAddressController } from './user-address.controller';
@@ -12,7 +13,7 @@ const controller = new UserAddressController();
 router.use(authMiddleware);
 
 // 管理端：需管理员（注意顺序，需在参数路由前注册）
-router.use('/admin', adminMiddleware);
+router.use('/admin', roleMiddleware(ADMIN_ROLE_NAMES));
 router.get('/admin', paginationQuery(), paginationResponse, controller.adminList);
 router.get('/admin/:id', controller.adminDetail);
 router.put('/admin/:id', controller.adminUpdate);

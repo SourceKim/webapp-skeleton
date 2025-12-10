@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { PermissionController } from '@/modules/permission/permission.controller';
 import { authMiddleware } from '@/middlewares/auth.middleware';
-import { adminMiddleware } from '@/middlewares/admin.middleware';
+import { roleMiddleware } from '@/middlewares/role.middleware';
+import { ADMIN_ROLE_NAMES } from '@/constants/role.constants';
 import { paginationQuery } from '@/middlewares/paginationQuery';
 import { paginationResponse } from '@/middlewares/paginationResponse';
 
@@ -9,7 +10,7 @@ const router = Router();
 const controller = new PermissionController();
 
 // 权限相关路由 - 需要认证和管理员权限
-router.use(authMiddleware, adminMiddleware);
+router.use(authMiddleware, roleMiddleware(ADMIN_ROLE_NAMES));
 
 // 权限管理路由
 router.get('/admin', paginationQuery(), paginationResponse, controller.findAllPermissions);

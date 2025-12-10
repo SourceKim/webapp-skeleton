@@ -5,7 +5,7 @@ import { Cart } from '@/modules/mall/cart/cart.model';
 import { ProductSku } from '@/modules/product/sku/product-sku.model';
 import { UserAddress } from '@/modules/user/address/user-address.model';
 import { nanoid } from 'nanoid';
-import { HttpException } from '@/exceptions/HttpException';
+import { HttpException } from '@/exceptions/http.exception';
 
 export class OrderService {
   private orderRepo: Repository<MallOrder> = AppDataSource.getRepository(MallOrder)
