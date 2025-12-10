@@ -17,7 +17,7 @@ export type MTableProps<T extends object, F extends object> = Omit<TableProps<T>
   isSortColumn?: boolean // 是否表格列排序
   selection?: TableSelection // 表格多选类型
   selectionLimit?: number // 最多可选择行数
-  filterColumns?: CommonFormColumn<any>[] // 过滤column
+  filterColumns?: CommonFormColumn<F>[] // 过滤column
   filterParam?: F // 过滤param
   columns?: CommonTableColumn<T>[] // 表格列定义
   fetchData?: FetchPageDataFun<T> // 请求后台数据的方法
@@ -81,7 +81,7 @@ export interface TableSortColumn {
 
 export interface CI<T extends object> {
   $index: number
-  column: any
+  column: TableColumnCtx<T>
   row: T
   $fullIndex?: number
   $column: TableColumn<T>
@@ -100,7 +100,7 @@ export interface TablePagination {
   // 显示哪些布局控件，参考element-plus分页组件
   layout: 'total,sizes,prev,pager,next,jumper' | string
 
-  [prop: string]: any
+  [prop: string]: string | number | boolean | null | undefined | Record<string, string | number | boolean | null | undefined> | (string | number | boolean | null | undefined)[]
 }
 
 /**
@@ -214,8 +214,8 @@ export interface FilterRow {
   checked: boolean
   prop?: string
   condition?: 'ct' | 'nct' | 'eq' | 'ne' | 'gt' | 'ge' | 'lt' | 'le' | 'in' | 'bt'
-  value1: any
-  value2?: any
+  value1: string | number | boolean | null | undefined | Date | string[] | number[]
+  value2?: string | number | boolean | null | undefined | Date | string[] | number[]
   children?: FilterRow[]
 }
 

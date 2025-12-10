@@ -62,7 +62,7 @@ export interface ValidRule<T extends object, K extends keyof T> {
  */
 export type RuleValidator<T extends object, K extends keyof T> = (
   rule: ValidRule<T, K>,
-  val: T[K] | any,
+  val: T[K],
   callback: (errMsg?: Error) => void,
   formData?: T
 ) => void

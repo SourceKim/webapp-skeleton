@@ -10,9 +10,7 @@
         <el-link :underline="false" type="primary">
           <div style="display: inline-flex; align-items: center">
             {{ $t('comp.operation.more') }}
-            <el-icon>
-              <Arrow-down />
-            </el-icon>
+            <el-icon><ArrowDown /></el-icon>
           </div>
         </el-link>
         <template #dropdown>
@@ -55,8 +53,6 @@ const props = withDefaults(defineProps<OperationButtonProps<T>>(), {
   maxCount: DefaultMaxCount
 })
 
-// 需要收纳
-const storage = ref(false)
 const arr1 = ref<Array<OperationButton<T>>>([])
 const arr2 = ref<Array<OperationButton<T>>>([])
 
@@ -78,26 +74,20 @@ function init() {
         disabled: i.disabled instanceof Function ? i.disabled(props.row!) : i.disabled
       }
     })
-  if (props.auth) {
-    buttons.filter(() => {
-      return true
-      // if (!i.auth) return true
-      // return auth2(i.auth, i.authLogic)
-    })
-  }
 
-  storage.value = buttons.length > props.maxCount
-  arr1.value = buttons
-  if (storage.value) {
+  const needStorage = buttons.length > props.maxCount
+  if (needStorage) {
     arr1.value = buttons.splice(0, ~~(props.maxCount - 1))
     arr2.value = buttons
+  } else {
+    arr1.value = buttons
   }
 }
 
 function getBind(item: OperationButton<T>) {
-  const i: any = { ...item }
+  const i: Partial<OperationButton<T>> & Record<string, unknown> = { ...item }
   if (typeof i.icon === 'string') {
-    if (i.icon && i.icon?.indexOf?.('|') != -1) {
+    if (i.icon && i.icon.indexOf('|') !== -1) {
       i.icon = h(MIcon, { value: i.icon, wrap: false })
     }
   }

@@ -1,24 +1,23 @@
-import { ref, computed, watch, shallowRef, createVNode, h, type Ref } from 'vue'
+import { ref, computed, watch, shallowRef, h, type Ref } from 'vue'
 import { getDownloadFileUrl } from '@/utils/file'
 import { useI18n } from 'vue-i18n'
 import { useLocaleStore } from '@/stores/locale'
 import { generateLabelWidth, getItemListRef } from '@/components/utils'
 import { DefaultMaxCount } from '@/components/constants'
-import type { CommonTableColumn, TableColumn, CI } from '@/components/interface/table'
-import type { TableSortColumn, TableSelectionMode } from '../types'
+import type { CommonTableColumn, TableColumn, CI, TablePagination } from '@/components/interface/table'
+import type { TableSortColumn, TableSelectionMode, TableFetchFunction } from '../types'
 import MOperationButton from '../OperationButton.vue'
 
 /**
  * 表格列配置逻辑
  */
-export function useTableColumns<T extends object>(props: {
+export function useTableColumns<T extends object, F extends object = Record<string, unknown>>(props: {
   columns?: CommonTableColumn<T>[]
   selection?: TableSelectionMode
   isPage?: boolean
-  fetchData?: any
-  isSortColumn?: boolean
+  fetchData?: TableFetchFunction<T, F>
 }, context: {
-  pagination: Ref<any>
+  pagination: Ref<TablePagination>
   selectionRows: Ref<T[]>
   selectable: (row: T) => boolean
 }) {
@@ -35,7 +34,7 @@ export function useTableColumns<T extends object>(props: {
 
   // 排序列参数
   const sortColumnsParams = computed(() => {
-    return getSortColumnsParams(sortColumns.value)
+    return getSortColumnsParams(sortColumns.value) || []
   })
 
   // 监听 columns 变化，重新初始化表格列参数
@@ -187,13 +186,19 @@ export function useTableColumns<T extends object>(props: {
 
     // 处理必填标记
     tableColumParams.required ??= (() => {
-      const rules = column.rules ?? (column.editParam as any)?.rules
+      const editParamRules = typeof column.editParam === 'object' && column.editParam !== null && 'rules' in column.editParam
+        ? (column.editParam as { rules?: unknown }).rules
+        : undefined
+      const rules = column.rules ?? editParamRules
       if (rules) {
         if (rules instanceof Array) {
-          return rules.some((i) => i.required)
+          return rules.some((i) => i && typeof i === 'object' && 'required' in i && i.required)
         }
-        return rules.required
+        if (rules && typeof rules === 'object' && 'required' in rules) {
+          return Boolean(rules.required)
+        }
       }
+      return undefined
     })()
 
          // 生成头部插槽
@@ -263,7 +268,7 @@ export function useTableColumns<T extends object>(props: {
           $fullIndex = $index + context.pagination.value.pageSize! * (context.pagination.value.currentPage! - 1)
         }
         
-        return createVNode(MOperationButton, {
+        return h(MOperationButton, {
           ...tableColumParams,
           row: scope.row,
           index: { $index, $fullIndex }
@@ -278,13 +283,15 @@ export function useTableColumns<T extends object>(props: {
       tableColumParams.align ??= 'center'
       const size = Math.min(Number(tableColumParams.width ?? 60), 80)
       tableColumParams.slots.default = (scope: CI<T>) => {
-        const value: any = (scope.row as any)[tableColumParams.prop as string]
+        const prop = tableColumParams.prop
+        if (!prop) return h('span', '-')
+        const value = (scope.row as Record<string, unknown>)[prop]
         if (!value) return h('span', '-')
         let url: string | undefined
         if (typeof value === 'string') {
           url = value.startsWith('http') || value.startsWith('data:') ? value : getDownloadFileUrl({ object: value })
-        } else if (typeof value === 'object') {
-          const obj = value as any
+        } else if (typeof value === 'object' && value !== null) {
+          const obj = value as { id?: string; object?: string }
           url = getDownloadFileUrl({ id: obj.id, object: obj.object })
         }
         if (!url) return h('span', '-')
@@ -300,10 +307,6 @@ export function useTableColumns<T extends object>(props: {
   initTableColumnParamFun()
 
   return {
-    tableColumnsParams,
-    tableColumnsParamsObj,
-    sortColumns,
-    sortColumnsParams,
-    initTableColumnParamFun
+    sortColumnsParams
   }
 } 

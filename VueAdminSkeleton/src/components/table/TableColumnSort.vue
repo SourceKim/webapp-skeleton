@@ -81,7 +81,7 @@ watchEffect(() => {
 })
 
 //只允许同级拖拽
-function allowDrop(draggingNode: any, dropNode: any, type: string) {
+function allowDrop(draggingNode: Node, dropNode: Node, type: string) {
   return ['prev', 'next'].includes(type) && draggingNode.parent === dropNode.parent
 }
 

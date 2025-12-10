@@ -1,4 +1,4 @@
-import { ref, computed, watch, toRef, nextTick, type Ref } from 'vue'
+import { ref, computed, watch, nextTick, type Ref, type ComputedRef } from 'vue'
 import type { PageQuery, TableFetchFunction } from '../types'
 import type { TablePagination } from '@/components/interface/table'
 
@@ -16,7 +16,7 @@ export function useTableData<T extends object, F extends object>(props: {
   const loadingRef = ref(false)
 
   // 表格数据
-  const data = ref(toRef(props, 'data').value ?? []) as Ref<T[]>
+  const data = ref((props.data ?? []) as T[])
   
   watch(
     () => props.data,
@@ -26,11 +26,11 @@ export function useTableData<T extends object, F extends object>(props: {
   )
 
   // 过滤查询数据
-  const pageQuery: Ref<PageQuery<F>> = ref({
-    isPage: toRef(props, 'isPage').value ?? false,
+  const pageQuery = ref<PageQuery<F>>({
+    isPage: props.isPage ?? false,
     currentPage: 1,
     pageSize: 20,
-    param: toRef(props, 'filterParam').value ?? {} as F,
+    param: (props.filterParam ?? {}) as F,
   })
 
   watch(
@@ -67,12 +67,12 @@ export function useTableData<T extends object, F extends object>(props: {
   )
 
   // 当前分页的数据
-  const pageData = computed(() => {
+  const pageData: ComputedRef<T[]> = computed(() => {
     if (!props.fetchData && props.isPage) {
       const start = pageQuery.value.pageSize! * (pageQuery.value.currentPage! - 1)
-      return data.value.slice(start, start + pageQuery.value.pageSize!)
+      return data.value.slice(start, start + pageQuery.value.pageSize!) as T[]
     }
-    return data.value
+    return data.value as T[]
   })
 
   // 向后端请求表格数据

@@ -1,11 +1,11 @@
 <template>
-    <div :style="props.style" :class="warpperClass1">
-        <div :class="warpperClass2">
+    <div :style="props.style" :class="wrapperClass1">
+        <div :class="wrapperClass2">
             <TopFilter
             v-if="props.isFilterTable && props.filterColumns"
             class="top-filter"
             :columns="props.filterColumns"
-            :param="pageQuery.param ?? []"
+            :param="pageQuery.param || {}"
             :loading="loadingRef"
             :onSearch="fetchQuery"
             />
@@ -13,7 +13,7 @@
             :isFilterTable="props.isFilterTable"
             :selection="props.selection ?? 'single'"
             :data="pageData"
-            :sortedTableColumns="sortColumnsParams ?? []"
+            :sortedTableColumns="sortColumnsParams || []"
             :tableParam="tableParam"
             >
             <template #left-action>
@@ -31,20 +31,18 @@
             </template>
             <template #pagination>
               <el-scrollbar :class="['table-scrollbar', 'pagination']" wrap-style="height: auto;">
-                <el-form :disabled="false">
-                                <el-pagination
-                v-bind="{...pagination}"
-                :disabled="loadingRef"
-                :total="Math.max(pagination.total ?? 0, pageData.length)"
-                :size="layoutStore.widthShrink ? 'small' : layoutStore.size"
-                :pager-count="layoutStore.widthShrink ? 5 : 7"
-                :layout="layoutStore.widthShrink ? 'prev, pager, next' : pagination.layout.split(',').filter((i) => i !== 'total').join(',')"
-                :onCurrentChange="fetchQuery"
-                :onSizeChange="fetchQuery"
-                v-model:current-page="pageQuery.currentPage"
-                v-model:page-size="pageQuery.pageSize"
-              />
-                </el-form>
+                <el-pagination
+                  v-bind="{...pagination}"
+                  :disabled="loadingRef"
+                  :total="Math.max(pagination.total ?? 0, pageData.length)"
+                  :size="layoutStore.widthShrink ? 'small' : layoutStore.size"
+                  :pager-count="layoutStore.widthShrink ? 5 : 7"
+                  :layout="layoutStore.widthShrink ? 'prev, pager, next' : pagination.layout.split(',').filter((i) => i !== 'total').join(',')"
+                  :onCurrentChange="fetchQuery"
+                  :onSizeChange="fetchQuery"
+                  v-model:current-page="pageQuery.currentPage"
+                  v-model:page-size="pageQuery.pageSize"
+                />
               </el-scrollbar>
             </template>
             </TableCore>
@@ -54,7 +52,7 @@
 
 <script lang="ts" setup generic="T extends object, F extends object">
 
-import { ElScrollbar, ElForm, ElPagination } from 'element-plus'
+import { ElScrollbar, ElPagination } from 'element-plus'
 import TopFilter from './TopFilter.vue'
 import TotalView from './TotalView.vue'
 import TableCore from './TableCore.vue'
@@ -64,23 +62,19 @@ import type { MTableProps } from '../interface/table'
 const props = withDefaults(defineProps<MTableProps<T, F>>(), {
     layout: 'auto',
     defaultQuery: true,
-    isSortColumn: true,
     selectionLimit: 10,
     isFilterTable: true,
     selection: 'single',
     isPage: true,
-    version: '0.1',
-    install: false,
-    showHeader: true,
-    width: '100%',
     height: '100%',
+    width: '100%',
     fit: true,
+    showHeader: true,
 })
 
 const emit = defineEmits<{
-    (e: 'update:data', data: T[]): void
     (e: 'selection-change', rows: T[]): void
-    (e: 'row-click', row: T, column: any, event: Event): void
+    (e: 'row-click', row: T, column: import('../interface/table').CommonTableColumn<T>, event: Event): void
 }>()
 
 // 使用组合式 API
@@ -101,9 +95,6 @@ const {
     fetchQuery
 } = useTable(props, emit)
 
-// 向后兼容：保持原来的变量名
-const warpperClass1 = wrapperClass1
-const warpperClass2 = wrapperClass2
 
 // 暴露方法给父组件
 defineExpose({
@@ -115,6 +106,7 @@ defineExpose({
 <style scoped lang="scss">
 .m-table {
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
 

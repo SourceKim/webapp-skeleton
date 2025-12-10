@@ -51,12 +51,12 @@ defineOptions({
 const props = defineProps({
   // 参数对象
   param: {
-    type: Object as PropType<object>,
+    type: Object as PropType<Record<string, unknown>>,
     required: true
   },
   // 过滤列定义
   columns: {
-    type: Array as PropType<CommonFormColumn<any>[]>,
+    type: Array as PropType<CommonFormColumn<Record<string, unknown>>[]>,
     default: () => []
   },
   labelWidth: {
@@ -69,7 +69,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits<{
-  (e: 'search', param: object): void | Promise<void>
+  (e: 'search', param: Record<string, unknown>): void | Promise<void>
 }>()
 
 const { t } = useI18n()

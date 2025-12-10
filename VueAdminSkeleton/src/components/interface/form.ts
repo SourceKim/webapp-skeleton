@@ -42,7 +42,7 @@ export interface CommonFormColumn<T extends object> extends Partial<Omit<FormPro
   // 自定义渲染，参数为默认渲染的vNode
   render?: (vNode: VNode) => VNode
   //疑问备注框
-  comment?: any
+  comment?: VNode
   //显示必填星号
   required?: boolean
   //表单项插槽
@@ -58,7 +58,7 @@ export interface CommonFormColumn<T extends object> extends Partial<Omit<FormPro
   //绑定表单的属性
   single?: boolean
 
-  [prop: string]: any
+  [prop: string]: string | number | boolean | null | undefined | VNode | Record<string, string | number | boolean | null | undefined> | (string | number | boolean | null | undefined)[] | Function
 }
 
 /**
@@ -70,7 +70,7 @@ export interface UploadFormColumn<T extends object> extends CommonFormColumn<T> 
   limit?: number
 }
 
-export const mFormProps: Record<string, any> = {
+export const mFormProps: Record<string, PropType<string | number | boolean | null | undefined | object | (string | number | boolean | null | undefined)[]> | { type: PropType<string | number | boolean | null | undefined | object | (string | number | boolean | null | undefined)[]>; default?: string | number | boolean | null | undefined | object | (string | number | boolean | null | undefined)[]; required?: boolean }> = {
   ...formProps,
   // 表单处理类型
   handleType: {
@@ -88,7 +88,7 @@ export const mFormProps: Record<string, any> = {
   },
   // 表单项定义
   columns: {
-    type: Array as PropType<CommonFormColumn<any>[]>,
+    type: Array as PropType<CommonFormColumn<Record<string, string | number | boolean | null | undefined>>[]>,
     default: []
   },
   labelWidth: {
@@ -109,6 +109,6 @@ export const mFormProps: Record<string, any> = {
   }
 }
 
-export const mFormEmits: Record<string, any> = {
+export const mFormEmits: Record<string, ((...args: (string | number | boolean | null | undefined | object | (string | number | boolean | null | undefined)[])[]) => void) | true> = {
   ...formEmits
 }

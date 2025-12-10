@@ -3,14 +3,18 @@ import { useLayoutStore } from '@/stores/layout'
 import { useTableData } from './useTableData'
 import { useTableSelection } from './useTableSelection'
 import { useTableColumns } from './useTableColumns'
-import type { MTableProps } from '@/components/interface/table'
+import type { MTableProps, CommonTableColumn } from '@/components/interface/table'
+import type { TableProps } from 'element-plus'
 
 /**
  * 表格主要逻辑组合
  */
 export function useTable<T extends object, F extends object>(
   props: MTableProps<T, F>,
-  emit: any
+  emit: {
+    (e: 'selection-change', rows: T[]): void
+    (e: 'row-click', row: T, column: CommonTableColumn<T>, event: Event): void
+  }
 ) {
   const layoutStore = useLayoutStore()
   const attrs = useAttrs()
@@ -18,7 +22,6 @@ export function useTable<T extends object, F extends object>(
   // 数据管理
   const {
     loadingRef,
-    data,
     pageQuery,
     pagination,
     pageData,
@@ -35,10 +38,13 @@ export function useTable<T extends object, F extends object>(
 
   // 列配置
   const {
-    tableColumnsParams,
-    sortColumnsParams,
-    initTableColumnParamFun
-  } = useTableColumns(props as any, {
+    sortColumnsParams
+  } = useTableColumns<T, F>({
+    columns: props.columns,
+    selection: props.selection,
+    isPage: props.isPage,
+    fetchData: props.fetchData
+  }, {
     pagination,
     selectionRows,
     selectable
@@ -50,7 +56,7 @@ export function useTable<T extends object, F extends object>(
 
   // table 的参数
   const tableParam = computed(() => {
-    const param: any = {
+    const param: Partial<TableProps<T>> & Record<string, unknown> = {
       ...attrs,
       ...props,
       data: pageData.value,
@@ -83,46 +89,31 @@ export function useTable<T extends object, F extends object>(
 
   // 处理选中事件
   function handleSelectionChange(rows: T[]) {
-    const selectedRows = selectionChange(rows)
-    emit('selection-change', selectedRows as T[])
+    selectionChange(rows)
+    emit('selection-change', selectionRows.value)
   }
 
   // 处理行点击事件
-  function handleRowClick(row: T, column: any, event: Event) {
-    const selectedRows = rowClick(row, column, event)
-    emit('selection-change', selectedRows as T[])
+  function handleRowClick(row: T, column: CommonTableColumn<T>, event: Event) {
+    rowClick(row)
+    emit('selection-change', selectionRows.value)
     emit('row-click', row, column, event)
-  }
-
-  // 更新数据时的处理
-  function handleDataUpdate(newData: T[]) {
-    if (props.data) {
-      emit('update:data', newData)
-    } else {
-      data.value = newData
-    }
   }
 
   return {
     // 状态
     loadingRef,
     layoutStore,
-    data,
     pageQuery,
     pagination,
     pageData,
     selectionRows,
-    tableColumnsParams,
     sortColumnsParams,
     wrapperClass1,
     wrapperClass2,
     tableParam,
     
     // 方法
-    fetchQuery,
-    handleSelectionChange,
-    handleRowClick,
-    handleDataUpdate,
-    initTableColumnParamFun
+    fetchQuery
   }
 } 

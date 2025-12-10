@@ -1,7 +1,6 @@
 import { ref, type Ref } from 'vue'
 import { isUndefined } from 'lodash-es'
 import type { TableSelectionMode } from '../types'
-import type { CommonTableColumn } from '@/components/interface/table'
 
 /**
  * 表格选择逻辑
@@ -16,18 +15,14 @@ export function useTableSelection<T extends object>(props: {
   // 处理选中事件
   function selectionChange(rows: T[]) {
     selectionRows.value = rows
-    return selectionRows.value
   }
 
   // 处理行点击事件
-  function rowClick(row: T, _column: CommonTableColumn<T>, _event: Event) {
+  function rowClick(row: T) {
     if (props.selection === 'single') {
       selectionRows.value = [row]
-      return selectionRows.value
-    } else if (props.selection === 'multiple') {
-      // 多选逻辑可以在这里扩展
     }
-    return selectionRows.value
+    // 多选模式由 el-table 的 selection 列处理，无需在此实现
   }
 
   // 判断行是否可选择

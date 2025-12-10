@@ -3,7 +3,7 @@
  */
 
 /** 分页查询参数 */
-export interface PageQuery<T = any> {
+export interface PageQuery<T = Record<string, unknown>> {
   /** 是否分页 */
   isPage?: boolean
   /** 当前页码 */
@@ -17,7 +17,7 @@ export interface PageQuery<T = any> {
 }
 
 /** 分页结果 */
-export interface PageResult<T = any> {
+export interface PageResult<T = object> {
   /** 数据列表 */
   items: T[]
   /** 总数 */
@@ -29,7 +29,7 @@ export interface PageResult<T = any> {
 }
 
 /** REST API 响应 */
-export interface RestResponse<T = any> {
+export interface RestResponse<T = unknown> {
   /** 响应代码 */
   code?: number
   /** 响应消息 */
@@ -49,7 +49,7 @@ export type TableLayoutMode = 'auto' | 'fixed' | 'default'
 /** 表格数据获取函数 */
 export type TableFetchFunction<T, F> = (
   filters?: F,
-  context?: { loadingRef?: any }
+  context?: { loadingRef?: import('vue').Ref<boolean> }
 ) => Promise<RestResponse<PageResult<T>>>
 
 /** 表格排序列 */

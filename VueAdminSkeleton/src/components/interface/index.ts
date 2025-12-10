@@ -1,6 +1,6 @@
 import type { VNode, Ref } from 'vue'
 
-export type SlotRender = (...args: any[]) => VNode | VNode[]
+export type SlotRender = (scope: Record<string, string | number | boolean | null | undefined | VNode | Record<string, string | number | boolean | null | undefined> | (string | number | boolean | null | undefined)[]>) => VNode | VNode[]
 
 export type SlotsObj = {
   [slotName: string]: SlotRender
@@ -73,7 +73,7 @@ export interface CommonItemData {
   // 选项的名称
   label?: string
 
-  [prop: string]: any
+  [prop: string]: string | number | boolean | null | undefined | VNode | Record<string, string | number | boolean | null | undefined> | (string | number | boolean | null | undefined)[]
 }
 
 /**
@@ -82,10 +82,10 @@ export interface CommonItemData {
 export interface CommonModelParam {
   start?: number | string
   end?: number | string
-  modelValue?: any
-  'onUpdate:modelValue'?: (val: any) => void
-  'onUpdate:start'?: (val: any) => void
-  'onUpdate:end'?: (val: any) => void
+  modelValue?: string | number | boolean | null | undefined | Date | [string | number | Date, string | number | Date] | (string | number | boolean | null | undefined)[]
+  'onUpdate:modelValue'?: (val: string | number | boolean | null | undefined | Date | [string | number | Date, string | number | Date] | (string | number | boolean | null | undefined)[]) => void
+  'onUpdate:start'?: (val: string | number | Date | null | undefined) => void
+  'onUpdate:end'?: (val: string | number | Date | null | undefined) => void
 }
 
 /**
