@@ -1,11 +1,13 @@
 import { ref, computed, watch, shallowRef, h, type Ref } from 'vue'
-import { getDownloadFileUrl } from '@/utils/file'
+import { getDownloadFileUrl, getUploadFileUrl } from '@/utils/file'
 import { useI18n } from 'vue-i18n'
 import { useLocaleStore } from '@/stores/locale'
 import { generateLabelWidth, getItemListRef } from '@/components/utils'
 import { DefaultMaxCount } from '@/components/constants'
+import { ElRadio } from 'element-plus'
 import type { CommonTableColumn, TableColumn, CI, TablePagination } from '@/components/interface/table'
 import type { TableSortColumn, TableSelectionMode, TableFetchFunction } from '../types'
+import type { SlotRender } from '@/components/interface'
 import MOperationButton from '../OperationButton.vue'
 
 /**
@@ -230,6 +232,24 @@ export function useTableColumns<T extends object, F extends object = Record<stri
   }
 
   /**
+   * 获取行唯一标识
+   */
+  const rowKeyMap = new WeakMap<object, string>()
+  let rowKeyCounter = 0
+  function getRowKey(row: any): string | number {
+    if (row?.id !== undefined && row?.id !== null) {
+      return row.id
+    }
+    if (typeof row !== 'object' || row === null) {
+      return String(row)
+    }
+    if (!rowKeyMap.has(row)) {
+      rowKeyMap.set(row, `__generated_id_${rowKeyCounter++}`)
+    }
+    return rowKeyMap.get(row)!
+  }
+
+  /**
    * 根据类型处理列
    */
   function processColumnByType(tableColumParams: CommonTableColumn<T>) {
@@ -247,21 +267,38 @@ export function useTableColumns<T extends object, F extends object = Record<stri
         tableColumParams.selectable ??= context.selectable
       }
       
-             if (tableColumParams.selection === 'single') {
-         if (!tableColumParams.slots) tableColumParams.slots = {}
-         tableColumParams.slots.default ??= (scope: CI<T>) => 
-           h('el-radio', {
-             onClick: (e: Event) => e.preventDefault(),
-             label: true,
-             modelValue: context.selectionRows.value.includes(scope.row)
-           }, [h('span')])
-       }
+      if (tableColumParams.selection === 'single') {
+        if (!tableColumParams.slots) tableColumParams.slots = {}
+        tableColumParams.slots.default ??= ((scope: CI<T>) => {
+          // 获取行的唯一标识
+          const rowId = getRowKey(scope.row)
+          // 获取当前选中的 rowId
+          const selectedRowId = context.selectionRows.value.length > 0 
+            ? getRowKey(context.selectionRows.value[0])
+            : undefined
+          
+          return h(ElRadio, {
+            label: rowId,
+            modelValue: selectedRowId,
+            'onUpdate:modelValue': (value: any) => {
+              // 单选模式：点击时更新选中行
+              if (value === rowId) {
+                // 选中当前行
+                context.selectionRows.value = [scope.row]
+              } else {
+                // 取消选中（点击已选中的 radio 时）
+                context.selectionRows.value = []
+              }
+            }
+          })
+        }) as unknown as SlotRender
+      }
     }
 
          // 操作列
      if (tableColumParams.type === 'operation' && !tableColumParams.slots?.default) {
        if (!tableColumParams.slots) tableColumParams.slots = {}
-       tableColumParams.slots.default = (scope: CI<T>) => {
+       tableColumParams.slots.default = ((scope: CI<T>) => {
         const $index = scope.$index
         let $fullIndex = $index
         if (props.isPage) {
@@ -273,7 +310,7 @@ export function useTableColumns<T extends object, F extends object = Record<stri
           row: scope.row,
           index: { $index, $fullIndex }
         })
-      }
+      }) as unknown as SlotRender
     }
 
     // 图片列：根据单元格值渲染图片
@@ -282,24 +319,51 @@ export function useTableColumns<T extends object, F extends object = Record<stri
       tableColumParams.showOverflowTooltip = false
       tableColumParams.align ??= 'center'
       const size = Math.min(Number(tableColumParams.width ?? 60), 80)
-      tableColumParams.slots.default = (scope: CI<T>) => {
+      tableColumParams.slots.default = ((scope: CI<T>) => {
         const prop = tableColumParams.prop
         if (!prop) return h('span', '-')
         const value = (scope.row as Record<string, unknown>)[prop]
         if (!value) return h('span', '-')
-        let url: string | undefined
+        let url: string | undefined | null
         if (typeof value === 'string') {
-          url = value.startsWith('http') || value.startsWith('data:') ? value : getDownloadFileUrl({ object: value })
+          // 如果是完整的 URL（http/https/data），直接使用
+          if (value.startsWith('http') || value.startsWith('data:')) {
+            url = value
+          } else {
+            // 判断是静态上传文件路径还是云存储 object
+            // 静态上传文件路径特征：以 images/、uploads/ 开头，或简单文件名
+            // 云存储 object 特征：通常包含多层路径或特殊字符，且不以常见静态目录开头
+            const isStaticPath = 
+              value.startsWith('images/') || 
+              value.startsWith('/images/') ||
+              value.startsWith('uploads/') || 
+              value.startsWith('/uploads/') ||
+              (!value.includes('/') && value.includes('.')) // 简单文件名如 avatar.jpg
+            
+            if (isStaticPath) {
+              // 使用静态文件访问 URL
+              url = getUploadFileUrl(value)
+            } else {
+              // 使用文件下载 API（云存储 object）
+              url = getDownloadFileUrl({ object: value })
+            }
+          }
         } else if (typeof value === 'object' && value !== null) {
-          const obj = value as { id?: string; object?: string }
-          url = getDownloadFileUrl({ id: obj.id, object: obj.object })
+          const obj = value as { id?: string; object?: string; file_path?: string }
+          // 优先使用 file_path（静态文件路径）
+          if (obj.file_path) {
+            url = getUploadFileUrl(obj.file_path)
+          } else {
+            // 使用 object（云存储路径）或 id
+            url = getDownloadFileUrl({ id: obj.id, object: obj.object })
+          }
         }
         if (!url) return h('span', '-')
         return h('img', {
           src: url,
           style: `width: ${size}px; height: ${size}px; border-radius: 4px; object-fit: cover;`
         })
-      }
+      }) as unknown as SlotRender
     }
   }
 

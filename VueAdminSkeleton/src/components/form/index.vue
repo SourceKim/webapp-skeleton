@@ -45,7 +45,7 @@
 import { provide, ref, shallowRef, useAttrs, watchEffect } from 'vue'
 import { generateDynamicColumn, generateFormRules, generatePlaceholder, vModelValue } from '@/components/mutils'
 import { useElementSize } from '@vueuse/core'
-import type { UploadCtx } from '@/components/form/Upload.vue'
+import type { UploadCtx } from '@/components/upload/Upload.vue'
 import { type CommonFormColumn, mFormEmits } from '@/components/interface/form'
 import { useLayoutStore } from '@/stores/layout'
 import { ElForm, ElFormItem, ElCol } from 'element-plus'

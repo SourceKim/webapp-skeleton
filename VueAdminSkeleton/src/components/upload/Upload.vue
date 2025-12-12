@@ -18,20 +18,29 @@
 
     <template #trigger>
       <slot name="trigger">
-        <!-- 如果类型是 upload-img，则显示图片上传按钮 -->
-        <div v-if="type === 'upload-img'" class="el-upload--picture-card">
-          <div class="file-lib-btn" v-if="selectFromLib" @click.stop="openFileLib('image/')">
-            {{ $t('comp.upload.selectFromLib') }}
+        <!-- 如果提供了 request prop，使用 OverwriteUpload 风格的按钮 -->
+        <template v-if="request">
+          <el-button v-if="fileList.length > 0" :disabled="disabled" type="primary" plain size="small">
+            {{ replaceText || '更换图片' }}
+          </el-button>
+          <el-icon v-else><Plus /></el-icon>
+        </template>
+        <!-- 默认样式：如果类型是 upload-img，则显示图片上传按钮 -->
+        <template v-else-if="type === 'upload-img'">
+          <div class="el-upload--picture-card">
+            <div class="file-lib-btn" v-if="selectFromLib" @click.stop="openFileLib('image/')">
+              {{ $t('comp.upload.selectFromLib') }}
+            </div>
+            <Plus class="icon" />
           </div>
-          <Plus class="icon" />
-        </div>
-        <!-- 如果类型是 upload-file，则显示文件上传按钮 -->
-        <div v-else>
+        </template>
+        <!-- 默认样式：如果类型是 upload-file，则显示文件上传按钮 -->
+        <template v-else>
           <el-button-group>
             <el-button type="primary" v-if="selectFromLib" @click.stop="openFileLib()" icon="search" />
             <el-button type="primary">{{ $t('comp.upload.selectFromFile') }}</el-button>
           </el-button-group>
-        </div>
+        </template>
       </slot>
     </template>
     <el-image-viewer
@@ -55,40 +64,26 @@
     >
       <selectSysFile
         :param="param"
-        :selection="selection"
-        selectLimit="1"
+        :selection-limit="1"
         style="height: calc(90vh - 80px)"
         @select="select"
         @close="visible = false"
       />
     </el-dialog>
-    <!-- 裁剪 -->
-    <el-dialog
-      :title="$t('comp.upload.imageCropper')"
-      v-model="visible2"
-      draggable
-      append-to-body
-      destroy-on-close
-      :close-on-click-modal="false"
-      width="75%"
-    >
-      <cropper :="cropperOption" @close="visible2 = false" />
-    </el-dialog>
   </el-upload>
 </template>
 <script setup lang="ts">
 /**
- * 增强el-upload上传功能，增加裁剪，直接粘贴图片文件等。
- * sxh 2023-4-14
+ * 增强 el-upload 上传功能，支持文件库选择、图片预览等
+ * @author sxh 2023-4-14
  */
 import type { ExtractPropTypes, PropType } from 'vue'
 import { computed, inject, onUnmounted, ref, watchEffect } from 'vue'
 import { uploadFile } from '@/api/file'
 import selectSysFile from '@/components/form/selectSysFile.vue'
-import { getDownloadFileUrl } from '@/utils/file'
+import { getDownloadFileUrl, getUploadFileUrl } from '@/utils/file'
 import { ElUpload, genFileId, uploadProps } from 'element-plus'
 import type { UploadFile } from 'element-plus'
-import Cropper from './Cropper.vue'
 import { Plus } from '@element-plus/icons-vue'
 
 export interface UploadFileItem extends UploadFile {
@@ -98,18 +93,43 @@ export interface UploadFileItem extends UploadFile {
   object?: string
 }
 
+/**
+ * 文件库选择的文件项类型
+ */
+interface SysFileItem {
+  id: number
+  name: string
+  object: string
+}
+
+/**
+ * modelValue 的类型：字符串（单文件模式）或文件数组（多文件模式）
+ */
+type ModelValueType = string | UploadFileItem[] | undefined
+
+/**
+ * 自定义上传函数的返回类型
+ */
+export interface UploadResult {
+  url: string
+  id?: string | number
+  raw?: unknown
+}
+
 defineOptions({
   name: 'MUpload',
   extends: ElUpload
 })
 
-const emit = defineEmits(['update:fileList', 'update:modelValue'])
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: ModelValueType): void
+  (e: 'uploaded', payload: UploadResult): void
+  (e: 'error', err: unknown): void
+  (e: 'remove'): void
+}>()
 
 const props = defineProps({
   ...uploadProps,
-  autoUpload: {
-    type: Boolean
-  },
   type: {
     type: String as PropType<'upload-img' | 'upload-file'>
   },
@@ -118,23 +138,30 @@ const props = defineProps({
     default: false
   },
   modelValue: {
+    type: [String, Array] as PropType<ModelValueType>,
     required: true
   },
-  // 当为单文件模式时，指定回填/提交值的字段：'object' | 'id' | 'url'
+  // 单文件模式，返回字符串 URL（而非数组）
   single: {
-    type: String as PropType<'object' | 'id' | 'url'>
+    type: Boolean,
+    default: false
   },
   // 是否允许从文件库中选择
   selectFromLib: {
     type: Boolean,
     default: true
   },
-  // 裁剪参数
-  cropper: {
-    type: Object
-  },
   tip: {
     type: String
+  },
+  // 自定义上传函数（如果提供，则使用自定义上传，否则使用默认的 uploadFile）
+  request: {
+    type: Function as PropType<(file: File) => Promise<UploadResult>>
+  },
+  // 替换文本（当使用 request 时显示）
+  replaceText: {
+    type: String,
+    default: '更换图片'
   }
 })
 
@@ -142,14 +169,16 @@ const uploadRef = ref()
 
 const uploadParam = computed(() => {
   const param: ExtractPropTypes<typeof ElUpload> = {
-    limit: props.limit,
+    limit: props.limit || 1,
     ...props,
     fileList: fileList.value,
     onChange,
     onRemove,
     onPreview,
-    // 需要裁剪的图片一次只能选择一张
-    multiple: !props.cropper
+    multiple: false, // 单文件模式
+    autoUpload: false, // 手动上传模式
+    // 如果提供了自定义 request，使用自定义上传
+    httpRequest: props.request ? handleHttpRequest : undefined
   }
 
   // 上传图片默认参数
@@ -163,22 +192,48 @@ const uploadParam = computed(() => {
 
 const fileList = ref<UploadFileItem[]>([])
 watchEffect(() => {
-  const mv: any = props.modelValue
+  const mv = props.modelValue
   let files: UploadFileItem[] = []
   if (Array.isArray(mv)) {
+    // 多文件模式：直接使用数组
     files = mv
-  } else if (mv) {
-    if (typeof mv === 'string') {
-      files = [{ uid: genFileId(), object: mv, status: 'success' } as UploadFileItem]
-    } else if (typeof mv === 'object') {
-      const obj = mv as UploadFileItem
-      if (!obj.uid) obj.uid = genFileId()
-      files = [obj]
-    }
+  } else if (typeof mv === 'string' && mv) {
+    // 单文件模式：字符串 URL 或 object，转换为文件项
+    files = [{ uid: genFileId(), object: mv, status: 'success' } as UploadFileItem]
   }
+  // 为文件项生成预览 URL
   files.forEach((file) => {
     if (!file.url) {
-      const url = getDownloadFileUrl({ id: (file as any).id, object: (file as any).object })
+      let url: string | null | undefined
+      if (file.object) {
+        const objectValue = file.object
+        // 如果是完整的 URL（http/https/data），直接使用
+        if (typeof objectValue === 'string' && (objectValue.startsWith('http') || objectValue.startsWith('data:'))) {
+          url = objectValue
+        } else {
+          // 判断是静态上传文件路径还是云存储 object
+          // 静态上传文件路径特征：以 images/、uploads/ 开头，或简单文件名
+          const isStaticPath = 
+            (typeof objectValue === 'string' && (
+              objectValue.startsWith('images/') || 
+              objectValue.startsWith('/images/') ||
+              objectValue.startsWith('uploads/') || 
+              objectValue.startsWith('/uploads/') ||
+              (!objectValue.includes('/') && objectValue.includes('.')) // 简单文件名如 avatar.jpg
+            ))
+          
+          if (isStaticPath) {
+            // 使用静态文件访问 URL
+            url = getUploadFileUrl(objectValue)
+          } else {
+            // 使用文件下载 API（云存储 object）
+            url = getDownloadFileUrl({ id: file.id, object: objectValue })
+          }
+        }
+      } else if (file.id) {
+        // 只有 id，使用下载 API
+        url = getDownloadFileUrl({ id: file.id })
+      }
       if (url) file.url = url
     }
   })
@@ -187,20 +242,15 @@ watchEffect(() => {
 
 const previewImageUrlList = ref<string[]>([])
 const previewImageVisible = ref(false)
-const initialIndex = ref(1)
+const initialIndex = ref(0)
 
 const visible = ref(false)
-const param = ref({
+const param = ref<{ type: string }>({
   type: ''
 })
-const selection = ref('multiple')
-
-const visible2 = ref(false)
-const cropperOption = ref({})
-const cropperFile = ref()
 
 // 超过限制时，替换掉第一个 (From element-plus 官网)
-const onExceed = (files: UploadFileItem[], _fileList: UploadFileItem[]) => {
+const onExceed = (files: UploadFileItem[]) => {
   uploadRef.value.clearFiles()
   const file = files[0]
   file.uid = genFileId()
@@ -208,40 +258,22 @@ const onExceed = (files: UploadFileItem[], _fileList: UploadFileItem[]) => {
 }
 
 function onChange(file: UploadFileItem, files: UploadFileItem[]) {
-  if (props.cropper) {
-    visible2.value = true
-    cropperOption.value = {
-      img: file.url,
-      onCropper(blob: Blob) {
-        const fileName = cropperFile.value.name.replace(/\.[0-9a-z]+$/, '') + '.png'
-        const file = new File([blob], fileName, { type: blob.type })
-        fileList.value.push({
-          ...cropperFile.value,
-          name: fileName,
-          raw: file,
-          size: file.size,
-          url: (window.URL || window.webkitURL).createObjectURL(file)
-        })
-        visible2.value = false
-      },
-      ...props.cropper
-    }
-    cropperFile.value = file
-    files.pop()
-  }
   onUpdateFileList(files)
+  // 如果使用自定义 request，选择文件后自动上传
+  if (props.request && !props.disabled && file.raw) {
+    uploadRef.value?.submit()
+  }
   props.onChange?.(file, files)
 }
 
 function onRemove(file: UploadFileItem, files: UploadFileItem[]) {
   onUpdateFileList(files)
+  emit('remove')
   props.onRemove?.(file, files)
 }
 
 function onUpdateFileList(files: UploadFileItem[]) {
   fileList.value = files
-  console.log('fileList.value', fileList.value)
-  if (props.autoUpload) upload()
   emitModelValue()
 }
 
@@ -260,25 +292,23 @@ function onPreview(file: UploadFileItem) {
   }
 }
 
-//
-// function onDownload (file) {
-//   previewImageUrlList.value = fileList.value.map((i) => i.url)
-//   initialIndex.value = fileList.value.findIndex((i) => i === file)
-//   previewImageVisible.value = true
-// }
-
-// 图片库选择后事件
-function select(rows: any[]) {
+// 文件库选择后事件
+function select(rows: SysFileItem[]) {
   onUpdateFileList([
     ...fileList.value,
-    ...rows.map((i) => {
+    ...rows.map((file) => {
+      // 兼容 Material 数据格式：object 或 file_path
+      const filePath = (file as any).object || (file as any).file_path || ''
+      const fileId = file.id || (file as any).id
+      const fileName = file.name || (file as any).filename || (file as any).original_name || ''
+      
       const item: UploadFileItem = {
         uid: genFileId(),
-        url: getDownloadFileUrl({ object: i.object })!,
+        url: getDownloadFileUrl({ object: filePath })!,
         status: 'success',
-        id: i.id,
-        name: i.name,
-        object: i.object
+        id: typeof fileId === 'string' ? Number(fileId) : fileId,
+        name: fileName,
+        object: filePath
       }
       return item
     })
@@ -286,7 +316,34 @@ function select(rows: any[]) {
   visible.value = false
 }
 
-// 文件手动上传
+// 自定义上传处理函数
+async function handleHttpRequest(option: { file: File; onSuccess?: (response: unknown) => void; onError?: (err: unknown) => void }) {
+  if (!props.request) return
+  
+  try {
+    const res = await props.request(option.file)
+    // 更新文件列表
+    const fileItem = fileList.value.find(f => f.raw === option.file) || fileList.value[0]
+    if (fileItem) {
+      fileItem.status = 'success'
+      fileItem.url = res.url
+      if (res.id) fileItem.id = typeof res.id === 'number' ? res.id : Number(res.id)
+    }
+    emit('update:modelValue', res.url)
+    emit('uploaded', res)
+    option.onSuccess?.(res)
+    emitModelValue()
+  } catch (err) {
+    const fileItem = fileList.value.find(f => f.raw === option.file) || fileList.value[0]
+    if (fileItem) {
+      fileItem.status = 'fail'
+    }
+    emit('error', err)
+    option.onError?.(err)
+  }
+}
+
+// 文件手动上传（使用默认的 uploadFile API）
 async function upload() {
   // 'ready' | 'uploading' | 'success' | 'fail'
   const uploadFiles = fileList.value.filter((i) => ['ready', 'fail'].includes(i.status) || !i.status)
@@ -302,26 +359,6 @@ async function upload() {
       item.status = 'success'
     }
   }
-    // try {
-    // try {
-    //   const res = await uploadFile(item.raw, (progressEvent) => {
-    //     item.percentage = (progressEvent.loaded! / progressEvent.total!) * 100
-    //   })
-    //   item.status = 'success'
-    //   item.id = res.data.id
-    //   item.name = res.data.name
-    //   item.object = res.data.object
-    //   item.contentType = res.data.contentType
-    //   item.suffix = res.data.suffix
-    //   item.size = res.data.size
-    //   item.imgWidth = res.data.imgWidth
-    //   item.imgHeight = res.data.imgHeight
-    //   item.imgRatio = res.data.imgRatio
-    // } catch (e) {
-    //   item.status = 'fail'
-    //   throw e
-    // }
-
   emitModelValue()
 }
 
@@ -332,16 +369,20 @@ function openFileLib(type?: string) {
 }
 
 function emitModelValue() {
-  if (props.single) {
+  // 如果提供了 request prop，默认使用单文件模式
+  const isSingle = props.single || !!props.request
+  if (isSingle) {
+    // 单文件模式：返回第一个文件的 URL 字符串
     const first = fileList.value?.[0]
-    let out: any = undefined
     if (first) {
-      if (props.single === 'object') out = first.object
-      else if (props.single === 'id') out = first.id
-      else if (props.single === 'url') out = first.url
+      // 优先使用 url，如果没有则通过 object/id 生成 URL
+      const url = first.url || getDownloadFileUrl({ id: first.id, object: first.object })
+      emit('update:modelValue', url || undefined)
+    } else {
+      emit('update:modelValue', undefined)
     }
-    emit('update:modelValue', out)
   } else {
+    // 多文件模式：返回文件数组
     emit('update:modelValue', fileList.value)
   }
 }

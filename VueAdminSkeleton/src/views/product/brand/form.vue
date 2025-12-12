@@ -1,7 +1,7 @@
 <template>
   <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
     <el-form-item label="Logo">
-      <OverwriteUpload
+      <Upload
         v-model="logoUrl"
         :list-type="'picture'"
         :disabled="isDetail"
@@ -42,7 +42,7 @@ import type { CreateProductBrandDto, ProductBrand, UpdateProductBrandDto } from 
 import { createBrand, updateBrand } from '@/api/product/brand'
 import { uploadMaterial } from '@/api/material/material'
 import { getUploadFileUrl } from '@/utils/file'
-import OverwriteUpload from '@/components/upload/OverwriteUpload.vue'
+import Upload from '@/components/upload/Upload.vue'
 
 const props = defineProps<{ handleType?: string, modelValue?: ProductBrand }>()
 const emit = defineEmits<{ (e: 'close', refresh?: boolean): void }>()

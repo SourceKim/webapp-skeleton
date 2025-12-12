@@ -71,7 +71,15 @@ const ctx = computed(() => {
   }
 })
 
-const previews = ref<any>({})
+interface PreviewData {
+  w?: number
+  h?: number
+  div?: Record<string, string>
+  url?: string
+  img?: Record<string, string>
+}
+
+const previews = ref<PreviewData>({})
 
 const formSize = ref(useElementSize(cropperRoot))
 const itemStyle = ref({})
@@ -87,7 +95,7 @@ watchEffect(() => {
 })
 
 // 实时裁剪预览
-function onRealTime(data: any) {
+function onRealTime(data: PreviewData) {
   previews.value = data
 }
 

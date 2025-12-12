@@ -25,7 +25,7 @@ import {
 } from 'element-plus'
 import SingleDatePicker from '@/components/form/SingleDatePicker.vue'
 import IconSelect from '@/components/form/IconSelect.vue'
-import MUpload from '@/components/form/Upload.vue'
+import MUpload from '@/components/upload/Upload.vue'
 import MNative from '@/components/form/Native.vue'
 import type { CommonItemData, ItemListColumn } from '@/components/interface'
 import type { CommonFormColumn } from '@/components/interface/form'

@@ -12,7 +12,7 @@
       <el-input type="textarea" v-model="form.description" :disabled="isDetail" placeholder="请输入描述" />
     </el-form-item>
     <el-form-item label="图片">
-      <OverwriteUpload v-model="imageUrl" :disabled="isDetail" :request="uploader" list-type="picture" replace-text="更新图片" @uploaded="onUploaded" />
+      <Upload v-model="imageUrl" :disabled="isDetail" :request="uploader" list-type="picture" replace-text="更新图片" @uploaded="onUploaded" />
     </el-form-item>
     <el-form-item label="层级">
       <el-input v-model="levelStr" disabled style="width: 120px;" />
@@ -57,7 +57,7 @@ import { createCategory, updateCategory, getCategories } from '@/api/product/cat
 import { getBrandsAll } from '@/api/product/brand'
 import { uploadMaterial } from '@/api/material/material'
 import { getUploadFileUrl } from '@/utils/file'
-import OverwriteUpload from '@/components/upload/OverwriteUpload.vue'
+import Upload from '@/components/upload/Upload.vue'
 
 const props = defineProps<{ handleType?: string, modelValue?: ProductCategory }>()
 const emit = defineEmits<{ (e: 'close', refresh?: boolean): void }>()

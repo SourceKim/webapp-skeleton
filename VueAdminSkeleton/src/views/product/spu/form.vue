@@ -10,7 +10,7 @@
       <el-input type="textarea" v-model="form.description" :disabled="isDetail" placeholder="请输入描述" />
     </el-form-item>
     <el-form-item label="主图">
-      <OverwriteUpload v-model="mainImageUrl" :disabled="isDetail" :request="uploadMain" list-type="picture" replace-text="更新主图" @uploaded="(res)=> form.main_material_id = res.id" />
+      <Upload v-model="mainImageUrl" :disabled="isDetail" :request="uploadMain" list-type="picture" replace-text="更新主图" @uploaded="(res)=> form.main_material_id = res.id" />
     </el-form-item>
     <el-form-item label="图集">
       <el-upload
@@ -89,7 +89,7 @@ import { ElMessage } from 'element-plus'
 import type { CreateProductSpuDto, ProductSpu, UpdateProductSpuDto } from '@/api/product/spu.d'
 import { createSpu, updateSpu } from '@/api/product/spu'
 import { uploadMaterial } from '@/api/material/material'
-import OverwriteUpload from '@/components/upload/OverwriteUpload.vue'
+import Upload from '@/components/upload/Upload.vue'
 import { Plus } from '@element-plus/icons-vue'
 import { getCategories } from '@/api/product/category'
 import { getBrandsAll } from '@/api/product/brand'
