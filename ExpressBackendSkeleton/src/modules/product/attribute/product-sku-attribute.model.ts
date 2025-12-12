@@ -3,9 +3,10 @@ import { BaseEntity } from '@/modules/common/base.model';
 import { ProductSku } from '@/modules/product/sku/product-sku.model';
 import { ProductAttributeKey } from './product-attribute-key.model';
 import { ProductAttributeValue } from './product-attribute-value.model';
+import type { ProductSkuAttribute as IProductSkuAttribute } from '@skeleton/shared-types';
 
 @Entity('product_sku_attributes')
-export class ProductSkuAttribute extends BaseEntity {
+export class ProductSkuAttribute extends BaseEntity implements IProductSkuAttribute {
     @ManyToOne(() => ProductSku, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'sku_id' })
     sku!: ProductSku;

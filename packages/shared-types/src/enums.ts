@@ -40,8 +40,14 @@ export {
   DeliveryStatus,
   OrderStatus,
   PaymentMethod,
-  ProductSpuStatus,
-  ProductSkuStatus,
   UserAddressTag,
   UserAddressStatus
 } from './modules/mall/enums'
+
+// 重新导出商品相关枚举（保持向后兼容）
+export {
+  ProductSpuStatus,
+  ProductSkuStatus,
+  ProductCategoryStatus,
+  ProductBrandStatus
+} from './modules/product/enums'

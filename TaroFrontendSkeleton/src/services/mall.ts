@@ -5,14 +5,18 @@ import type {
   PaginatedResponse,
   ProductSpu,
   ProductSku,
+  ProductCategory,
+  ProductBrand,
   ProductSpuStatus,
   ProductSkuStatus,
+  ProductCategoryStatus,
+  ProductBrandStatus,
   SkuAttributeKV
 } from '@skeleton/shared-types'
 
 // 重新导出类型和枚举
-export type { ProductSpu, ProductSku, SkuAttributeKV }
-export { ProductSpuStatus, ProductSkuStatus }
+export type { ProductSpu, ProductSku, ProductCategory, ProductBrand, SkuAttributeKV }
+export { ProductSpuStatus, ProductSkuStatus, ProductCategoryStatus, ProductBrandStatus }
 
 // 类型别名，保持向后兼容
 export type Spu = ProductSpu
@@ -30,30 +34,9 @@ export interface PaginatedMeta {
   sort_order?: 'ASC' | 'DESC'
 }
 
-export interface Brand {
-  id: string
-  name: string
-  description?: string
-  material_id?: string
-  website?: string
-  status: 'ENABLED' | 'DISABLED'
-  created_at?: string
-  updated_at?: string
-  material?: {
-    id?: string
-    file_path?: string
-  }
-}
-
-export interface Category {
-  id: string
-  name: string
-  description?: string
-  parent_id?: string | null
-  level: number
-  material_id?: string
-  status: 'ENABLED' | 'DISABLED'
-}
+// 类型别名，保持向后兼容
+export type Brand = ProductBrand
+export type Category = ProductCategory
 
 // 扩展 PaginatedResponse，使用本地的 meta 结构
 export interface PaginatedResponse<T> extends Omit<import('@skeleton/shared-types').PaginatedResponse<T>, 'meta'> {

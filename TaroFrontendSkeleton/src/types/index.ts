@@ -18,10 +18,12 @@ export type {
   DeliveryStatus,
   OrderStatus,
   PaymentMethod,
-  ProductSpuStatus,
-  ProductSkuStatus,
   UserAddressTag,
   UserAddressStatus,
+  ProductSpuStatus,
+  ProductSkuStatus,
+  ProductCategoryStatus,
+  ProductBrandStatus,
   
   // 用户相关类型
   User,
@@ -40,9 +42,16 @@ export type {
   Carousel,
   ShopIntro,
   ShopIntroBanner,
+  UserAddress,
+  
+  // 商品相关类型
   ProductSpu,
   ProductSku,
-  UserAddress,
+  ProductCategory,
+  ProductBrand,
+  ProductAttributeKey,
+  ProductAttributeValue,
+  ProductSkuAttribute,
   SkuAttributeKV,
   
   // API 相关类型
@@ -63,10 +72,12 @@ export {
   DeliveryStatus,
   OrderStatus,
   PaymentMethod,
+  UserAddressTag,
+  UserAddressStatus,
   ProductSpuStatus,
   ProductSkuStatus,
-  UserAddressTag,
-  UserAddressStatus
+  ProductCategoryStatus,
+  ProductBrandStatus
 } from '@skeleton/shared-types';
 
 // BaseModel 作为 BaseEntity 的别名，保持向后兼容

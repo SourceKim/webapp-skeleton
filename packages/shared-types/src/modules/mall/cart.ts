@@ -3,7 +3,7 @@
  */
 import { BaseEntity } from '../../base'
 import type { User } from '../user'
-import type { ProductSku } from './product'
+import type { ProductSku } from '../product'
 
 /**
  * 购物车实体接口

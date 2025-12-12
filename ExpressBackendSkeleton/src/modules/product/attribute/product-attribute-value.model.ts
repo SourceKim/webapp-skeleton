@@ -3,9 +3,10 @@ import { BaseEntity } from '@/modules/common/base.model';
 import { IsString, MaxLength } from 'class-validator';
 import { ProductAttributeKey } from './product-attribute-key.model';
 import { Material } from '@/modules/material/material.model';
+import type { ProductAttributeValue as IProductAttributeValue } from '@skeleton/shared-types';
 
 @Entity('product_attribute_values')
-export class ProductAttributeValue extends BaseEntity {
+export class ProductAttributeValue extends BaseEntity implements IProductAttributeValue {
     @ManyToOne(() => ProductAttributeKey, k => k.values, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'attribute_key_id' })
     attribute_key!: ProductAttributeKey;

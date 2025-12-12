@@ -62,23 +62,27 @@ export const deleteCarousel = (id: string, option?: RequestOption): RestResponse
 }
 
 // --- ShopIntro API ---
+import type { ShopIntro as IShopIntro, ShopIntroBanner as IShopIntroBanner } from '@skeleton/shared-types'
 
-export interface ShopIntroBannerDTO {
-    id: string
-    material_id: string
+/**
+ * 店铺介绍横幅类型定义
+ * 使用 @skeleton/shared-types 中的统一类型定义
+ */
+export type { ShopIntroBanner } from '@skeleton/shared-types'
+
+// 扩展 ShopIntroBanner 接口
+export interface ShopIntroBannerDTO extends IShopIntroBanner {
     material?: any
-    sort_order: number
 }
 
-export interface ShopIntroDTO {
-    id: string
-    name: string
-    introduction?: string
-    detail?: string
-    contact_phone?: string
-    longitude?: number
-    latitude?: number
-    address?: string
+/**
+ * 店铺介绍类型定义
+ * 使用 @skeleton/shared-types 中的统一类型定义
+ */
+export type { ShopIntro } from '@skeleton/shared-types'
+
+// 扩展 ShopIntro 接口
+export interface ShopIntroDTO extends IShopIntro {
     banners?: ShopIntroBannerDTO[]
 }
 

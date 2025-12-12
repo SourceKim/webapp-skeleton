@@ -1,14 +1,15 @@
-import type { ProductSku as IProductSku } from '@skeleton/shared-types'
+import type { ProductSku as IProductSku, SkuAttributeKV } from '@skeleton/shared-types'
 
 /**
  * 商品SKU类型定义
  * 使用 @skeleton/shared-types 中的统一类型定义
  */
-export type { ProductSku } from '@skeleton/shared-types'
+export type { ProductSku, SkuAttributeKV } from '@skeleton/shared-types'
 
 // 扩展 ProductSku 接口，添加前端特定字段
 export interface ProductSku extends IProductSku {
   status: string | IProductSku['status'] // 后端可能返回中文或枚举值
+  attributes?: SkuAttributeKV[] // 兼容旧字段名
   created_at?: string | Date
   updated_at?: string | Date
 }

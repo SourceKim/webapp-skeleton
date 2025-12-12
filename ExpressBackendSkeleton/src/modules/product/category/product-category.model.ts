@@ -2,16 +2,14 @@ import { Entity, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 import { IsEnum, IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 import { BaseEntity } from '@/modules/common/base.model';
 import { Material } from '@/modules/material/material.model';
-
 import { ProductBrand } from '../brand/product-brand.model';
+import { ProductCategoryStatus, type ProductCategory as IProductCategory } from '@skeleton/shared-types';
 
-export enum ProductCategoryStatus {
-    ENABLED = 'ENABLED',
-    DISABLED = 'DISABLED',
-}
+// 重新导出枚举，保持向后兼容
+export { ProductCategoryStatus };
 
 @Entity('product_categories')
-export class ProductCategory extends BaseEntity {
+export class ProductCategory extends BaseEntity implements IProductCategory {
     @Column({ type: 'varchar', length: 50 })
     @IsString()
     @MaxLength(50)

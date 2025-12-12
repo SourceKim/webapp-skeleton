@@ -3,9 +3,10 @@ import { BaseEntity } from '@/modules/common/base.model';
 import { IsBoolean, IsString, MaxLength } from 'class-validator';
 import { ProductSpu } from '@/modules/product/spu/product-spu.model';
 import { ProductAttributeValue } from './product-attribute-value.model';
+import type { ProductAttributeKey as IProductAttributeKey } from '@skeleton/shared-types';
 
 @Entity('product_attribute_keys')
-export class ProductAttributeKey extends BaseEntity {
+export class ProductAttributeKey extends BaseEntity implements IProductAttributeKey {
     @ManyToOne(() => ProductSpu, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'spu_id' })
     spu!: ProductSpu;

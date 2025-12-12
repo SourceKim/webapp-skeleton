@@ -2,15 +2,14 @@ import { Entity, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 import { IsEnum, IsOptional, IsString, MaxLength, IsUrl } from 'class-validator';
 import { BaseEntity } from '@/modules/common/base.model';
 import { Material } from '@/modules/material/material.model';
+import { ProductBrandStatus, type ProductBrand as IProductBrand } from '@skeleton/shared-types';
 
-export enum ProductBrandStatus {
-    ENABLED = 'ENABLED',
-    DISABLED = 'DISABLED',
-}
+// 重新导出枚举，保持向后兼容
+export { ProductBrandStatus };
 
 @Entity('product_brands')
 @Unique('uniq_product_brand_name', ['name'])
-export class ProductBrand extends BaseEntity {
+export class ProductBrand extends BaseEntity implements IProductBrand {
     @Column({ type: 'varchar', length: 50 })
     @IsString()
     @MaxLength(50)

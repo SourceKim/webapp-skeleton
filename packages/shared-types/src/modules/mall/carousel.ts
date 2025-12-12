@@ -3,7 +3,7 @@
  */
 import { BaseEntity } from '../../base'
 import type { Material } from '../material'
-import type { ProductSpu } from './product'
+import type { ProductSpu } from '../product'
 
 /**
  * 轮播图实体接口
