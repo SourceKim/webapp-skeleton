@@ -1,5 +1,5 @@
 import { SelectQueryBuilder, Brackets, ObjectLiteral } from 'typeorm';
-import { FilterOperator, FilterCondition } from '@/modules/common/common.dto';
+import { FilterOperator, FilterCondition } from '@skeleton/shared-types';
 
 /**
  * 查询筛选构建器

@@ -8,6 +8,9 @@
 // 基础类型
 export * from './base'
 
+// 通用工具类型
+export * from './common'
+
 // 枚举类型
 export * from './enums'
 

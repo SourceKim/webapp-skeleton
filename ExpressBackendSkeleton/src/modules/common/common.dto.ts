@@ -1,5 +1,6 @@
 import { Expose } from "class-transformer";
 import { IsNotEmpty, IsString } from "class-validator";
+import { FilterOperator, FilterCondition } from '@skeleton/shared-types';
 
 export class BaseDTO {
     @Expose()
@@ -21,33 +22,8 @@ export class FindByIdDto {
     id!: string;
 }
 
-/**
- * 筛选操作符枚举
- */
-export enum FilterOperator {
-    EQUALS = 'eq',           // 等于
-    NOT_EQUALS = 'ne',       // 不等于
-    LIKE = 'like',           // 模糊匹配
-    ILIKE = 'ilike',         // 忽略大小写的模糊匹配
-    IN = 'in',               // 在...之中
-    NOT_IN = 'not_in',       // 不在...之中
-    GREATER_THAN = 'gt',     // 大于
-    GREATER_THAN_EQUAL = 'gte', // 大于等于
-    LESS_THAN = 'lt',        // 小于
-    LESS_THAN_EQUAL = 'lte', // 小于等于
-    IS_NULL = 'is_null',     // 为空
-    IS_NOT_NULL = 'is_not_null', // 不为空
-    BETWEEN = 'between',     // 在...之间
-}
-
-/**
- * 筛选条件接口
- */
-export interface FilterCondition {
-    field: string;
-    operator: FilterOperator;
-    value: any;
-}
+// 重新导出 shared-types 中的类型，保持向后兼容
+export { FilterOperator, FilterCondition };
 
 /**
  * 分页查询接口
