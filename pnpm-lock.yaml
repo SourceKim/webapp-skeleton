@@ -314,6 +314,10 @@ importers:
         version: 2.2.12(typescript@5.7.3)
 
   packages/shared-types:
+    dependencies:
+      zod:
+        specifier: ^4.1.13
+        version: 4.1.13
     devDependencies:
       tsup:
         specifier: ^8.0.0
@@ -6758,6 +6762,9 @@ packages:
   zip-stream@4.1.1:
     resolution: {integrity: sha512-9qv4rlDiopXg4E69k+vMHjNN63YFMe9sZMrdlvKnCjlCRWeCBswPPMPUfx+ipsAWq1LXHe70RcbaHdJJpS6hyQ==}
     engines: {node: '>= 10'}
+
+  zod@4.1.13:
+    resolution: {integrity: sha512-AvvthqfqrAhNH9dnfmrfKzX5upOdjUVJYFqNSlkmGf64gRaTzlPwz99IHYnVs28qYAybvAlBV+H7pn0saFY4Ig==}
 
 snapshots:
 
@@ -13806,3 +13813,5 @@ snapshots:
       archiver-utils: 3.0.4
       compress-commons: 4.1.2
       readable-stream: 3.6.2
+
+  zod@4.1.13: {}

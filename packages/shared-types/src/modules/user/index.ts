@@ -24,3 +24,6 @@ export interface User extends BaseEntity {
 
 // 导出 DTO 类型
 export * from './dto'
+
+// 导出验证规则配置
+export * from './validation'

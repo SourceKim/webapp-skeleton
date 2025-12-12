@@ -49,3 +49,6 @@ export interface MaterialTag extends BaseEntity {
 
 // 导出 DTO 类型
 export * from './dto'
+
+// 导出验证规则
+export * from './validation'

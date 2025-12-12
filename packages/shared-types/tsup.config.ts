@@ -8,6 +8,6 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   treeshake: true,
-  // 类型定义包不需要外部依赖
-  external: []
+  // zod 是运行时依赖，不应该被打包
+  external: ['zod']
 })
