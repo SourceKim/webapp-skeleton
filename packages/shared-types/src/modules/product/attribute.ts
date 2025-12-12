@@ -33,10 +33,10 @@ export interface ProductAttributeKey extends BaseEntity {
  * 商品SKU属性关联实体接口
  */
 export interface ProductSkuAttribute extends BaseEntity {
-  sku_id: string
+  sku_id: string // 外键字段
   sku?: any // 关联商品SKU（避免循环引用）
-  attribute_key_id: string
+  attribute_key_id: string // 外键字段
   attribute_key?: ProductAttributeKey // 关联属性键
-  attribute_value_id: string
+  attribute_value_id: string // 外键字段
   attribute_value?: ProductAttributeValue // 关联属性值
 }

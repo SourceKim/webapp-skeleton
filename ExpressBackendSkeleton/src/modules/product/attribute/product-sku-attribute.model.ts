@@ -7,13 +7,22 @@ import type { ProductSkuAttribute as IProductSkuAttribute } from '@skeleton/shar
 
 @Entity('product_sku_attributes')
 export class ProductSkuAttribute extends BaseEntity implements IProductSkuAttribute {
+    @Column({ type: 'varchar', length: 36, name: 'sku_id' })
+    sku_id!: string;
+
     @ManyToOne(() => ProductSku, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'sku_id' })
     sku!: ProductSku;
 
+    @Column({ type: 'varchar', length: 36, name: 'attribute_key_id' })
+    attribute_key_id!: string;
+
     @ManyToOne(() => ProductAttributeKey, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'attribute_key_id' })
     attribute_key!: ProductAttributeKey;
+
+    @Column({ type: 'varchar', length: 36, name: 'attribute_value_id' })
+    attribute_value_id!: string;
 
     @ManyToOne(() => ProductAttributeValue, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'attribute_value_id' })
