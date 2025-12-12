@@ -3,7 +3,7 @@
  * 用于在 Vue 组件中使用 Zod Schema 进行表单验证
  */
 
-import { validate, formatValidationErrors, ValidationResult } from '@skeleton/shared-types'
+import { validate, formatValidationErrors, type ValidationResult } from '@skeleton/shared-types'
 
 /**
  * 验证表单数据

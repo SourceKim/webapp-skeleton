@@ -114,18 +114,17 @@
           errorMsg: '登录失败' // 失败的提示信息
         }
       ).then((res) => {
-          const data = res.data
-          console.log('登录成功', data)
-          useAuthStore().token = data.access_token
-          useAuthStore().loginState = 'success'
-          useAuthStore().user = data.user
-          const firstRoute = useMenuStore().getFirstRoute()
-          console.log('firstRoute', firstRoute)
-          router.replace(firstRoute.fullPath)
-        }).catch((err) => {
-          console.log('登录失败', err)
-        })
-      }
+        const data = res.data
+        console.log('登录成功', data)
+        useAuthStore().token = data.access_token
+        useAuthStore().loginState = 'success'
+        useAuthStore().user = data.user
+        const firstRoute = useMenuStore().getFirstRoute()
+        console.log('firstRoute', firstRoute)
+        router.replace(firstRoute.fullPath)
+      }).catch((err) => {
+        console.log('登录失败', err)
+      })
     })
   }
   

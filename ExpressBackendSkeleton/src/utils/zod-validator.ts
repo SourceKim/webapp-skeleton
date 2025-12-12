@@ -5,7 +5,7 @@
 
 import { Request, Response, NextFunction } from 'express'
 import { HttpException } from '@/exceptions/http.exception'
-import { validate, formatValidationErrors, ValidationResult } from '@skeleton/shared-types'
+import { validate, formatValidationErrors, type ValidationResult } from '@skeleton/shared-types'
 import { z } from 'zod'
 
 /**

@@ -12,7 +12,7 @@ export interface ValidationResult<T = any> {
   success: boolean
   data?: T
   errors?: Array<{
-    path: (string | number | symbol)[]
+    path: (string | number)[]
     message: string
   }>
 }
@@ -39,7 +39,7 @@ export function validate<T>(
   return {
     success: false,
     errors: result.error.issues.map((err: z.ZodIssue) => ({
-      path: err.path as (string | number)[],
+      path: err.path.filter((p): p is string | number => typeof p === 'string' || typeof p === 'number') as (string | number)[],
       message: err.message
     }))
   }
@@ -81,7 +81,7 @@ export async function validateAsync<T>(
   return {
     success: false,
     errors: result.error.issues.map((err: z.ZodIssue) => ({
-      path: err.path as (string | number)[],
+      path: err.path.filter((p): p is string | number => typeof p === 'string' || typeof p === 'number') as (string | number)[],
       message: err.message
     }))
   }
