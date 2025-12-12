@@ -2,13 +2,14 @@ import { Material } from '../material.model';
 import { Entity, Column, ManyToMany, Index } from 'typeorm';
 import { IsString, MaxLength, IsOptional, IsNotEmpty } from 'class-validator';
 import { BaseEntity } from '@/modules/common/base.model';
+import type { MaterialTag as IMaterialTag } from '@skeleton/shared-types';
 
 /**
  * 素材标签实体
  * 用于管理素材的标签
  */
 @Entity('material_tags')
-export class MaterialTag extends BaseEntity {
+export class MaterialTag extends BaseEntity implements IMaterialTag {
     /**
      * 标签名称
      */

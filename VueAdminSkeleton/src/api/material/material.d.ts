@@ -1,79 +1,24 @@
 /**
  * 素材管理相关类型定义
+ * 使用 @skeleton/shared-types 中的统一类型定义
  */
 import type { PaginationQuery } from '../types/common';
+import type {
+  Material as IMaterial,
+  MaterialCategory as IMaterialCategory,
+  MaterialTag as IMaterialTag,
+  MaterialType,
+  User as IUser
+} from '@skeleton/shared-types';
 
-/**
- * 素材类型
- */
-export type MaterialType = 'image' | 'audio' | 'video' | 'document' | 'text' | 'other';
+// 重新导出 shared-types 中的类型和枚举
+export type { MaterialType };
+export type { Material, MaterialCategory, MaterialTag, User } from '@skeleton/shared-types';
 
-/**
- * 素材分类信息
- */
-export interface MaterialCategory {
-  id: string;
-  name: string;
-  description?: string;
-  created_at: string;
-  updated_at: string;
-  deleted_at?: string;
-}
-
-/**
- * 素材标签信息
- */
-export interface MaterialTag {
-  id: string;
-  name: string;
-  description?: string;
-  created_at: string;
-  updated_at: string;
-  deleted_at?: string;
-}
-
-/**
- * 用户信息
- */
-export interface User {
-  id: string;
-  username: string;
-  email: string;
-  nickname?: string;
-  phone?: string;
-  avatar?: string;
-  status: string;
-  bio?: string;
-  created_at: string;
-  updated_at: string;
-  deleted_at?: string;
-}
-
-/**
- * 素材信息
- */
-export interface Material {
-  id: string;
-  filename: string;
-  original_name: string;
-  file_path: string;
-  mime_type: string;
-  file_size: string;
-  type: MaterialType;
-  material_category?: MaterialCategory;
-  description?: string;
-  material_tags: MaterialTag[];
-  user: User;
-  is_public: boolean;
-  upload_dir?: string;
-  metadata?: Record<string, any>;
-  parent_id?: string;
-  access_count: number;
-  file_hash: string;
+// 扩展 Material 接口，添加前端特定的字段
+export interface Material extends IMaterial {
+  // 前端特定的扩展字段
   url?: string;
-  created_at: string;
-  updated_at: string;
-  deleted_at?: string;
   
   // 兼容旧字段名
   originalname?: string;

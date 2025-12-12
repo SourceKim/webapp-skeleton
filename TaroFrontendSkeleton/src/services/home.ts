@@ -1,6 +1,7 @@
 import api from './api'
 import { Material } from './material'
 import { getUploadUrl as getEnvUploadUrl } from '../utils/env'
+import type { PaginatedResponse } from '@skeleton/shared-types'
 
 export interface Carousel {
   id: string
@@ -32,10 +33,8 @@ export interface ShopIntro {
   banners?: ShopIntroBanner[]
 }
 
-export interface PaginatedResponse<T> {
-  items: T[]
-  meta: any
-}
+// 重新导出 PaginatedResponse 类型
+export type { PaginatedResponse }
 
 export const getUploadUrl = (filePath?: string): string => {
   try {

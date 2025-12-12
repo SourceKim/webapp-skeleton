@@ -1,5 +1,6 @@
 import Taro from '@tarojs/taro'
 import { getApiUrl } from '../utils/env'
+import type { ApiResponse } from '@skeleton/shared-types'
 
 // API基础URL
 export const BASE_URL = getApiUrl()
@@ -15,13 +16,8 @@ interface RequestOptions {
   headers?: Record<string, string>
 }
 
-// 响应接口
-interface ApiResponse<T = any> {
-  code: number
-  message: string
-  data: T
-  error?: any
-}
+// 重新导出 ApiResponse 类型
+export type { ApiResponse }
 
 // 避免多次重定向
 let isRedirecting = false

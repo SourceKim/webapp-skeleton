@@ -3,21 +3,13 @@ import { IsEmail, Length, IsOptional, Matches, IsEnum, MinLength, IsDateString }
 import * as bcrypt from 'bcryptjs';
 import { Role } from '@/modules/role/role.model';
 import { BaseEntity } from '@/modules/common/base.model';
+import { UserStatus, UserGender, type User as IUser } from '@skeleton/shared-types';
 
-export enum UserStatus {
-    ACTIVE = 'active',
-    INACTIVE = 'inactive',
-    BANNED = 'banned'
-}
-
-export enum UserGender {
-    MALE = 'male',
-    FEMALE = 'female',
-    OTHER = 'other'
-}
+// 重新导出枚举，保持向后兼容
+export { UserStatus, UserGender };
 
 @Entity('users')
-export class User extends BaseEntity {
+export class User extends BaseEntity implements IUser {
     @Column({ type: 'varchar', length: 100, unique: true })
     @Length(3, 100, { message: '用户名长度必须在3-100个字符之间' })
     username!: string;

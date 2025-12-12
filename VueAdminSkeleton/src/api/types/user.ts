@@ -1,48 +1,18 @@
 /**
  * 用户相关类型定义
+ * 使用 @skeleton/shared-types 中的统一类型定义
  */
 import type { PaginationQuery } from './common';
+import type {
+  User,
+  Role,
+  Permission,
+  UserStatus,
+  UserGender
+} from '@skeleton/shared-types';
 
-/**
- * 用户状态
- */
-export type UserStatus = 'active' | 'inactive' | 'banned';
-
-/**
- * 角色信息
- */
-export interface Role {
-  id: string;
-  name: string;
-  description?: string;
-}
-
-/**
- * 权限信息
- */
-export interface Permission {
-  id: string;
-  name: string;
-  resource: string;
-  action: string;
-}
-
-/**
- * 用户信息
- */
-export interface User {
-  id: string;
-  username: string;
-  email?: string;
-  phone?: string;
-  nickname?: string;
-  avatar?: string;
-  bio?: string;
-  status: UserStatus;
-  created_at: string;
-  updated_at: string;
-  roles?: Role[];
-}
+// 重新导出 shared-types 中的类型和枚举（供外部使用）
+export type { UserStatus, UserGender, User, Role, Permission };
 
 /**
  * 登录请求参数

@@ -2,13 +2,14 @@ import { Material } from '../material.model';
 import { Entity, Column, OneToMany, Index } from 'typeorm';
 import { IsString, MaxLength, IsOptional, IsNotEmpty } from 'class-validator';
 import { BaseEntity } from '@/modules/common/base.model';
+import type { MaterialCategory as IMaterialCategory } from '@skeleton/shared-types';
 
 /**
  * 素材分类实体
  * 用于管理素材的分类
  */
 @Entity('material_categories')
-export class MaterialCategory extends BaseEntity {
+export class MaterialCategory extends BaseEntity implements IMaterialCategory {
     /**
      * 分类名称
      */

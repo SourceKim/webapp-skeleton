@@ -39,11 +39,32 @@ const paginationData: PaginationResponse<User> = {
 
 // 用户类型
 const user: User = {
-  id: 1,
+  id: '1',
   username: 'john',
   email: 'john@example.com',
-  createdAt: Date.now(),
-  updatedAt: Date.now()
+  created_at: new Date(),
+  updated_at: new Date(),
+  status: UserStatus.ACTIVE,
+  gender: UserGender.MALE
+}
+
+// 枚举类型使用
+import { UserStatus, MaterialType } from '@skeleton/shared-types'
+
+const status = UserStatus.ACTIVE
+const materialType = MaterialType.IMAGE
+
+// 素材类型
+import type { Material } from '@skeleton/shared-types'
+
+const material: Material = {
+  id: '1',
+  type: MaterialType.IMAGE,
+  filename: 'example.jpg',
+  is_public: true,
+  access_count: 0,
+  created_at: new Date(),
+  updated_at: new Date()
 }
 ```
 
@@ -54,18 +75,35 @@ const user: User = {
 - `ApiResponse<T>` - API 响应类型
 - `PaginationParams` - 分页请求参数
 - `PaginationResponse<T>` - 分页响应数据
+- `PaginationQuery` - 分页查询参数（兼容后端）
+- `PaginatedResponse<T>` - 分页响应数据（兼容后端）
+- `RequestOption` - 请求选项
+- `RestResponse<T>` - REST 响应类型
+- `PageResult<T>` - 分页结果类型（兼容表格组件）
 
 ### 基础类型
 
 - `ID` - 通用 ID 类型（string | number）
 - `Timestamp` - 时间戳类型（number | string | Date）
-- `BaseEntity` - 通用实体基础字段
+- `BaseEntity` - 通用实体基础字段（包含 id, created_at, updated_at, deleted_at）
+
+### 枚举类型
+
+- `UserStatus` - 用户状态枚举（ACTIVE, INACTIVE, BANNED）
+- `UserGender` - 用户性别枚举（MALE, FEMALE, OTHER）
+- `MaterialType` - 素材类型枚举（IMAGE, AUDIO, VIDEO, DOCUMENT, TEXT, AVATAR, OTHER）
 
 ### 业务类型
 
-- `User` - 用户类型
-- `Role` - 角色类型
-- `Permission` - 权限类型
+#### 用户相关
+- `User` - 用户实体接口
+- `Role` - 角色实体接口
+- `Permission` - 权限实体接口
+
+#### 素材相关
+- `Material` - 素材实体接口
+- `MaterialCategory` - 素材分类实体接口
+- `MaterialTag` - 素材标签实体接口
 
 ## 开发
 

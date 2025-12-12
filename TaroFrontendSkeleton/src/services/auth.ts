@@ -1,5 +1,9 @@
 import api from './api'
 import Taro from '@tarojs/taro'
+import type { User, UserGender, UserStatus } from '@skeleton/shared-types'
+
+// 重新导出枚举类型
+export type { UserGender, UserStatus } from '@skeleton/shared-types'
 
 // 用户登录请求参数
 export interface LoginParams {
@@ -8,7 +12,7 @@ export interface LoginParams {
 }
 
 // 用户注册请求参数
-export type Gender = 'male' | 'female' | 'other'
+export type Gender = UserGender
 
 export interface RegisterParams {
   username: string
@@ -22,19 +26,9 @@ export interface RegisterParams {
   bio?: string
 }
 
-// 用户信息响应
-export interface UserInfo {
-  id: string
-  username: string
-  email?: string
-  phone?: string
-  nickname?: string
-  avatar?: string
-  bio?: string
-  status: 'active' | 'inactive' | 'banned'
-  is_active: boolean
-  created_at: string
-  updated_at: string
+// 用户信息响应（扩展 User 接口，添加前端特定字段）
+export interface UserInfo extends User {
+  is_active?: boolean
   roles?: Array<{
     id: string
     name: string

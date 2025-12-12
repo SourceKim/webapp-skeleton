@@ -4,26 +4,17 @@ import { IsString, IsInt, IsBoolean, IsOptional, IsEnum, Min, MaxLength, IsNotEm
 import { BaseEntity } from '@/modules/common/base.model';
 import { MaterialCategory } from '@/modules/material/mateial-category/material-category.model';
 import { MaterialTag } from '@/modules/material/mateial-tag/material-tag.model';
+import { MaterialType, type Material as IMaterial } from '@skeleton/shared-types';
 
-/**
- * 素材类型枚举
- */
-export enum MaterialType {
-    IMAGE = 'image',
-    AUDIO = 'audio',
-    VIDEO = 'video',
-    DOCUMENT = 'document',
-    TEXT = 'text',
-    AVATAR = 'avatar',
-    OTHER = 'other'
-}
+// 重新导出枚举，保持向后兼容
+export { MaterialType };
 
 /**
  * 素材实体类
  * 用于管理各种类型的素材，包括图片、音频、视频、文档、文本等
  */
 @Entity('materials')
-export class Material extends BaseEntity {
+export class Material extends BaseEntity implements IMaterial {
 
 
     /**

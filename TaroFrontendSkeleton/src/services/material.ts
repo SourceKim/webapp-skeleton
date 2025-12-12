@@ -1,31 +1,18 @@
 import api, { BASE_URL } from './api'
 import Taro from '@tarojs/taro'
+import type { Material as IMaterial, MaterialType, PaginationQuery, PaginatedResponse } from '@skeleton/shared-types'
 
-// 素材类型
-export type MaterialType = 'image' | 'audio' | 'video' | 'document' | 'text' | 'other'
+// 重新导出 MaterialType 枚举
+export { MaterialType } from '@skeleton/shared-types';
 
-// 素材接口
-export interface Material {
-  id: string
-  filename?: string
+// 扩展 Material 接口，添加前端特定的字段
+export interface Material extends IMaterial {
+  // 兼容旧字段名
   originalname?: string
-  file_path?: string
   mimetype?: string
   size?: number
-  type: MaterialType
   category?: string
-  description?: string
-  is_public: boolean
-  upload_dir?: string
-  user?: {
-    id: string
-    username: string
-  }
   tags?: string[]
-  metadata?: any
-  parent_id?: string
-  created_at: string
-  updated_at: string
 }
 
 // 创建素材请求参数
@@ -55,12 +42,8 @@ export interface UpdateMaterialParams {
 }
 
 // 获取素材列表查询参数
-export interface GetMaterialsQueryParams {
-  page?: number
-  limit?: number
-  sort_by?: string
-  sort_order?: 'ASC' | 'DESC'
-  type?: MaterialType
+export interface GetMaterialsQueryParams extends PaginationQuery {
+  type?: MaterialType | MaterialType[]
   category?: string
   keyword?: string
   is_public?: boolean
@@ -71,17 +54,7 @@ export interface GetMaterialsQueryParams {
 }
 
 // 分页素材列表响应
-export interface PaginatedMaterialsResponse {
-  items: Material[]
-  meta: {
-    total: number
-    page: number
-    limit: number
-    pages: number
-    sort_by?: string
-    sort_order?: 'ASC' | 'DESC'
-  }
-}
+export interface PaginatedMaterialsResponse extends PaginatedResponse<Material> {}
 
 // 批量删除素材请求参数
 export interface BatchDeleteMaterialsParams {

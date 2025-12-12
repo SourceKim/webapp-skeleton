@@ -1,7 +1,9 @@
 import api from './api'
 import { Material } from './material'
 import { getUploadUrl as getEnvUploadUrl } from '../utils/env'
+import type { PaginatedResponse } from '@skeleton/shared-types'
 
+// PaginatedMeta 保持本地定义（与后端响应结构匹配）
 export interface PaginatedMeta {
   total: number
   page: number
@@ -75,7 +77,8 @@ export interface Sku {
   attributes?: SkuAttributeKV[]
 }
 
-export interface PaginatedResponse<T> {
+// 扩展 PaginatedResponse，使用本地的 meta 结构
+export interface PaginatedResponse<T> extends Omit<import('@skeleton/shared-types').PaginatedResponse<T>, 'meta'> {
   items: T[]
   meta: PaginatedMeta
 }

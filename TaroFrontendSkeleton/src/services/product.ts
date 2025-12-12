@@ -1,4 +1,5 @@
 import api, { BASE_URL } from './api'
+import type { Material } from '@skeleton/shared-types'
 
 // 与后端 ProductDTO 对齐的产品模型
 export interface ProductMaterialRef {
@@ -46,11 +47,9 @@ export interface UpdateProductParams {
 }
 
 // 查询参数（分页中间件支持 sort 与 filters）
-export interface ProductQueryParams {
-  page?: number
-  limit?: number
-  sort_by?: string
-  sort_order?: 'ASC' | 'DESC'
+import type { PaginationQuery, PaginatedResponse } from '@skeleton/shared-types'
+
+export interface ProductQueryParams extends PaginationQuery {
   filters?: Record<string, any>
 }
 
@@ -63,7 +62,8 @@ export interface PaginatedMeta {
   sort_order?: 'ASC' | 'DESC'
 }
 
-export interface PaginatedProductsResponse {
+// 扩展 PaginatedResponse，使用本地的 meta 结构
+export interface PaginatedProductsResponse extends Omit<PaginatedResponse<Product>, 'meta'> {
   items: Product[]
   meta: PaginatedMeta
 }

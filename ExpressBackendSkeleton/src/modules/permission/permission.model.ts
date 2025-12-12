@@ -2,9 +2,10 @@ import { Entity, Column, ManyToMany } from 'typeorm';
 import { Role } from '@/modules/role/role.model';
 import { IsString, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 import { BaseEntity } from '@/modules/common/base.model';
+import type { Permission as IPermission } from '@skeleton/shared-types';
 
 @Entity('permissions')
-export class Permission extends BaseEntity {
+export class Permission extends BaseEntity implements IPermission {
     @Column({ type: 'varchar', length: 100, unique: true })
     @IsString()
     @IsNotEmpty({ message: '权限名称不能为空' })

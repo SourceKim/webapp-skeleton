@@ -1,5 +1,6 @@
 import api from './api'
 import type { UserInfo } from './auth'
+import type { UserGender } from '@skeleton/shared-types'
 
 export interface UpdateProfileParams {
   username?: string
@@ -9,7 +10,7 @@ export interface UpdateProfileParams {
   nickname?: string
   avatar?: string
   bio?: string
-  gender?: 'male' | 'female' | 'other'
+  gender?: UserGender
   birthdate?: string
 }
 
