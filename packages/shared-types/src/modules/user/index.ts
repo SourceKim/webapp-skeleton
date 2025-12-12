@@ -1,9 +1,9 @@
 /**
  * 用户相关类型定义
  */
-import { BaseEntity } from '../base'
-import { UserStatus, UserGender } from '../enums'
-import type { Role } from './role'
+import { BaseEntity } from '../../base'
+import { UserStatus, UserGender } from '../../enums'
+import type { Role } from '../role'
 
 /**
  * 用户实体接口

@@ -1,9 +1,9 @@
 /**
  * 素材相关类型定义
  */
-import { BaseEntity } from '../base'
-import { MaterialType } from '../enums'
-import type { User } from './user'
+import { BaseEntity } from '../../base'
+import { MaterialType } from '../../enums'
+import type { User } from '../user'
 
 /**
  * 素材实体接口
