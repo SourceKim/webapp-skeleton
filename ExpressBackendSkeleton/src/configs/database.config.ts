@@ -24,7 +24,7 @@ import { ShopIntro, ShopIntroBanner } from '@/modules/mall/shop-intro/shop-intro
 export const AppDataSource = new DataSource({
     type: 'mysql',
     host: ENV.MYSQL_HOST,
-    port: parseInt(ENV.MYSQL_PORT),
+    port: ENV.MYSQL_PORT,  // 已经是 number 类型，无需 parseInt
     username: ENV.MYSQL_USER,
     password: ENV.MYSQL_PASSWORD,  // 处理空密码的情况
     database: ENV.MYSQL_DATABASE,

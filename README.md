@@ -1,11 +1,42 @@
 ## 简介
 
-Skeleton 是一个全栈项目骨架，包含：
+Skeleton 是一个全栈项目骨架，采用 **Monorepo** 架构，包含：
 - **ExpressBackendSkeleton**: Express.js + TypeScript 后端服务
 - **VueAdminSkeleton**: Vue 3 + Element Plus 管理后台
 - **TaroFrontendSkeleton**: Taro + Vue 3 跨平台前端应用
+- **packages/**: 共享包目录
+  - `@skeleton/shared-utils`: 共享工具函数库
+  - `@skeleton/shared-types`: 共享 TypeScript 类型定义
 
-## 快速开始
+## Monorepo 架构
+
+本项目使用 **pnpm workspaces** 管理多个包和项目，通过共享包实现代码复用。
+
+### 快速开始（推荐）
+
+```bash
+# 1. 安装 pnpm（如果还没有）
+npm install -g pnpm
+
+# 2. 安装所有依赖
+pnpm install
+
+# 3. 构建共享包
+pnpm build:shared
+
+# 4. 启动开发服务器
+pnpm dev:backend   # 启动后端
+pnpm dev:admin     # 启动管理后台
+pnpm dev:taro      # 启动 Taro H5
+pnpm dev:all       # 启动所有项目（并行）
+```
+
+更多 Monorepo 使用说明请查看：
+- [快速开始指南](./QUICKSTART.md)
+- [Monorepo 使用指南](./MONOREPO.md)
+- [迁移指南](./MIGRATION.md)
+
+## 快速开始（传统方式）
 
 ### 统一管理脚本
 

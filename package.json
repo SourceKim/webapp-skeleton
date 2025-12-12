@@ -1,0 +1,38 @@
+{
+  "name": "skeleton-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Skeleton 全栈项目 Monorepo",
+  "scripts": {
+    "dev:backend": "pnpm --filter express-backend-skeleton dev",
+    "dev:admin": "pnpm --filter admin-vue-skeleton dev",
+    "dev:taro": "pnpm --filter taro-frontend-skeleton dev:h5",
+    "dev:all": "pnpm -r --parallel dev",
+    "build:backend": "pnpm --filter express-backend-skeleton build",
+    "build:admin": "pnpm --filter admin-vue-skeleton build",
+    "build:taro": "pnpm --filter taro-frontend-skeleton build:h5",
+    "build:all": "pnpm -r build",
+    "build:shared": "pnpm --filter '@skeleton/*' build",
+    "lint": "pnpm -r lint",
+    "clean": "pnpm -r exec rm -rf dist build node_modules"
+  },
+  "keywords": [
+    "monorepo",
+    "typescript",
+    "express",
+    "vue",
+    "taro"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}

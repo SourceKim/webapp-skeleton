@@ -37,6 +37,8 @@
   ],
   "author": "",
   "dependencies": {
+    "@skeleton/shared-types": "workspace:*",
+    "@skeleton/shared-utils": "workspace:*",
     "@babel/runtime": "^7.24.4",
     "@nutui/icons-vue-taro": "^0.0.9",
     "@nutui/nutui-taro": "^4.3.14",

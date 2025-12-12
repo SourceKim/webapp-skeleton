@@ -1,0 +1,64 @@
+{
+  "name": "@skeleton/shared-utils",
+  "version": "1.0.0",
+  "description": "Skeleton 项目共享工具函数库",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "env": ["./dist/env.d.ts"],
+      "validation": ["./dist/validation.d.ts"]
+    }
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./env": {
+      "types": "./dist/env.d.ts",
+      "import": "./dist/env.mjs",
+      "require": "./dist/env.js"
+    },
+    "./validation": {
+      "types": "./dist/validation.d.ts",
+      "import": "./dist/validation.mjs",
+      "require": "./dist/validation.js"
+    },
+    "./env/vite": {
+      "types": "./dist/env/vite.d.ts",
+      "import": "./dist/env/vite.mjs",
+      "require": "./dist/env/vite.js"
+    },
+    "./env/taro": {
+      "types": "./dist/env/taro.d.ts",
+      "import": "./dist/env/taro.mjs",
+      "require": "./dist/env/taro.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "utils",
+    "shared",
+    "skeleton"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "tsup": "^8.0.0",
+    "typescript": "^5.8.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

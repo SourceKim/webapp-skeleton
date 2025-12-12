@@ -1,44 +1,31 @@
 /**
- * 环境变量配置工具
- * 参考 ExpressBackendSkeleton/src/configs/env.config.ts
+ * 环境变量配置工具（Vite 前端版本）
  * 
+ * 使用 @skeleton/shared-utils/env/vite 提供的工具函数
  * 所有环境变量都从此工具读取，如果未设置必需的环境变量则报错
+ * 
+ * 注意：前端项目使用 import.meta.env，而不是 process.env
+ * Vite 环境变量需要以 VITE_ 开头才能被访问
  */
 
-/**
- * 获取环境变量，如果未赋值则直接报错
- * @param key 环境变量键名
- * @param description 环境变量的描述信息（用于错误提示）
- * @param defaultValue 默认值（如果提供了默认值，则不会报错）
- * @returns 环境变量的值
- * @throws Error 如果环境变量未设置且没有默认值
- */
-export function getEnv(key: string, description?: string, defaultValue?: string): string {
-  const value = import.meta.env[key]
-  
-  if (value === undefined || value === '') {
-    if (defaultValue !== undefined) {
-      return defaultValue
-    }
-    
-    const desc = description ? ` (${description})` : ''
-    throw new Error(
-      `缺少必需的环境变量: ${key}${desc}\n` +
-      `请在 .env 文件中配置此环境变量`
-    )
-  }
-  
-  return value
-}
+// 从共享工具库导入 Vite 版本的环境变量工具
+import {
+  getEnv,
+  getEnvOptional,
+  getEnvNumber,
+  getEnvBoolean,
+  getEnvArray,
+  printAllEnv
+} from '@skeleton/shared-utils/env/vite'
 
-/**
- * 获取环境变量（可选），如果未赋值则返回 undefined
- * @param key 环境变量键名
- * @returns 环境变量的值或 undefined
- */
-export function getEnvOptional(key: string): string | undefined {
-  const value = import.meta.env[key]
-  return value === '' ? undefined : value
+// 重新导出所有工具函数
+export {
+  getEnv,
+  getEnvOptional,
+  getEnvNumber,
+  getEnvBoolean,
+  getEnvArray,
+  printAllEnv
 }
 
 /**
