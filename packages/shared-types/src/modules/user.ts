@@ -3,25 +3,7 @@
  */
 import { BaseEntity } from '../base'
 import { UserStatus, UserGender } from '../enums'
-
-/**
- * 权限实体接口（前向声明，避免循环引用）
- */
-export interface Permission extends BaseEntity {
-  name: string
-  resource: string
-  action: string
-  description?: string
-}
-
-/**
- * 角色实体接口
- */
-export interface Role extends BaseEntity {
-  name: string
-  description?: string
-  permissions?: Permission[] // 关联权限
-}
+import type { Role } from './role'
 
 /**
  * 用户实体接口
