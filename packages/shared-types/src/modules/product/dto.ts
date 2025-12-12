@@ -1,0 +1,214 @@
+/**
+ * 商品相关 DTO 类型定义
+ */
+import type { ProductSpu, ProductSku, ProductCategory, ProductBrand } from './index'
+import type { ProductSpuStatus, ProductSkuStatus, ProductCategoryStatus, ProductBrandStatus } from './enums'
+import type { Material } from '../material'
+
+/**
+ * 创建商品SPU请求参数
+ */
+export interface CreateProductSpuDto {
+  name: string
+  sub_title?: string
+  description?: string
+  category_id?: string
+  brand_id?: string
+  status?: ProductSpuStatus
+  main_material_id?: string
+  sub_material_ids?: string[]
+  detail_content?: string
+}
+
+/**
+ * 更新商品SPU请求参数
+ */
+export interface UpdateProductSpuDto {
+  name?: string
+  sub_title?: string
+  description?: string
+  category_id?: string
+  brand_id?: string
+  status?: ProductSpuStatus
+  main_material_id?: string
+  sub_material_ids?: string[]
+  detail_content?: string
+}
+
+/**
+ * 商品SPU查询参数
+ */
+export interface ProductSpuQueryDto {
+  page?: number
+  limit?: number
+  sort_by?: string
+  sort_order?: 'ASC' | 'DESC'
+  name?: string
+  category_id?: string
+  brand_id?: string
+  status?: ProductSpuStatus
+}
+
+/**
+ * 商品SPU响应数据
+ */
+export interface ProductSpuResponseDto extends ProductSpu {
+  price?: string // 最低价格
+  category?: ProductCategory
+  brand?: ProductBrand
+  main_material?: Material
+  sub_materials?: Material[]
+}
+
+/**
+ * 创建商品SKU请求参数
+ */
+export interface CreateProductSkuDto {
+  spu_id: string
+  sku_code: string
+  sku_name?: string
+  price: string
+  original_price?: string
+  cost_price?: string
+  stock: number
+  status?: ProductSkuStatus
+  is_default?: boolean
+  attribute_ids?: Array<{ key_id: string; value_id: string }> // 属性关联
+}
+
+/**
+ * 更新商品SKU请求参数
+ */
+export interface UpdateProductSkuDto {
+  sku_code?: string
+  sku_name?: string
+  price?: string
+  original_price?: string | null
+  cost_price?: string | null
+  stock?: number
+  status?: ProductSkuStatus
+  is_default?: boolean
+}
+
+/**
+ * 更新SKU价格请求参数
+ */
+export interface UpdateSkuPriceDto {
+  price: string
+}
+
+/**
+ * 更新SKU库存请求参数
+ */
+export interface UpdateSkuStockDto {
+  stock: number
+}
+
+/**
+ * 更新SKU状态请求参数
+ */
+export interface UpdateSkuStatusDto {
+  status: ProductSkuStatus
+}
+
+/**
+ * 商品SKU查询参数
+ */
+export interface ProductSkuQueryDto {
+  page?: number
+  limit?: number
+  sort_by?: string
+  sort_order?: 'ASC' | 'DESC'
+  spu_id?: string
+  sku_code?: string
+  status?: ProductSkuStatus
+}
+
+/**
+ * 商品SKU响应数据
+ */
+export interface ProductSkuResponseDto extends ProductSku {
+  attributes?: Array<{ key_id: string; value_id: string; key_name?: string; value?: string }>
+}
+
+/**
+ * 创建商品分类请求参数
+ */
+export interface CreateProductCategoryDto {
+  name: string
+  description?: string
+  parent_id?: string
+  material_id?: string
+  status?: ProductCategoryStatus
+}
+
+/**
+ * 更新商品分类请求参数
+ */
+export interface UpdateProductCategoryDto {
+  name?: string
+  description?: string
+  parent_id?: string
+  material_id?: string
+  status?: ProductCategoryStatus
+}
+
+/**
+ * 商品分类查询参数
+ */
+export interface ProductCategoryQueryDto {
+  page?: number
+  limit?: number
+  sort_by?: string
+  sort_order?: 'ASC' | 'DESC'
+  name?: string
+  parent_id?: string
+  status?: ProductCategoryStatus
+}
+
+/**
+ * 商品分类响应数据
+ */
+export interface ProductCategoryResponseDto extends ProductCategory {
+  material?: Material
+  brand_name?: string
+}
+
+/**
+ * 创建商品品牌请求参数
+ */
+export interface CreateProductBrandDto {
+  name: string
+  description?: string
+  logo_id?: string
+  status?: ProductBrandStatus
+}
+
+/**
+ * 更新商品品牌请求参数
+ */
+export interface UpdateProductBrandDto {
+  name?: string
+  description?: string
+  logo_id?: string
+  status?: ProductBrandStatus
+}
+
+/**
+ * 商品品牌查询参数
+ */
+export interface ProductBrandQueryDto {
+  page?: number
+  limit?: number
+  sort_by?: string
+  sort_order?: 'ASC' | 'DESC'
+  name?: string
+  status?: ProductBrandStatus
+}
+
+/**
+ * 商品品牌响应数据
+ */
+export interface ProductBrandResponseDto extends ProductBrand {
+  logo?: Material
+}

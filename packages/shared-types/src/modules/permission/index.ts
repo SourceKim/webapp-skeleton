@@ -12,3 +12,6 @@ export interface Permission extends BaseEntity {
   action: string
   description?: string
 }
+
+// 导出 DTO 类型
+export * from './dto'

@@ -19,3 +19,6 @@ export * from './spu'
 
 // 商品SKU
 export * from './sku'
+
+// DTO 类型
+export * from './dto'

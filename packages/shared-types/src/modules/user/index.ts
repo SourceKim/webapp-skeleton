@@ -21,3 +21,6 @@ export interface User extends BaseEntity {
   birthdate?: string // YYYY-MM-DD
   roles?: Role[] // 关联角色
 }
+
+// 导出 DTO 类型
+export * from './dto'

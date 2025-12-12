@@ -46,3 +46,6 @@ export interface MaterialTag extends BaseEntity {
   description?: string
   materials?: Material[] // 关联素材
 }
+
+// 导出 DTO 类型
+export * from './dto'

@@ -12,3 +12,6 @@ export interface Role extends BaseEntity {
   description?: string
   permissions?: Permission[] // 关联权限
 }
+
+// 导出 DTO 类型
+export * from './dto'

@@ -22,3 +22,6 @@ export * from './product'
 
 // 用户地址相关
 export * from './address'
+
+// DTO 类型
+export * from './dto'
