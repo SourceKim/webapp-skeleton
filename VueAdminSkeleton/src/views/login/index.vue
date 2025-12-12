@@ -58,6 +58,9 @@
   import { useMenuStore } from '@/stores/menu'
   import { useAuthStore } from '@/stores/auth'
   import { ENV } from '@/utils/env'
+  import { loginSchema } from '@skeleton/shared-types'
+  import { validateFormErrors } from '@/utils/zod-validator'
+  import { ElMessage } from 'element-plus'
 
   defineOptions({
     name: 'SystemLogin'

@@ -62,18 +62,21 @@ export const registerSchema = z.object({
     .max(100, '用户名长度必须在3-100个字符之间'),
   password: z.string()
     .min(6, '密码长度不能少于6个字符'),
+  phone: z.string()
+    .regex(/^1[3-9]\d{9}$/, '手机号格式不正确'),
+  nickname: z.string()
+    .min(1, '昵称不能为空')
+    .max(100, '昵称长度必须在1-100个字符之间'),
+  gender: z.nativeEnum(UserGender),
   email: z.string()
     .email('邮箱格式不正确')
-    .optional(),
-  phone: z.string()
-    .regex(/^1[3-9]\d{9}$/, '手机号格式不正确')
-    .optional(),
-  nickname: z.string()
-    .max(100, '昵称长度必须在1-100个字符之间')
     .optional(),
   avatar: z.string().optional(),
   bio: z.string()
     .max(500, '简介长度不能超过500个字符')
+    .optional(),
+  birthdate: z.string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, '出生日期格式不正确，应为 YYYY-MM-DD')
     .optional()
 })
 

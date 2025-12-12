@@ -9,6 +9,13 @@ import {
     LoginResponseDto, 
     ProfileResponseDto 
 } from '@/modules/auth/auth.dto';
+import { 
+    loginSchema, 
+    registerSchema,
+    type LoginResponseDto as ILoginResponseDto,
+    type RegisterResponseDto as IRegisterResponseDto
+} from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 import { logInfo, logError, logDebug } from '@/utils/logger';
 
 /**
@@ -54,55 +61,23 @@ export class AuthController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { username, password, email, phone, nickname, gender, birthdate, avatar, bio } = req.body;
+            // 使用 Zod Schema 验证请求体
+            const registerData = validateData(registerSchema, req.body);
+            const { username, password, email, phone, nickname, gender, birthdate, avatar, bio } = registerData;
+            
             logInfo('用户注册请求', (req as any).requestId, { username, email, phone, nickname });
 
-            // 基本验证
-            if (!username || !password || !phone || !nickname || !gender) {
-                logError('注册参数缺失', (req as any).requestId, { username, password, phone, nickname, gender });
-                throw new HttpException(400, '用户名、密码、手机号、昵称、性别均为必填');
-            }
-
-            // 用户名格式验证
-            if (username.length < 2 || username.length > 20) {
-                throw new HttpException(400, '用户名长度必须在2-20个字符之间');
-            }
-
-            // 密码强度验证
-            if (password.length < 6) {
-                throw new HttpException(400, '密码长度不能少于6个字符');
-            }
-
-            // 邮箱格式验证
-            if (email && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-                throw new HttpException(400, '邮箱格式不正确');
-            }
-
-            // 手机号格式验证
-            if (!/^1[3-9]\d{9}$/.test(phone)) {
-                throw new HttpException(400, '手机号格式不正确');
-            }
-
-            // 性别枚举
-            if (!['male', 'female', 'other'].includes(String(gender))) {
-                throw new HttpException(400, '性别取值不正确');
-            }
-
-            // 出生日期格式（可选）
-            if (birthdate && isNaN(Date.parse(birthdate))) {
-                throw new HttpException(400, '出生日期格式不正确');
-            }
-
+            // Zod Schema 已经完成所有验证，直接使用验证后的数据
             const result = await this.authService.register({
                 username,
                 password,
-                phone,
-                nickname,
-                gender,
-                birthdate: birthdate && birthdate.trim() !== '' ? birthdate : undefined,
-                email: email && email.trim() !== '' ? email : undefined,
-                avatar: avatar && avatar.trim() !== '' ? avatar : undefined,
-                bio: bio && bio.trim() !== '' ? bio : undefined
+                phone: phone!,
+                nickname: nickname!,
+                gender: gender!,
+                birthdate,
+                email,
+                avatar,
+                bio
             });
             
             logInfo('用户注册成功', (req as any).requestId, { userId: result.user.id, username });
@@ -128,13 +103,11 @@ export class AuthController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { username, password } = req.body;
+            // 使用 Zod Schema 验证请求体
+            const loginData = validateData(loginSchema, req.body);
+            const { username, password } = loginData;
+            
             logInfo('用户登录请求', (req as any).requestId, { username });
-
-            if (!username || !password) {
-                logError('登录参数缺失', (req as any).requestId, { username });
-                throw new HttpException(400, '用户名和密码不能为空');
-            }
 
             const result = await this.authService.login(username, password);
             
