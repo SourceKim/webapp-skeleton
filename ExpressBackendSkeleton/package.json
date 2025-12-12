@@ -50,9 +50,10 @@
     "reflect-metadata": "^0.2.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "typeorm": "0.3.20",
     "tsc-alias": "^1.8.16",
-    "winston": "^3.17.0"
+    "typeorm": "0.3.20",
+    "winston": "^3.17.0",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

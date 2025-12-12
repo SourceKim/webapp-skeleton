@@ -10,9 +10,9 @@
     "deploy": "./scripts/deploy.sh"
   },
   "dependencies": {
+    "@amap/amap-jsapi-loader": "^1.0.1",
     "@skeleton/shared-types": "workspace:*",
     "@skeleton/shared-utils": "workspace:*",
-    "@amap/amap-jsapi-loader": "^1.0.1",
     "axios": "^1.8.4",
     "dayjs": "^1.11.13",
     "element-plus": "^2.9.7",
@@ -25,7 +25,8 @@
     "vue": "^3.5.13",
     "vue-cropper": "^0.6.5",
     "vue-i18n": "^11.1.2",
-    "vue-router": "^4.5.0"
+    "vue-router": "^4.5.0",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",

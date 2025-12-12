@@ -184,6 +184,9 @@ importers:
       vue:
         specifier: ^3.5.22
         version: 3.5.25(typescript@5.8.2)
+      zod:
+        specifier: ^4.1.13
+        version: 4.1.13
     devDependencies:
       '@babel/core':
         specifier: ^7.24.4
