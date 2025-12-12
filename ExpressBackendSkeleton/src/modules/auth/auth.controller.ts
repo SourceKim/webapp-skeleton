@@ -11,10 +11,9 @@ import {
 } from '@/modules/auth/auth.dto';
 import { 
     loginSchema, 
-    registerSchema,
-    type LoginDto,
-    type RegisterDto
+    registerSchema
 } from '@skeleton/shared-types';
+import type { z } from 'zod';
 import { validateData } from '@/utils/zod-validator';
 import { logInfo, logError, logDebug } from '@/utils/logger';
 
@@ -62,7 +61,7 @@ export class AuthController {
     ): Promise<void> => {
         try {
             // 使用 Zod Schema 验证请求体
-            const registerData = validateData<RegisterDto>(registerSchema, req.body);
+            const registerData = validateData(registerSchema, req.body);
             const { username, password, email, phone, nickname, gender, birthdate, avatar, bio } = registerData;
             
             logInfo('用户注册请求', (req as any).requestId, { username, email, phone, nickname });
@@ -104,7 +103,7 @@ export class AuthController {
     ): Promise<void> => {
         try {
             // 使用 Zod Schema 验证请求体
-            const loginData = validateData(loginSchema, req.body);
+            const loginData = validateData<LoginDto>(loginSchema, req.body);
             const { username, password } = loginData;
             
             logInfo('用户登录请求', (req as any).requestId, { username });

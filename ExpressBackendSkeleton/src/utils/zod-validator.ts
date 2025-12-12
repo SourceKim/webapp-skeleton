@@ -6,6 +6,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { HttpException } from '@/exceptions/http.exception'
 import { validate, formatValidationErrors, ValidationResult } from '@skeleton/shared-types'
+import { z } from 'zod'
 
 /**
  * 验证请求体的中间件工厂函数
