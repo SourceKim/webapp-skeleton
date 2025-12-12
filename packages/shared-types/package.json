@@ -35,8 +35,5 @@
   },
   "dependencies": {
     "zod": "^4.1.13"
-  },
-  "dependencies": {
-    "zod": "^4.1.13"
   }
 }
