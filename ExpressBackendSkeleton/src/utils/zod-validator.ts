@@ -107,7 +107,7 @@ export function validateParams<T>(schema: any) {
  * @returns 验证后的数据
  * @throws HttpException 如果验证失败
  */
-export function validateData<T>(schema: any, data: unknown): T {
+export function validateData<T>(schema: z.ZodSchema<T>, data: unknown): T {
   const result: ValidationResult<T> = validate<T>(schema, data)
   
   if (!result.success && result.errors) {

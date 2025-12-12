@@ -86,20 +86,34 @@
   const formRef = ref()
   
   function submit() {
+    // 先使用 Element Plus 表单验证
     formRef.value.validate((valid) => {
-      if (valid) {
-        useAuthStore().token = ''
-        login(
-          {
-            ...formData
-          },
-          {
-            loadingRef: loading, // vue3中的ref,可以动态更新此值
-            showSuccessMsg: true,
-            successMsg: (res) => '登录成功！欢迎你，尊敬的' + res.data.user.name, // 成功的提示信息
-            errorMsg: '登录失败' // 失败的提示信息
-          }
-        ).then((res) => {
+      if (!valid) {
+        return
+      }
+      
+      // 使用 Zod Schema 进行二次验证（确保前后端验证规则一致）
+      const errors = validateFormErrors(loginSchema, formData)
+      if (errors) {
+        // 显示 Zod 验证错误
+        Object.values(errors).forEach(msg => {
+          ElMessage.error(msg)
+        })
+        return
+      }
+      
+      useAuthStore().token = ''
+      login(
+        {
+          ...formData
+        },
+        {
+          loadingRef: loading, // vue3中的ref,可以动态更新此值
+          showSuccessMsg: true,
+          successMsg: (res) => '登录成功！欢迎你，尊敬的' + res.data.user.name, // 成功的提示信息
+          errorMsg: '登录失败' // 失败的提示信息
+        }
+      ).then((res) => {
           const data = res.data
           console.log('登录成功', data)
           useAuthStore().token = data.access_token

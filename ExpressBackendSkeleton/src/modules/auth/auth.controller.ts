@@ -12,8 +12,8 @@ import {
 import { 
     loginSchema, 
     registerSchema,
-    type LoginResponseDto as ILoginResponseDto,
-    type RegisterResponseDto as IRegisterResponseDto
+    type LoginDto,
+    type RegisterDto
 } from '@skeleton/shared-types';
 import { validateData } from '@/utils/zod-validator';
 import { logInfo, logError, logDebug } from '@/utils/logger';
@@ -62,7 +62,7 @@ export class AuthController {
     ): Promise<void> => {
         try {
             // 使用 Zod Schema 验证请求体
-            const registerData = validateData(registerSchema, req.body);
+            const registerData = validateData<RegisterDto>(registerSchema, req.body);
             const { username, password, email, phone, nickname, gender, birthdate, avatar, bio } = registerData;
             
             logInfo('用户注册请求', (req as any).requestId, { username, email, phone, nickname });
