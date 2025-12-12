@@ -3,9 +3,10 @@ import { BaseEntity } from '../../common/base.model';
 import { Material } from '../../material/material.model';
 import { ProductSpu } from '../../product/spu/product-spu.model';
 import { IsString, IsOptional, IsBoolean, IsInt } from 'class-validator';
+import type { Carousel as ICarousel } from '@skeleton/shared-types';
 
 @Entity('carousels')
-export class Carousel extends BaseEntity {
+export class Carousel extends BaseEntity implements ICarousel {
     @Column({ length: 100, nullable: true, comment: '轮播图标题' })
     @IsString()
     @IsOptional()

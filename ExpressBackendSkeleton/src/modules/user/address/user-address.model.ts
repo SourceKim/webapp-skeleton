@@ -2,22 +2,14 @@ import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { IsBoolean, IsEnum, IsOptional, IsString, Length, MaxLength } from 'class-validator';
 import { BaseEntity } from '@/modules/common/base.model';
 import { User } from '@/modules/user/user.model';
+import { UserAddressTag, UserAddressStatus, type UserAddress as IUserAddress } from '@skeleton/shared-types';
 
-export enum UserAddressTag {
-    HOME = 'HOME',
-    COMPANY = 'COMPANY',
-    SCHOOL = 'SCHOOL',
-    OTHER = 'OTHER',
-}
-
-export enum UserAddressStatus {
-    ACTIVE = 'ACTIVE',
-    INACTIVE = 'INACTIVE',
-}
+// 重新导出枚举，保持向后兼容
+export { UserAddressTag, UserAddressStatus };
 
 @Entity('user_addresses')
 @Index('idx_user_addresses_user', ['user'])
-export class UserAddress extends BaseEntity {
+export class UserAddress extends BaseEntity implements IUserAddress {
     @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     user!: User;

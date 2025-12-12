@@ -2,9 +2,10 @@ import { Entity, Column, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../common/base.model';
 import { Material } from '../../material/material.model';
 import { IsString, IsOptional, IsInt, IsNumber } from 'class-validator';
+import type { ShopIntro as IShopIntro, ShopIntroBanner as IShopIntroBanner } from '@skeleton/shared-types';
 
 @Entity('shop_intros')
-export class ShopIntro extends BaseEntity {
+export class ShopIntro extends BaseEntity implements IShopIntro {
     @Column({ length: 100, comment: '店铺名称' })
     @IsString()
     name!: string;
@@ -44,7 +45,7 @@ export class ShopIntro extends BaseEntity {
 }
 
 @Entity('shop_intro_banners')
-export class ShopIntroBanner extends BaseEntity {
+export class ShopIntroBanner extends BaseEntity implements IShopIntroBanner {
     @Column({ name: 'shop_intro_id', length: 36 })
     shop_intro_id!: string;
 

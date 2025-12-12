@@ -1,19 +1,17 @@
 import type { Material } from '../material/material.d'
+import type { ProductSpu as IProductSpu } from '@skeleton/shared-types'
 
-export interface ProductSpu {
-  id: string
-  name: string
-  sub_title?: string
-  description?: string
-  category_id?: string
+/**
+ * 商品SPU类型定义
+ * 使用 @skeleton/shared-types 中的统一类型定义
+ */
+export type { ProductSpu } from '@skeleton/shared-types'
+
+// 扩展 ProductSpu 接口，添加前端特定字段
+export interface ProductSpu extends IProductSpu {
   category?: { name: string }
-  brand_id?: string
   brand?: { name: string }
-  status: string // 后端返回中文：草稿、上架、下架
-  main_material_id?: string
-  main_material?: Material
-  sub_materials?: Material[]
-  detail_content?: string
+  status: string | IProductSpu['status'] // 后端可能返回中文或枚举值
   createdAt?: string | Date
   updatedAt?: string | Date
 }

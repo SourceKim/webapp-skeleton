@@ -1,14 +1,20 @@
 import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { BaseEntity } from '@/modules/common/base.model';
 import { User } from '@/modules/user/user.model';
+import {
+  PaymentStatus,
+  DeliveryStatus,
+  OrderStatus,
+  PaymentMethod,
+  type MallOrder as IMallOrder,
+  type MallOrderItem as IMallOrderItem
+} from '@skeleton/shared-types';
 
-export enum PaymentStatus { UNPAID = 'UNPAID', PAID = 'PAID', REFUNDED = 'REFUNDED' }
-export enum DeliveryStatus { PENDING = 'PENDING', SHIPPED = 'SHIPPED', DELIVERED = 'DELIVERED' }
-export enum OrderStatus { UNPAID = 'UNPAID', TO_BE_SHIPPED = 'TO_BE_SHIPPED', SHIPPED = 'SHIPPED', COMPLETED = 'COMPLETED', CANCELED = 'CANCELED' }
-export enum PaymentMethod { ALIPAY = 'ALIPAY', WECHAT = 'WECHAT', CASH = 'CASH' }
+// 重新导出枚举，保持向后兼容
+export { PaymentStatus, DeliveryStatus, OrderStatus, PaymentMethod };
 
 @Entity('mall_orders')
-export class MallOrder extends BaseEntity {
+export class MallOrder extends BaseEntity implements IMallOrder {
     @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     user!: User;
@@ -60,7 +66,7 @@ export class MallOrder extends BaseEntity {
 }
 
 @Entity('mall_order_items')
-export class MallOrderItem extends BaseEntity {
+export class MallOrderItem extends BaseEntity implements IMallOrderItem {
     @ManyToOne(() => MallOrder, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'order_id' })
     order!: MallOrder;

@@ -33,3 +33,15 @@ export enum MaterialType {
   AVATAR = 'avatar',
   OTHER = 'other'
 }
+
+// 重新导出商城相关枚举（保持向后兼容）
+export {
+  PaymentStatus,
+  DeliveryStatus,
+  OrderStatus,
+  PaymentMethod,
+  ProductSpuStatus,
+  ProductSkuStatus,
+  UserAddressTag,
+  UserAddressStatus
+} from './modules/mall/enums'

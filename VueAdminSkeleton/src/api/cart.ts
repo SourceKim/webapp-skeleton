@@ -1,12 +1,17 @@
 import createAxios from '@/utils/request'
+import type { Cart as ICart } from '@skeleton/shared-types'
+
 const request = createAxios({})
 
-export interface CartItemDTO {
-  id: string
-  user_id?: string
+/**
+ * 购物车类型定义
+ * 使用 @skeleton/shared-types 中的统一类型定义
+ */
+export type { Cart } from '@skeleton/shared-types'
+
+// 扩展 Cart 接口，添加前端特定字段
+export interface CartItemDTO extends ICart {
   user?: { id: string; username: string; email?: string; phone?: string; avatar?: string }
-  quantity: number
-  selected: boolean
   sku?: { 
     id: string
     sku_code?: string

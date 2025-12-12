@@ -3,14 +3,13 @@ import { BaseEntity } from '@/modules/common/base.model';
 import { IsBoolean, IsEnum, IsInt, IsNumberString, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 import { ProductSpu } from '@/modules/product/spu/product-spu.model';
 import { ProductSkuAttribute } from '@/modules/product/attribute/product-sku-attribute.model';
+import { ProductSkuStatus, type ProductSku as IProductSku } from '@skeleton/shared-types';
 
-export enum ProductSkuStatus {
-    ON_SHELF = 'ON_SHELF',
-    OFF_SHELF = 'OFF_SHELF',
-}
+// 重新导出枚举，保持向后兼容
+export { ProductSkuStatus };
 
 @Entity('product_sku')
-export class ProductSku extends BaseEntity {
+export class ProductSku extends BaseEntity implements IProductSku {
     @ManyToOne(() => ProductSpu, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'spu_id' })
     spu!: ProductSpu;

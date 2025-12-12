@@ -4,15 +4,13 @@ import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
 import { ProductCategory } from '@/modules/product/category/product-category.model';
 import { ProductBrand } from '@/modules/product/brand/product-brand.model';
 import { Material } from '@/modules/material/material.model';
+import { ProductSpuStatus, type ProductSpu as IProductSpu } from '@skeleton/shared-types';
 
-export enum ProductSpuStatus {
-    DRAFT = 'DRAFT',
-    ON_SHELF = 'ON_SHELF',
-    OFF_SHELF = 'OFF_SHELF',
-}
+// 重新导出枚举，保持向后兼容
+export { ProductSpuStatus };
 
 @Entity('product_spu')
-export class ProductSpu extends BaseEntity {
+export class ProductSpu extends BaseEntity implements IProductSpu {
     @Column({ type: 'varchar', length: 255 })
     @IsString()
     @MaxLength(255)

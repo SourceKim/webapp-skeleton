@@ -3,7 +3,16 @@ import type { RequestOption, RestResponse } from '@/api/types/common'
 
 // --- Carousel API ---
 
-export interface CarouselDTO {
+import type { Carousel as ICarousel } from '@skeleton/shared-types'
+
+/**
+ * 轮播图类型定义
+ * 使用 @skeleton/shared-types 中的统一类型定义
+ */
+export type { Carousel } from '@skeleton/shared-types'
+
+// 扩展 Carousel 接口，添加前端特定字段
+export interface CarouselDTO extends ICarousel {
     id: string
     title?: string
     material_id: string

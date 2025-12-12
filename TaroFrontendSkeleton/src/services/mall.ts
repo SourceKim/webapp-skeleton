@@ -1,7 +1,24 @@
 import api from './api'
 import { Material } from './material'
 import { getUploadUrl as getEnvUploadUrl } from '../utils/env'
-import type { PaginatedResponse } from '@skeleton/shared-types'
+import type {
+  PaginatedResponse,
+  ProductSpu,
+  ProductSku,
+  ProductSpuStatus,
+  ProductSkuStatus,
+  SkuAttributeKV
+} from '@skeleton/shared-types'
+
+// 重新导出类型和枚举
+export type { ProductSpu, ProductSku, SkuAttributeKV }
+export { ProductSpuStatus, ProductSkuStatus }
+
+// 类型别名，保持向后兼容
+export type Spu = ProductSpu
+export type Sku = ProductSku
+export type SpuStatus = ProductSpuStatus
+export type SkuStatus = ProductSkuStatus
 
 // PaginatedMeta 保持本地定义（与后端响应结构匹配）
 export interface PaginatedMeta {
@@ -36,45 +53,6 @@ export interface Category {
   level: number
   material_id?: string
   status: 'ENABLED' | 'DISABLED'
-}
-
-export type SpuStatus = 'DRAFT' | 'ON_SHELF' | 'OFF_SHELF'
-
-export interface Spu {
-  id: string
-  name: string
-  sub_title?: string
-  description?: string
-  category_id?: string
-  brand_id?: string
-  status: SpuStatus
-  main_material?: Material
-  sub_materials?: Material[]
-  detail_content?: string
-  price?: string
-}
-
-export type SkuStatus = 'ON_SHELF' | 'OFF_SHELF'
-
-export interface SkuAttributeKV {
-  key_id: string
-  value_id: string
-  key_name?: string
-  value?: string
-}
-
-export interface Sku {
-  id: string
-  spu_id: string
-  sku_code: string
-  sku_name?: string
-  price: string
-  original_price?: string
-  cost_price?: string
-  stock: number
-  status: SkuStatus
-  is_default: boolean
-  attributes?: SkuAttributeKV[]
 }
 
 // 扩展 PaginatedResponse，使用本地的 meta 结构
