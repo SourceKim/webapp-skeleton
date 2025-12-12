@@ -27,9 +27,15 @@ export class ProductSpu extends BaseEntity implements IProductSpu {
     @IsString()
     description?: string;
 
+    @Column({ type: 'varchar', length: 36, nullable: true, name: 'category_id' })
+    category_id?: string | null;
+
     @ManyToOne(() => ProductCategory, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'category_id' })
     category?: ProductCategory | null;
+
+    @Column({ type: 'varchar', length: 36, nullable: true, name: 'brand_id' })
+    brand_id?: string | null;
 
     @ManyToOne(() => ProductBrand, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'brand_id' })
@@ -39,8 +45,11 @@ export class ProductSpu extends BaseEntity implements IProductSpu {
     @IsEnum(ProductSpuStatus)
     status!: ProductSpuStatus;
 
+    @Column({ type: 'varchar', length: 36, nullable: true, name: 'main_material_id' })
+    main_material_id?: string | null;
+
     @ManyToOne(() => Material, { nullable: true, onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'main_material' })
+    @JoinColumn({ name: 'main_material_id' })
     main_material?: Material | null;
 
     @ManyToMany(() => Material)

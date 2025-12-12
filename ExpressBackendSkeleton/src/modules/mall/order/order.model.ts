@@ -15,6 +15,9 @@ export { PaymentStatus, DeliveryStatus, OrderStatus, PaymentMethod };
 
 @Entity('mall_orders')
 export class MallOrder extends BaseEntity implements IMallOrder {
+    @Column({ type: 'varchar', length: 36, name: 'user_id' })
+    user_id!: string;
+
     @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     user!: User;
@@ -67,6 +70,9 @@ export class MallOrder extends BaseEntity implements IMallOrder {
 
 @Entity('mall_order_items')
 export class MallOrderItem extends BaseEntity implements IMallOrderItem {
+    @Column({ type: 'varchar', length: 36, name: 'order_id' })
+    order_id!: string;
+
     @ManyToOne(() => MallOrder, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'order_id' })
     order!: MallOrder;

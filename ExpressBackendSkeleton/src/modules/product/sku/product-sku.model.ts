@@ -10,6 +10,9 @@ export { ProductSkuStatus };
 
 @Entity('product_sku')
 export class ProductSku extends BaseEntity implements IProductSku {
+    @Column({ type: 'varchar', length: 36, name: 'spu_id' })
+    spu_id!: string;
+
     @ManyToOne(() => ProductSpu, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'spu_id' })
     spu!: ProductSpu;

@@ -8,9 +8,15 @@ import type { Cart as ICart } from '@skeleton/shared-types';
 @Entity('cart')
 @Index('uniq_cart_user_sku', ['user', 'sku'], { unique: true })
 export class Cart extends BaseEntity implements ICart {
+    @Column({ type: 'varchar', length: 36, name: 'user_id' })
+    user_id!: string;
+
     @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     user!: User;
+
+    @Column({ type: 'varchar', length: 36, name: 'sku_id' })
+    sku_id!: string;
 
     @ManyToOne(() => ProductSku, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'sku_id' })

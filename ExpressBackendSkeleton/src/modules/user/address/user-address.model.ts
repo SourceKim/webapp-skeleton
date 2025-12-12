@@ -10,6 +10,9 @@ export { UserAddressTag, UserAddressStatus };
 @Entity('user_addresses')
 @Index('idx_user_addresses_user', ['user'])
 export class UserAddress extends BaseEntity implements IUserAddress {
+    @Column({ type: 'varchar', length: 36, name: 'user_id' })
+    user_id!: string;
+
     @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     user!: User;
