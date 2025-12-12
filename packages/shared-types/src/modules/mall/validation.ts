@@ -123,3 +123,54 @@ export const userAddressQuerySchema = z.object({
   is_default: z.boolean().optional(),
   status: z.string().optional()
 })
+
+/**
+ * 创建轮播图验证 Schema
+ */
+export const createCarouselSchema = z.object({
+  title: z.string()
+    .max(255, '标题长度不能超过255个字符')
+    .optional(),
+  material_id: z.string()
+    .min(1, '素材ID不能为空')
+    .max(36, '素材ID长度不能超过36个字符'),
+  spu_id: z.string()
+    .max(36, '商品SPU ID长度不能超过36个字符')
+    .optional(),
+  sort_order: z.number()
+    .int('排序值必须是整数')
+    .optional(),
+  is_active: z.boolean().optional()
+})
+
+/**
+ * 更新轮播图验证 Schema
+ */
+export const updateCarouselSchema = createCarouselSchema.partial()
+
+/**
+ * 创建店铺介绍验证 Schema
+ */
+export const createShopIntroSchema = z.object({
+  name: z.string()
+    .min(1, '店铺名称不能为空')
+    .max(100, '店铺名称长度不能超过100个字符'),
+  introduction: z.string()
+    .max(500, '简介长度不能超过500个字符')
+    .optional(),
+  detail: z.string().optional(),
+  contact_phone: z.string()
+    .max(20, '联系电话长度不能超过20个字符')
+    .optional(),
+  longitude: z.number().optional(),
+  latitude: z.number().optional(),
+  address: z.string()
+    .max(200, '地址长度不能超过200个字符')
+    .optional(),
+  banner_ids: z.array(z.string()).optional()
+})
+
+/**
+ * 更新店铺介绍验证 Schema
+ */
+export const updateShopIntroSchema = createShopIntroSchema.partial()

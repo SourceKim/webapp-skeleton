@@ -1,6 +1,8 @@
 import { Request, Response, Router } from 'express';
 import { CartService } from './cart.service';
-import { CreateCartDto, UpdateCartDto, UpdateSelectedDto } from './cart.dto';
+import type { CreateCartDto, UpdateCartDto, UpdateSelectedDto } from '@skeleton/shared-types';
+import { createCartSchema, updateCartSchema, updateSelectedSchema } from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 import { authMiddleware } from '@/middlewares/auth.middleware';
 
 const router = Router();
@@ -20,7 +22,7 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.post('/', async (req: Request, res: Response) => {
     try {
-        const dto = (await (req as any).validate(CreateCartDto, 'body')) as CreateCartDto;
+        const dto = validateData(createCartSchema, req.body);
         const userId = req.user!.id;
         const item = await service.addItem(userId, dto.sku_id, dto.quantity);
         res.json({ code: 0, message: 'OK', data: item });
@@ -51,7 +53,7 @@ router.put('/selected', async (req: Request, res: Response) => {
 // 注意顺序：放在 /selected 之后，避免 /selected 被当成 :id
 router.put('/:id', async (req: Request, res: Response) => {
     try {
-        const dto = (await (req as any).validate(UpdateCartDto, 'body')) as UpdateCartDto;
+        const dto = validateData(updateCartSchema, req.body);
         const userId = req.user!.id;
         const id = req.params.id;
         if (!dto.quantity) { res.status(400).json({ code: 400, message: 'quantity 必填' }); return; }

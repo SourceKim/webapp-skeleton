@@ -8,7 +8,6 @@ import { errorMiddleware } from '@/middlewares/error.middleware';
 import { requestTracingMiddleware, httpLoggerMiddleware } from '@/middlewares/logger.middleware';
 import routes from '@/routes';
 import { ENV } from '@/configs/env.config';
-import { extendRequestValidate } from '@/middlewares/dto-validation.middleware';
 
 const app = express();
 
@@ -23,7 +22,6 @@ app.use(cors({
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(extendRequestValidate());
 
 // 请求跟踪和日志中间件
 app.use(requestTracingMiddleware);

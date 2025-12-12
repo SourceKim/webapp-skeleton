@@ -1,9 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiResponse, FindByIdDto, PaginatedResponse } from '@/modules/common/common.dto';
+import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
 import { paginationQuery } from '@/middlewares/paginationQuery';
 import { paginationResponse } from '@/middlewares/paginationResponse';
-import { ProductBrandDTO, CreateProductBrandDto, UpdateProductBrandDto } from './product-brand.dto';
+import { ProductBrandDTO } from './product-brand.dto';
 import { ProductBrandService } from './product-brand.service';
+import { createProductBrandSchema, updateProductBrandSchema } from '@skeleton/shared-types';
+import { idParamSchema } from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 
 export class ProductBrandController {
     private service = new ProductBrandService();
@@ -27,7 +30,7 @@ export class ProductBrandController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const data = await this.service.findBrandById(id);
             res.json({ code: 0, message: 'success', data });
         } catch (error) {
@@ -41,7 +44,7 @@ export class ProductBrandController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const body = await req.validate(CreateProductBrandDto, 'body');
+            const body = validateData(createProductBrandSchema, req.body);
             const data = await this.service.createBrand(body);
             res.status(200).json({ code: 0, message: '创建成功', data });
         } catch (error) {
@@ -55,8 +58,8 @@ export class ProductBrandController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
-            const body = await req.validate(UpdateProductBrandDto, 'body');
+            const { id } = validateData(idParamSchema, req.params);
+            const body = validateData(updateProductBrandSchema, req.body);
             const data = await this.service.updateBrand(id, body);
             res.json({ code: 0, message: '更新成功', data });
         } catch (error) {
@@ -70,7 +73,7 @@ export class ProductBrandController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             await this.service.deleteBrand(id);
             res.json({ code: 0, message: '删除成功' });
         } catch (error) {

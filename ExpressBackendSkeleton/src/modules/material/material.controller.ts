@@ -3,9 +3,11 @@ import multer from 'multer';
 import path from 'path';
 import { plainToInstance } from 'class-transformer';
 import { MaterialService } from '@/modules/material/material.service';
-import { CreateMaterialDto, UpdateMaterialDto } from '@/modules/material/material.dto';
 import { HttpException } from '@/exceptions/http.exception';
-import { ApiResponse, PaginatedResponse, FindByIdDto } from '@/modules/common/common.dto';
+import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
+import { createMaterialSchema, updateMaterialSchema } from '@skeleton/shared-types';
+import { idParamSchema } from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 import { ENV } from '@/configs/env.config';
 import { MaterialDTO } from '@/modules/material/material.dto';
 
@@ -131,8 +133,8 @@ export class MaterialController {
                         delete req.body.category;
                     }
 
-                    // 使用 req.validate 验证并构造 DTO
-                    const materialData = await req.validate(CreateMaterialDto, 'body');
+                    // 使用 Zod 验证并构造数据
+                    const materialData = validateData(createMaterialSchema, req.body);
                     // 修正文件名中文乱码（某些浏览器以 latin1 传 filename）
                     const decodedOriginal = decodeLatin1ToUtf8(req.file.originalname);
                     req.file.originalname = decodedOriginal;
@@ -195,7 +197,7 @@ export class MaterialController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             
             // 获取素材
             const material = await this.materialService.getMaterialById(id);
@@ -221,8 +223,8 @@ export class MaterialController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
-            const updateData = await req.validate(UpdateMaterialDto, 'body');
+            const { id } = validateData(idParamSchema, req.params);
+            const updateData = validateData(updateMaterialSchema, req.body);
             
             // 更新素材
             const material = await this.materialService.updateMaterial(id, updateData);
@@ -248,7 +250,7 @@ export class MaterialController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             
             // 删除素材
             await this.materialService.deleteMaterial(id);

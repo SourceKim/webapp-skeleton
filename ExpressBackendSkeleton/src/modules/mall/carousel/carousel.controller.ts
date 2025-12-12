@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { CarouselService } from './carousel.service';
-import { CreateCarouselDto, UpdateCarouselDto, CarouselDTO } from './carousel.dto';
-import { FindByIdDto, ApiResponse, PaginatedResponse } from '../../common/common.dto';
+import { CarouselDTO } from './carousel.dto';
+import { ApiResponse, PaginatedResponse } from '../../common/common.dto';
+import { createCarouselSchema, updateCarouselSchema } from '@skeleton/shared-types';
+import { idParamSchema } from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 
 export class CarouselController {
     private carouselService = new CarouselService();
@@ -12,7 +15,7 @@ export class CarouselController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const dto = await req.validate(CreateCarouselDto, 'body');
+            const dto = validateData(createCarouselSchema, req.body);
             const carousel = await this.carouselService.createCarousel(dto);
             res.status(200).json({
                 code: 0,
@@ -30,8 +33,8 @@ export class CarouselController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
-            const dto = await req.validate(UpdateCarouselDto, 'body');
+            const { id } = validateData(idParamSchema, req.params);
+            const dto = validateData(updateCarouselSchema, req.body);
             const carousel = await this.carouselService.updateCarousel(id, dto);
             res.status(200).json({
                 code: 0,
@@ -49,7 +52,7 @@ export class CarouselController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             await this.carouselService.deleteCarousel(id);
             res.status(200).json({
                 code: 0,
@@ -66,7 +69,7 @@ export class CarouselController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const carousel = await this.carouselService.findOne(id);
             res.status(200).json({
                 code: 0,

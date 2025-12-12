@@ -139,6 +139,7 @@ export interface CreateProductCategoryDto {
   description?: string
   parent_id?: string
   material_id?: string
+  brand_id?: string
   status?: ProductCategoryStatus
 }
 
@@ -150,6 +151,7 @@ export interface UpdateProductCategoryDto {
   description?: string
   parent_id?: string
   material_id?: string
+  brand_id?: string
   status?: ProductCategoryStatus
 }
 
@@ -181,6 +183,8 @@ export interface CreateProductBrandDto {
   name: string
   description?: string
   logo_id?: string
+  material_id?: string
+  website?: string
   status?: ProductBrandStatus
 }
 
@@ -191,6 +195,8 @@ export interface UpdateProductBrandDto {
   name?: string
   description?: string
   logo_id?: string
+  material_id?: string
+  website?: string
   status?: ProductBrandStatus
 }
 
@@ -211,4 +217,42 @@ export interface ProductBrandQueryDto {
  */
 export interface ProductBrandResponseDto extends ProductBrand {
   logo?: Material
+}
+
+/**
+ * 创建商品属性键请求参数
+ */
+export interface CreateProductAttributeKeyDto {
+  spu_id: string
+  name: string
+  key?: string
+  required?: boolean
+}
+
+/**
+ * 更新商品属性键请求参数
+ */
+export interface UpdateProductAttributeKeyDto {
+  name?: string
+  key?: string
+  required?: boolean
+}
+
+/**
+ * 创建商品属性值请求参数
+ */
+export interface CreateProductAttributeValueDto {
+  attribute_key_id: string
+  value: string
+  value_id?: string
+  image_id?: string
+}
+
+/**
+ * 更新商品属性值请求参数
+ */
+export interface UpdateProductAttributeValueDto {
+  value?: string
+  value_id?: string
+  image_id?: string | null
 }

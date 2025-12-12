@@ -5,7 +5,8 @@ import { HttpException } from '@/exceptions/http.exception';
 import { nanoid } from 'nanoid';
 import { PaginationQueryDto } from '@/modules/common/common.dto';
 import { plainToInstance } from 'class-transformer';
-import { CreateProductBrandDto, ProductBrandDTO, UpdateProductBrandDto } from './product-brand.dto';
+import { ProductBrandDTO } from './product-brand.dto';
+import type { CreateProductBrandDto, UpdateProductBrandDto } from '@skeleton/shared-types';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 import { ENV } from '@/configs/env.config';
 

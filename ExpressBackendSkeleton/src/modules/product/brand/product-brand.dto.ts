@@ -1,5 +1,4 @@
 import { Expose, Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, MaxLength, IsUrl } from 'class-validator';
 import { BaseDTO } from '@/modules/common/common.dto';
 import { ProductBrandStatus } from './product-brand.model';
 import { convertEnabledStatusToChinese } from '@/utils/status.util';
@@ -22,53 +21,7 @@ export class ProductBrandDTO extends BaseDTO {
     status: string = ProductBrandStatus.ENABLED;
 }
 
-export class CreateProductBrandDto {
-    @IsString()
-    @MaxLength(50)
-    name!: string;
-
-    @IsOptional()
-    @IsString()
-    @MaxLength(200)
-    description?: string;
-
-    @IsOptional()
-    @IsString()
-    material_id?: string;
-
-    @IsOptional()
-    @IsString()
-    @MaxLength(200)
-    website?: string;
-
-    @IsOptional()
-    @IsEnum(ProductBrandStatus)
-    status?: ProductBrandStatus;
-}
-
-export class UpdateProductBrandDto {
-    @IsOptional()
-    @IsString()
-    @MaxLength(50)
-    name?: string;
-
-    @IsOptional()
-    @IsString()
-    @MaxLength(200)
-    description?: string;
-
-    @IsOptional()
-    @IsString()
-    material_id?: string;
-
-    @IsOptional()
-    @IsString()
-    @MaxLength(200)
-    website?: string;
-
-    @IsOptional()
-    @IsEnum(ProductBrandStatus)
-    status?: ProductBrandStatus;
-}
+// 请求 DTO 已迁移到 @skeleton/shared-types，请使用 type import
+// 例如: import type { CreateProductBrandDto, UpdateProductBrandDto } from '@skeleton/shared-types'
 
 

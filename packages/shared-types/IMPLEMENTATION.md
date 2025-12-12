@@ -188,7 +188,7 @@ const listResponse: ApiResponse<PaginationResponse<Material>> = await fetchMater
    - 或从 OpenAPI/Swagger 规范生成类型
 
 3. **类型验证**
-   - 运行时类型验证（使用 zod 或 class-validator）
+   - 运行时类型验证（使用 zod
    - API 请求/响应类型验证中间件
 
 ## 注意事项

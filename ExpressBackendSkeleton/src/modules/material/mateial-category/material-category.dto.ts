@@ -1,4 +1,3 @@
-import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
 import { Expose } from 'class-transformer';
 import { BaseDTO } from '@/modules/common/common.dto';
 
@@ -10,25 +9,5 @@ export class MaterialCategoryDTO extends BaseDTO {
     description: string = '';
 }
 
-// 创建角色的请求参数
-export class CreateMaterialCategoryDto {
-    @IsString()
-    @IsNotEmpty()
-    name!: string;
-
-    @IsOptional()
-    @IsString()
-    description?: string;
-}
-
-// 更新角色的请求参数
-export class UpdateMaterialCategoryDto {
-    @IsOptional()
-    @IsString()
-    @IsNotEmpty()
-    name?: string;
-
-    @IsOptional()
-    @IsString()
-    description?: string;
-}
+// 请求 DTO 已迁移到 @skeleton/shared-types，请使用 type import
+// 例如: import type { CreateMaterialCategoryDto, UpdateMaterialCategoryDto } from '@skeleton/shared-types'

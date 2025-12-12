@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiResponse, FindByIdDto, PaginatedResponse } from '@/modules/common/common.dto';
-import { ProductSpuDTO, CreateProductSpuDto, UpdateProductSpuDto, UpdateProductSpuStatusDto } from './product-spu.dto';
+import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
+import { ProductSpuDTO } from './product-spu.dto';
 import { ProductSpuService } from './product-spu.service';
-import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { createProductSpuSchema, updateProductSpuSchema } from '@skeleton/shared-types';
+import { idParamSchema } from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 
 export class ProductSpuController {
     private service = new ProductSpuService();
@@ -28,7 +29,7 @@ export class ProductSpuController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const body = req.body as { items: Array<{ sku_code?: string; sku_name?: string; price?: string; stock?: number; status?: string; is_default?: boolean; attribute_value_ids?: string[] }> };
             const count = await this.service.generateSkus(id, body.items || []);
             res.status(200).json({ code: 0, message: '生成成功', data: { count } });
@@ -43,7 +44,7 @@ export class ProductSpuController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const data = await this.service.findById(id);
             res.json({ code: 0, message: 'success', data });
         } catch (error) {
@@ -62,7 +63,7 @@ export class ProductSpuController {
                 req.body.sub_material_ids = req.body.sub_materials;
                 delete req.body.sub_materials;
             }
-            const body = await req.validate(CreateProductSpuDto, 'body');
+            const body = validateData(createProductSpuSchema, req.body);
             const data = await this.service.create(body);
             res.status(200).json({ code: 0, message: '创建成功', data });
         } catch (error) {
@@ -76,13 +77,13 @@ export class ProductSpuController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             // 兼容旧参数：sub_materials -> sub_material_ids
             if (req.body && req.body.sub_materials && !req.body.sub_material_ids) {
                 req.body.sub_material_ids = req.body.sub_materials;
                 delete req.body.sub_materials;
             }
-            const body = await req.validate(UpdateProductSpuDto, 'body');
+            const body = validateData(updateProductSpuSchema, req.body);
             const data = await this.service.update(id, body);
             res.json({ code: 0, message: '更新成功', data });
         } catch (error) {
@@ -96,7 +97,7 @@ export class ProductSpuController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             await this.service.remove(id);
             res.json({ code: 0, message: '删除成功' });
         } catch (error) {

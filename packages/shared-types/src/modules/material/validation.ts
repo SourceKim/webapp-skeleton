@@ -45,3 +45,37 @@ export const materialQuerySchema = z.object({
   tags: z.array(z.string()).optional(),
   userId: z.string().optional()
 })
+
+/**
+ * 创建素材标签验证 Schema
+ */
+export const createMaterialTagSchema = z.object({
+  name: z.string()
+    .min(1, '标签名称不能为空')
+    .max(50, '标签名称长度不能超过50个字符'),
+  description: z.string()
+    .max(200, '标签描述长度不能超过200个字符')
+    .optional()
+})
+
+/**
+ * 更新素材标签验证 Schema
+ */
+export const updateMaterialTagSchema = createMaterialTagSchema.partial()
+
+/**
+ * 创建素材分类验证 Schema
+ */
+export const createMaterialCategorySchema = z.object({
+  name: z.string()
+    .min(1, '分类名称不能为空')
+    .max(100, '分类名称长度不能超过100个字符'),
+  description: z.string()
+    .max(500, '描述长度不能超过500个字符')
+    .optional()
+})
+
+/**
+ * 更新素材分类验证 Schema
+ */
+export const updateMaterialCategorySchema = createMaterialCategorySchema.partial()

@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiResponse } from '@/modules/common/common.dto';
-import { CreateUserAddressDto, UpdateUserAddressDto, UserAddressDTO } from './user-address.dto';
+import { UserAddressDTO } from './user-address.dto';
 import { UserAddressService } from './user-address.service';
-import { FindByIdDto } from '@/modules/common/common.dto';
+import { createUserAddressSchema, updateUserAddressSchema } from '@skeleton/shared-types';
+import { idParamSchema } from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 
 export class UserAddressController {
     private service = new UserAddressService();
@@ -27,7 +29,7 @@ export class UserAddressController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const userId = req.user!.id;
             const data = await this.service.findByIdForUser(id, userId);
             res.json({ code: 0, message: 'success', data });
@@ -42,7 +44,7 @@ export class UserAddressController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const dto = await req.validate(CreateUserAddressDto, 'body');
+            const dto = validateData(createUserAddressSchema, req.body);
             const userId = req.user!.id;
             const data = await this.service.createForUser(userId, dto);
             res.json({ code: 0, message: 'success', data });
@@ -57,8 +59,8 @@ export class UserAddressController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
-            const dto = await req.validate(UpdateUserAddressDto, 'body');
+            const { id } = validateData(idParamSchema, req.params);
+            const dto = validateData(updateUserAddressSchema, req.body);
             const userId = req.user!.id;
             const data = await this.service.updateForUser(id, userId, dto);
             res.json({ code: 0, message: 'success', data });
@@ -73,7 +75,7 @@ export class UserAddressController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const userId = req.user!.id;
             await this.service.deleteForUser(id, userId);
             res.json({ code: 0, message: 'success' });
@@ -88,7 +90,7 @@ export class UserAddressController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const userId = req.user!.id;
             await this.service.setDefaultForUser(id, userId);
             res.json({ code: 0, message: 'success' });
@@ -119,7 +121,7 @@ export class UserAddressController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const data = await this.service.adminFindById(id);
             res.json({ code: 0, message: 'success', data });
         } catch (error) {
@@ -133,8 +135,8 @@ export class UserAddressController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
-            const dto = await req.validate(UpdateUserAddressDto, 'body');
+            const { id } = validateData(idParamSchema, req.params);
+            const dto = validateData(updateUserAddressSchema, req.body);
             const data = await this.service.adminUpdate(id, dto);
             res.json({ code: 0, message: 'success', data });
         } catch (error) {
@@ -148,7 +150,7 @@ export class UserAddressController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             await this.service.adminDelete(id);
             res.json({ code: 0, message: 'success' });
         } catch (error) {

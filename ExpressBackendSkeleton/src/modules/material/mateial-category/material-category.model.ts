@@ -1,6 +1,5 @@
 import { Material } from '../material.model';
 import { Entity, Column, OneToMany, Index } from 'typeorm';
-import { IsString, MaxLength, IsOptional, IsNotEmpty } from 'class-validator';
 import { BaseEntity } from '@/modules/common/base.model';
 import type { MaterialCategory as IMaterialCategory } from '@skeleton/shared-types';
 
@@ -14,18 +13,12 @@ export class MaterialCategory extends BaseEntity implements IMaterialCategory {
      * 分类名称
      */
     @Column({ type: 'varchar', length: 50, unique: true })
-    @IsString()
-    @IsNotEmpty({ message: '分类名称不能为空' })
-    @MaxLength(50, { message: '分类名称不能超过50个字符' })
     name!: string;
 
     /**
      * 分类描述
      */
     @Column({ type: 'varchar', length: 200, nullable: true })
-    @IsOptional()
-    @IsString()
-    @MaxLength(200, { message: '分类描述不能超过200个字符' })
     description?: string;
 
     /**

@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiResponse, FindByIdDto, PaginatedResponse } from '@/modules/common/common.dto';
-import { ProductSkuDTO, CreateProductSkuDto, UpdateProductSkuDto, UpdateSkuPriceDto, UpdateSkuStatusDto, UpdateSkuStockDto } from './product-sku.dto';
+import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
+import { ProductSkuDTO } from './product-sku.dto';
 import { ProductSkuService } from './product-sku.service';
+import { createProductSkuSchema, updateProductSkuSchema } from '@skeleton/shared-types';
+import { idParamSchema } from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 
 export class ProductSkuController {
     private service = new ProductSkuService();
@@ -25,7 +28,7 @@ export class ProductSkuController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const data = await this.service.findById(id);
             res.json({ code: 0, message: 'success', data });
         } catch (error) {
@@ -39,7 +42,7 @@ export class ProductSkuController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const body = await req.validate(CreateProductSkuDto, 'body');
+            const body = validateData(createProductSkuSchema, req.body);
             const data = await this.service.create(body);
             res.status(200).json({ code: 0, message: '创建成功', data });
         } catch (error) {
@@ -53,8 +56,8 @@ export class ProductSkuController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
-            const body = await req.validate(UpdateProductSkuDto, 'body');
+            const { id } = validateData(idParamSchema, req.params);
+            const body = validateData(updateProductSkuSchema, req.body);
             const data = await this.service.update(id, body);
             res.json({ code: 0, message: '更新成功', data });
         } catch (error) {
@@ -68,7 +71,7 @@ export class ProductSkuController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             await this.service.remove(id);
             res.json({ code: 0, message: '删除成功' });
         } catch (error) {

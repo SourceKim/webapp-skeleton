@@ -217,3 +217,66 @@ export const productBrandQuerySchema = z.object({
   name: z.string().optional(),
   status: z.nativeEnum(ProductBrandStatus).optional()
 })
+
+/**
+ * 创建商品属性键验证 Schema
+ */
+export const createProductAttributeKeySchema = z.object({
+  spu_id: z.string()
+    .min(1, '商品SPU ID不能为空')
+    .max(36, '商品SPU ID长度不能超过36个字符'),
+  name: z.string()
+    .min(1, '属性名称不能为空')
+    .max(50, '属性名称长度不能超过50个字符'),
+  key: z.string()
+    .max(50, '属性键长度不能超过50个字符')
+    .optional(),
+  required: z.boolean().optional()
+})
+
+/**
+ * 更新商品属性键验证 Schema
+ */
+export const updateProductAttributeKeySchema = z.object({
+  name: z.string()
+    .max(50, '属性名称长度不能超过50个字符')
+    .optional(),
+  key: z.string()
+    .max(50, '属性键长度不能超过50个字符')
+    .optional(),
+  required: z.boolean().optional()
+})
+
+/**
+ * 创建商品属性值验证 Schema
+ */
+export const createProductAttributeValueSchema = z.object({
+  attribute_key_id: z.string()
+    .min(1, '属性键ID不能为空')
+    .max(36, '属性键ID长度不能超过36个字符'),
+  value: z.string()
+    .min(1, '属性值不能为空')
+    .max(100, '属性值长度不能超过100个字符'),
+  value_id: z.string()
+    .max(100, '属性值ID长度不能超过100个字符')
+    .optional(),
+  image_id: z.string()
+    .max(36, '图片ID长度不能超过36个字符')
+    .optional()
+})
+
+/**
+ * 更新商品属性值验证 Schema
+ */
+export const updateProductAttributeValueSchema = z.object({
+  value: z.string()
+    .max(100, '属性值长度不能超过100个字符')
+    .optional(),
+  value_id: z.string()
+    .max(100, '属性值ID长度不能超过100个字符')
+    .optional(),
+  image_id: z.string()
+    .max(36, '图片ID长度不能超过36个字符')
+    .nullable()
+    .optional()
+})

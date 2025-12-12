@@ -1,5 +1,4 @@
 import { Expose } from 'class-transformer';
-import { IsBoolean, IsOptional, IsString, MaxLength } from 'class-validator';
 import { BaseDTO } from '@/modules/common/common.dto';
 
 export class ProductAttributeKeyDTO extends BaseDTO {
@@ -9,18 +8,8 @@ export class ProductAttributeKeyDTO extends BaseDTO {
     @Expose() required!: boolean;
 }
 
-export class CreateProductAttributeKeyDto {
-    @IsString() spu_id!: string;
-    @IsString() @MaxLength(50) name!: string;
-    @IsOptional() @IsString() @MaxLength(50) key?: string; // 可选，后端会自动生成
-    @IsOptional() @IsBoolean() required?: boolean;
-}
-
-export class UpdateProductAttributeKeyDto {
-    @IsOptional() @IsString() @MaxLength(50) name?: string;
-    @IsOptional() @IsString() @MaxLength(50) key?: string;
-    @IsOptional() @IsBoolean() required?: boolean;
-}
+// 请求 DTO 已迁移到 @skeleton/shared-types，请使用 type import
+// 例如: import type { CreateProductAttributeKeyDto, UpdateProductAttributeKeyDto } from '@skeleton/shared-types'
 
 export class ProductAttributeValueDTO extends BaseDTO {
     @Expose() attribute_key_id!: string;
@@ -29,17 +18,7 @@ export class ProductAttributeValueDTO extends BaseDTO {
     @Expose() image_id?: string;
 }
 
-export class CreateProductAttributeValueDto {
-    @IsString() attribute_key_id!: string;
-    @IsString() @MaxLength(100) value!: string;
-    @IsOptional() @IsString() @MaxLength(100) value_id?: string; // 可选，后端会自动生成
-    @IsOptional() @IsString() image_id?: string;
-}
-
-export class UpdateProductAttributeValueDto {
-    @IsOptional() @IsString() @MaxLength(100) value?: string;
-    @IsOptional() @IsString() @MaxLength(100) value_id?: string;
-    @IsOptional() @IsString() image_id?: string | null;
-}
+// 请求 DTO 已迁移到 @skeleton/shared-types，请使用 type import
+// 例如: import type { CreateProductAttributeValueDto, UpdateProductAttributeValueDto } from '@skeleton/shared-types'
 
 

@@ -3,12 +3,12 @@ import { AppDataSource } from '@/configs/database.config';
 import { Permission } from '@/modules/permission/permission.model';
 import { Role } from '@/modules/role/role.model';
 import { User } from '@/modules/user/user.model';
-import {
+import type {
     CreateRoleDto,
     UpdateRoleDto,
     AssignPermissionsDto,
     AssignRolesDto,
-} from '@/modules/role/role.dto';
+} from '@skeleton/shared-types';
 import { HttpException } from '@/exceptions/http.exception';
 import { PaginationQueryDto } from '@/modules/common/common.dto';
 import { RoleDTO } from '@/modules/role/role.dto';

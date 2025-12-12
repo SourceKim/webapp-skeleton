@@ -37,6 +37,14 @@ export const roleQuerySchema = z.object({
  * 分配权限验证 Schema
  */
 export const assignPermissionsSchema = z.object({
-  permissions: z.array(z.string())
+  permissionIds: z.array(z.string())
     .min(1, '至少需要分配一个权限')
+})
+
+/**
+ * 分配角色验证 Schema
+ */
+export const assignRolesSchema = z.object({
+  roles: z.array(z.string())
+    .min(1, '至少需要分配一个角色')
 })

@@ -1,7 +1,9 @@
 import { Router, Request, Response } from 'express'
 import { authMiddleware } from '@/middlewares/auth.middleware'
 import { OrderService } from './order.service'
-import { OrderPreviewDto, CreateOrderDto } from './order.dto'
+import type { OrderPreviewDto, CreateOrderDto } from '@skeleton/shared-types'
+import { orderPreviewSchema, createOrderSchema } from '@skeleton/shared-types'
+import { validateData } from '@/utils/zod-validator'
 
 const router = Router()
 const service = new OrderService()
@@ -10,7 +12,7 @@ router.use(authMiddleware)
 
 router.post('/preview', async (req: Request, res: Response) => {
   try {
-    const dto = (await (req as any).validate(OrderPreviewDto, 'body')) as OrderPreviewDto
+    const dto = validateData(orderPreviewSchema, req.body)
     const data = await service.preview(req.user!.id, dto.cart_item_ids)
     res.json({ code: 0, message: 'OK', data })
   } catch (e: any) {
@@ -21,7 +23,7 @@ router.post('/preview', async (req: Request, res: Response) => {
 
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const dto = (await (req as any).validate(CreateOrderDto, 'body')) as CreateOrderDto
+    const dto = validateData(createOrderSchema, req.body)
     const order = await service.create(req.user!.id, dto.cart_item_ids, dto.address_id, dto.remark, (dto as any).payment_method)
     res.json({ code: 0, message: 'OK', data: order })
   } catch (e: any) {

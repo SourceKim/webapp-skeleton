@@ -1,4 +1,3 @@
-import { IsString, IsOptional, IsBoolean, IsInt, IsNotEmpty } from 'class-validator';
 import { Expose, Type } from 'class-transformer';
 import { BaseDTO } from '../../common/common.dto';
 import { MaterialDTO } from '../../material/material.dto';
@@ -24,46 +23,5 @@ export class CarouselDTO extends BaseDTO {
     is_active!: boolean;
 }
 
-export class CreateCarouselDto {
-    @IsString()
-    @IsOptional()
-    title?: string;
-
-    @IsString()
-    @IsNotEmpty()
-    material_id!: string;
-
-    @IsString()
-    @IsOptional()
-    spu_id?: string;
-
-    @IsInt()
-    @IsOptional()
-    sort_order?: number;
-
-    @IsBoolean()
-    @IsOptional()
-    is_active?: boolean;
-}
-
-export class UpdateCarouselDto {
-    @IsString()
-    @IsOptional()
-    title?: string;
-
-    @IsString()
-    @IsOptional()
-    material_id?: string;
-
-    @IsString()
-    @IsOptional()
-    spu_id?: string;
-
-    @IsInt()
-    @IsOptional()
-    sort_order?: number;
-
-    @IsBoolean()
-    @IsOptional()
-    is_active?: boolean;
-}
+// 请求 DTO 已迁移到 @skeleton/shared-types，请使用 type import
+// 例如: import type { CreateCarouselDto, UpdateCarouselDto } from '@skeleton/shared-types'

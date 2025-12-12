@@ -1,10 +1,10 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '@/configs/database.config';
 import { Permission } from '@/modules/permission/permission.model';
-import {
+import type {
     CreatePermissionDto,
     UpdatePermissionDto,
-} from '@/modules/permission/permission.dto';
+} from '@skeleton/shared-types';
 import { HttpException } from '@/exceptions/http.exception';
 import { PaginationQueryDto } from '@/modules/common/common.dto';
 import { PermissionDTO } from '@/modules/permission/permission.dto';

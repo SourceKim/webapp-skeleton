@@ -1,14 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import { RoleService } from '@/modules/role/role.service';
-import { ApiResponse, FindByIdDto, PaginatedResponse } from '@/modules/common/common.dto';
-import { 
-    CreateRoleDto,
-    UpdateRoleDto,
-    AssignPermissionsDto,
-    AssignRolesDto
-} from '@/modules/role/role.dto';
+import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
 import { RoleDTO } from '@/modules/role/role.dto';
 import { UserDTO } from '@/modules/user/user.dto';
+import { 
+    createRoleSchema,
+    updateRoleSchema,
+    assignPermissionsSchema,
+    assignRolesSchema
+} from '@skeleton/shared-types';
+import { idParamSchema } from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 
 /**
  * 角色控制器
@@ -49,7 +51,7 @@ export class RoleController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const role = await this.roleService.findRoleById(id);
             
             res.json({
@@ -72,7 +74,7 @@ export class RoleController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const roleData = await req.validate(CreateRoleDto, 'body');
+            const roleData = validateData(createRoleSchema, req.body);
             const role = await this.roleService.createRole(roleData);
             res.status(200).json({
                 code: 0,
@@ -94,8 +96,8 @@ export class RoleController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
-            const roleData = await req.validate(UpdateRoleDto, 'body');
+            const { id } = validateData(idParamSchema, req.params);
+            const roleData = validateData(updateRoleSchema, req.body);
             const role = await this.roleService.updateRole(id, roleData);
             
             res.json({
@@ -118,7 +120,7 @@ export class RoleController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             await this.roleService.deleteRole(id);
             res.json({
                 code: 0,
@@ -141,7 +143,7 @@ export class RoleController {
     ): Promise<void> => {
         try {
             const { roleId } = req.params;
-            const data = await req.validate(AssignPermissionsDto, 'body');
+            const data = validateData(assignPermissionsSchema, req.body);
             const role = await this.roleService.assignPermissionsToRole(roleId, data);
             
             res.json({
@@ -165,7 +167,7 @@ export class RoleController {
     ): Promise<void> => {
         try {
             const userId = req.params.userId;
-            const data = await req.validate(AssignRolesDto, 'body');
+            const data = validateData(assignRolesSchema, req.body);
             const user = await this.roleService.assignRolesToUser(userId, data);
             
             res.json({

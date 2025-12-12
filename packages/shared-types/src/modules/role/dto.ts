@@ -42,5 +42,5 @@ export interface RoleResponseDto extends Role {
  * 分配权限请求参数
  */
 export interface AssignPermissionsDto {
-  permissions: string[] // 权限ID数组
+  permissionIds: string[] // 权限ID数组
 }

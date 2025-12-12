@@ -1,5 +1,4 @@
 import { Expose } from "class-transformer";
-import { IsNotEmpty, IsString } from "class-validator";
 import { FilterOperator, FilterCondition } from '@skeleton/shared-types';
 
 export class BaseDTO {
@@ -14,12 +13,6 @@ export class BaseDTO {
 
     @Expose()
     deletedAt: Date | null = null;
-}
-
-export class FindByIdDto {
-    @IsString()
-    @IsNotEmpty()
-    id!: string;
 }
 
 // 重新导出 shared-types 中的类型，保持向后兼容

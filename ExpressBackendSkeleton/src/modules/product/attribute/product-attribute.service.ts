@@ -5,7 +5,8 @@ import { ProductAttributeValue } from './product-attribute-value.model';
 import { nanoid } from 'nanoid';
 import { HttpException } from '@/exceptions/http.exception';
 import { plainToInstance } from 'class-transformer';
-import { CreateProductAttributeKeyDto, CreateProductAttributeValueDto, ProductAttributeKeyDTO, ProductAttributeValueDTO, UpdateProductAttributeKeyDto, UpdateProductAttributeValueDto } from './product-attribute.dto';
+import { ProductAttributeKeyDTO, ProductAttributeValueDTO } from './product-attribute.dto';
+import type { CreateProductAttributeKeyDto, CreateProductAttributeValueDto, UpdateProductAttributeKeyDto, UpdateProductAttributeValueDto } from '@skeleton/shared-types';
 
 /**
  * 根据名称生成键名（key）

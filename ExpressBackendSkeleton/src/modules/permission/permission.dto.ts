@@ -1,4 +1,3 @@
-import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
 import { Expose } from 'class-transformer';
 import { BaseDTO } from '@/modules/common/common.dto';
 
@@ -16,43 +15,5 @@ export class PermissionDTO extends BaseDTO {
     action: string = '';
 }
 
-// 创建权限的请求参数
-export class CreatePermissionDto {
-    @IsString()
-    @IsNotEmpty()
-    name!: string;
-
-    @IsString()
-    @IsNotEmpty()
-    resource!: string;
-
-    @IsString()
-    @IsNotEmpty()
-    action!: string;
-
-    @IsOptional()
-    @IsString()
-    description?: string;
-}
-
-// 更新权限的请求参数
-export class UpdatePermissionDto {
-    @IsOptional()
-    @IsString()
-    @IsNotEmpty()
-    name?: string;
-
-    @IsOptional()
-    @IsString()
-    @IsNotEmpty()
-    resource?: string;
-
-    @IsOptional()
-    @IsString()
-    @IsNotEmpty()
-    action?: string;
-
-    @IsOptional()
-    @IsString()
-    description?: string;
-}
+// 请求 DTO 已迁移到 @skeleton/shared-types，请使用 type import
+// 例如: import type { CreatePermissionDto, UpdatePermissionDto } from '@skeleton/shared-types'

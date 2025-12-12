@@ -5,7 +5,8 @@ import { AppDataSource } from '@/configs/database.config';
 import { HttpException } from '@/exceptions/http.exception';
 import { PaginationQueryDto } from '@/modules/common/common.dto';
 import { plainToInstance } from 'class-transformer';
-import { CreateMaterialTagDTO, MaterialTagDTO, UpdateMaterialTagDTO } from './material-tag.dto';
+import { MaterialTagDTO } from './material-tag.dto';
+import type { CreateMaterialTagDto, UpdateMaterialTagDto } from '@skeleton/shared-types';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 
 export class MaterialTagService {
@@ -48,7 +49,7 @@ export class MaterialTagService {
         return plainToInstance(MaterialTagDTO, tag);
     }
 
-    async createMaterialTag(createMaterialTagDto: CreateMaterialTagDTO): Promise<MaterialTagDTO> {
+    async createMaterialTag(createMaterialTagDto: CreateMaterialTagDto): Promise<MaterialTagDTO> {
         const tag = this.materialTagRepository.create(createMaterialTagDto);
         // 检查标签名称是否已存在
         const existingTag = await this.materialTagRepository.findOne({ where: { name: createMaterialTagDto.name } });
@@ -60,7 +61,7 @@ export class MaterialTagService {
         return plainToInstance(MaterialTagDTO, tag);
     }
 
-    async updateMaterialTag(id: string, updateMaterialTagDto: UpdateMaterialTagDTO): Promise<MaterialTagDTO> {
+    async updateMaterialTag(id: string, updateMaterialTagDto: UpdateMaterialTagDto): Promise<MaterialTagDTO> {
         const tag = await this.materialTagRepository.findOne({ where: { id } });
         if (!tag) throw new HttpException(404, '标签不存在');
 

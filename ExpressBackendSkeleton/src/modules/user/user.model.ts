@@ -1,5 +1,4 @@
 import { Entity, Column, BeforeInsert, BeforeUpdate, ManyToMany, JoinTable, OneToMany } from 'typeorm';
-import { IsEmail, Length, IsOptional, Matches, IsEnum, MinLength, IsDateString } from 'class-validator';
 import * as bcrypt from 'bcryptjs';
 import { Role } from '@/modules/role/role.model';
 import { BaseEntity } from '@/modules/common/base.model';
@@ -11,28 +10,21 @@ export { UserStatus, UserGender };
 @Entity('users')
 export class User extends BaseEntity implements IUser {
     @Column({ type: 'varchar', length: 100, unique: true })
-    @Length(3, 100, { message: '用户名长度必须在3-100个字符之间' })
     username!: string;
 
     @Column({ type: 'varchar', length: 100, select: false }) // 默认查询时不返回密码
-    @MinLength(6, { message: '密码长度不能少于6个字符' })
     password!: string;
 
     @Column({ type: 'varchar', length: 100, unique: true, nullable: true })
-    @IsOptional()
-    @IsEmail({}, { message: '邮箱格式不正确' })
     email?: string;
 
     @Column({ type: 'varchar', length: 100, nullable: false })
-    @Length(2, 100, { message: '昵称长度必须在2-100个字符之间' })
     nickname?: string;
 
     @Column({ type: 'varchar', length: 20, unique: true, nullable: false })
-    @Matches(/^1[3-9]\d{9}$/, { message: '手机号格式不正确' })
     phone?: string;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
-    @IsOptional()
     avatar?: string;
 
     @Column({
@@ -40,12 +32,9 @@ export class User extends BaseEntity implements IUser {
         enum: UserStatus,
         default: UserStatus.ACTIVE
     })
-    @IsEnum(UserStatus, { message: '用户状态不正确' })
     status!: UserStatus;
 
     @Column({ type: 'varchar', length: 500, nullable: true })
-    @IsOptional()
-    @Length(0, 500, { message: '简介长度不能超过500个字符' })
     bio?: string; // 用户简介
 
     @Column({
@@ -53,12 +42,9 @@ export class User extends BaseEntity implements IUser {
         enum: UserGender,
         nullable: false
     })
-    @IsEnum(UserGender, { message: '性别不正确' })
     gender!: UserGender;
 
     @Column({ type: 'date', nullable: true })
-    @IsOptional()
-    @IsDateString({}, { message: '出生日期格式不正确' })
     birthdate?: string; // YYYY-MM-DD
 
     @ManyToMany(() => Role, role => role.users)

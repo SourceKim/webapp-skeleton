@@ -4,7 +4,8 @@ import { AppDataSource } from '@/configs/database.config';
 import { HttpException } from '@/exceptions/http.exception';
 import { PaginationQueryDto } from '@/modules/common/common.dto';
 import { plainToInstance } from 'class-transformer';
-import { CreateMaterialCategoryDto, MaterialCategoryDTO, UpdateMaterialCategoryDto } from './material-category.dto';
+import { MaterialCategoryDTO } from './material-category.dto';
+import type { CreateMaterialCategoryDto, UpdateMaterialCategoryDto } from '@skeleton/shared-types';
 import { nanoid } from 'nanoid';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 

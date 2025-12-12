@@ -2,13 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '@/modules/auth/auth.service';
 import { HttpException } from '@/exceptions/http.exception';
 import { ApiResponse } from '@/modules/common/common.dto';
-import { 
+import type { 
     RegisterDto, 
     LoginDto, 
     RegisterResponseDto, 
     LoginResponseDto, 
     ProfileResponseDto 
-} from '@/modules/auth/auth.dto';
+} from '@skeleton/shared-types';
 import { 
     loginSchema, 
     registerSchema

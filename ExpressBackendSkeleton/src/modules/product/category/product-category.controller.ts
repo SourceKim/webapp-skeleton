@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiResponse, FindByIdDto, PaginatedResponse } from '@/modules/common/common.dto';
-import { ProductCategoryDTO, CreateProductCategoryDto, UpdateProductCategoryDto } from './product-category.dto';
+import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
+import { ProductCategoryDTO } from './product-category.dto';
 import { ProductCategoryService } from './product-category.service';
+import { createProductCategorySchema, updateProductCategorySchema } from '@skeleton/shared-types';
+import { idParamSchema } from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 
 export class ProductCategoryController {
     private service = new ProductCategoryService();
@@ -28,7 +31,7 @@ export class ProductCategoryController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const data = await this.service.findById(id);
             res.json({ code: 0, message: 'success', data });
         } catch (error) {
@@ -42,7 +45,7 @@ export class ProductCategoryController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const body = await req.validate(CreateProductCategoryDto, 'body');
+            const body = validateData(createProductCategorySchema, req.body);
             const data = await this.service.create(body);
             res.status(200).json({ code: 0, message: '创建成功', data });
         } catch (error) {
@@ -56,8 +59,8 @@ export class ProductCategoryController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
-            const body = await req.validate(UpdateProductCategoryDto, 'body');
+            const { id } = validateData(idParamSchema, req.params);
+            const body = validateData(updateProductCategorySchema, req.body);
             const data = await this.service.update(id, body);
             res.json({ code: 0, message: '更新成功', data });
         } catch (error) {
@@ -71,7 +74,7 @@ export class ProductCategoryController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             await this.service.remove(id);
             res.json({ code: 0, message: '删除成功' });
         } catch (error) {

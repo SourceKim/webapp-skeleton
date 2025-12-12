@@ -1,6 +1,5 @@
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from '@/modules/common/base.model';
-import { IsString, MaxLength } from 'class-validator';
 import { ProductAttributeKey } from './product-attribute-key.model';
 import { Material } from '@/modules/material/material.model';
 import type { ProductAttributeValue as IProductAttributeValue } from '@skeleton/shared-types';
@@ -15,13 +14,9 @@ export class ProductAttributeValue extends BaseEntity implements IProductAttribu
     attribute_key!: ProductAttributeKey;
 
     @Column({ type: 'varchar', length: 100 })
-    @IsString()
-    @MaxLength(100)
     value!: string;
 
     @Column({ type: 'varchar', length: 100 })
-    @IsString()
-    @MaxLength(100)
     value_id!: string;
 
     @ManyToOne(() => Material, { nullable: true, onDelete: 'SET NULL' })

@@ -58,8 +58,7 @@
     "@tarojs/shared": "4.0.9",
     "@tarojs/taro": "4.0.9",
     "pinia": "^2.1.7",
-    "vue": "^3.5.22",
-    "zod": "^4.1.13"
+    "vue": "^3.5.22"
   },
   "devDependencies": {
     "@babel/core": "^7.24.4",

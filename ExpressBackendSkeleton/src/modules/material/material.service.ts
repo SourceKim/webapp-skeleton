@@ -20,7 +20,8 @@ import { PaginationQueryDto } from '@/modules/common/common.dto';
 import { plainToInstance } from 'class-transformer';
 import { logError, logDebug } from '@/utils/logger';
 import { MaterialCategory } from '@/modules/material/mateial-category/material-category.model';
-import { CreateMaterialDto, MaterialDTO } from '@/modules/material/material.dto';
+import { MaterialDTO } from '@/modules/material/material.dto';
+import type { CreateMaterialDto } from '@skeleton/shared-types';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 
 /**

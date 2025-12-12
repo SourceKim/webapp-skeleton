@@ -5,7 +5,8 @@ import { HttpException } from '@/exceptions/http.exception';
 import { nanoid } from 'nanoid';
 import { PaginationQueryDto } from '@/modules/common/common.dto';
 import { plainToInstance } from 'class-transformer';
-import { CreateProductSkuDto, ProductSkuDTO, UpdateProductSkuDto } from './product-sku.dto';
+import { ProductSkuDTO } from './product-sku.dto';
+import type { CreateProductSkuDto, UpdateProductSkuDto } from '@skeleton/shared-types';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 
 export class ProductSkuService {

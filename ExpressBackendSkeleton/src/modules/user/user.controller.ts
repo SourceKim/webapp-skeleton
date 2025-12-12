@@ -1,8 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from '@/modules/user/user.service';
-import { ApiResponse, FindByIdDto, PaginatedResponse } from '@/modules/common/common.dto';
-import { CreateUserDto, UpdateUserDto, UserDTO, ChangePasswordDto, ChangePhoneDto } from '@/modules/user/user.dto';
+import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
+import { UserDTO } from '@/modules/user/user.dto';
 import { HttpException } from '@/exceptions/http.exception';
+import {
+    createUserSchema,
+    updateUserSchema,
+    changePasswordSchema,
+    changePhoneSchema,
+    updateProfileSchema
+} from '@skeleton/shared-types';
+import { idParamSchema } from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 
 /**
  * 用户控制器
@@ -25,7 +34,7 @@ export class UserController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const userData = await req.validate(CreateUserDto, 'body');
+            const userData = validateData(createUserSchema, req.body);
             const user = await this.userService.createUser(userData);
             res.status(200).json({
                 code: 0,
@@ -47,19 +56,9 @@ export class UserController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
-            // 过滤白名单字段，避免 forbidNonWhitelisted 触发
-            const allowedKeys = [
-                'username','password','email','nickname','phone','avatar','bio','roles','gender','birthdate'
-            ];
-            const raw: any = req.body || {};
-            const filtered: Record<string, any> = {};
-            for (const key of allowedKeys) {
-                if (key in raw) filtered[key] = raw[key];
-            }
-            // 覆盖 req.body 后再做 DTO 校验
-            (req as any).body = filtered;
-            const userData = await req.validate(UpdateUserDto, 'body');
+            const { id } = validateData(idParamSchema, req.params);
+            // Zod 会自动过滤未定义的字段，所以不需要手动过滤
+            const userData = validateData(updateUserSchema, req.body);
             const user = await this.userService.updateUser(id, userData);
             res.json({
                 code: 0,
@@ -130,7 +129,7 @@ export class UserController {
             if (!userId) {
                 throw new HttpException(401, '未认证');
             }
-            const userData = await req.validate(UpdateUserDto, 'body');
+            const userData = validateData(updateProfileSchema, req.body);
             const user = await this.userService.updateUser(userId, userData);
             res.json({
                 code: 0,
@@ -155,7 +154,7 @@ export class UserController {
             const userId = req.user?.id;
             if (!userId) throw new HttpException(401, '未认证');
 
-            const dto = await req.validate(ChangePasswordDto, 'body');
+            const dto = validateData(changePasswordSchema, req.body);
             await this.userService.changePassword(userId, dto);
             res.json({
                 code: 0,
@@ -180,7 +179,7 @@ export class UserController {
             const userId = req.user?.id;
             if (!userId) throw new HttpException(401, '未认证');
 
-            const dto = await req.validate(ChangePhoneDto, 'body');
+            const dto = validateData(changePhoneSchema, req.body);
             await this.userService.changePhone(userId, dto);
             res.json({
                 code: 0,
@@ -202,7 +201,7 @@ export class UserController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             await this.userService.deleteUser(id);
             res.json({
                 code: 0,
@@ -224,7 +223,7 @@ export class UserController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const user = await this.userService.getUser(id);
             res.json({
                 code: 0,

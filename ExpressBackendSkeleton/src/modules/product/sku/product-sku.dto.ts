@@ -1,5 +1,4 @@
 import { Expose, Transform } from 'class-transformer';
-import { IsBoolean, IsEnum, IsInt, IsNumberString, IsOptional, IsString, MaxLength } from 'class-validator';
 import { BaseDTO } from '@/modules/common/common.dto';
 import { ProductSkuStatus } from './product-sku.model';
 import { convertSkuStatusToChinese } from '@/utils/status.util';
@@ -19,59 +18,7 @@ export class ProductSkuDTO extends BaseDTO {
     @Expose() attributes?: Array<{ key_id: string; value_id: string; key_name?: string; value?: string }>;
 }
 
-export class CreateProductSkuDto {
-    @IsString() spu_id!: string;
-    @IsString() @MaxLength(100) sku_code!: string;
-    @IsOptional() @IsString() @MaxLength(500) sku_name?: string;
-    @IsNumberString() 
-    @Transform(({ value }) => value === null || value === undefined ? value : String(value))
-    price!: string;
-    
-    @IsOptional() 
-    @IsNumberString() 
-    @Transform(({ value }) => value === null || value === undefined ? value : String(value))
-    original_price?: string;
-    
-    @IsOptional() 
-    @IsNumberString() 
-    @Transform(({ value }) => value === null || value === undefined ? value : String(value))
-    cost_price?: string;
-
-    @IsInt() stock!: number;
-    @IsOptional() @IsEnum(ProductSkuStatus) status?: ProductSkuStatus;
-    @IsOptional() @IsBoolean() is_default?: boolean;
-}
-
-export class UpdateProductSkuDto {
-    @IsOptional() @IsString() @MaxLength(100) sku_code?: string;
-    @IsOptional() @IsString() @MaxLength(500) sku_name?: string;
-    
-    @IsOptional() 
-    @IsNumberString() 
-    @Transform(({ value }) => value === null || value === undefined ? value : String(value))
-    price?: string;
-    
-    @IsOptional() 
-    @IsNumberString() 
-    @Transform(({ value }) => value === null || value === undefined ? value : String(value))
-    original_price?: string | null;
-    
-    @IsOptional() 
-    @IsNumberString() 
-    @Transform(({ value }) => value === null || value === undefined ? value : String(value))
-    cost_price?: string | null;
-
-    @IsOptional() @IsInt() stock?: number;
-    @IsOptional() @IsEnum(ProductSkuStatus) status?: ProductSkuStatus;
-    @IsOptional() @IsBoolean() is_default?: boolean;
-}
-
-export class UpdateSkuPriceDto { 
-    @IsNumberString() 
-    @Transform(({ value }) => value === null || value === undefined ? value : String(value))
-    price!: string; 
-}
-export class UpdateSkuStockDto { @IsInt() stock!: number; }
-export class UpdateSkuStatusDto { @IsEnum(ProductSkuStatus) status!: ProductSkuStatus; }
+// 请求 DTO 已迁移到 @skeleton/shared-types，请使用 type import
+// 例如: import type { CreateProductSkuDto, UpdateProductSkuDto, UpdateSkuPriceDto, UpdateSkuStockDto, UpdateSkuStatusDto } from '@skeleton/shared-types'
 
 

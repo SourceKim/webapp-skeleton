@@ -52,3 +52,35 @@ export interface MaterialQueryDto {
 export interface MaterialResponseDto extends Material {
   url?: string // 访问URL（前端计算）
 }
+
+/**
+ * 创建素材标签请求参数
+ */
+export interface CreateMaterialTagDto {
+  name: string
+  description?: string
+}
+
+/**
+ * 更新素材标签请求参数
+ */
+export interface UpdateMaterialTagDto {
+  name?: string
+  description?: string
+}
+
+/**
+ * 创建素材分类请求参数
+ */
+export interface CreateMaterialCategoryDto {
+  name: string
+  description?: string
+}
+
+/**
+ * 更新素材分类请求参数
+ */
+export interface UpdateMaterialCategoryDto {
+  name?: string
+  description?: string
+}

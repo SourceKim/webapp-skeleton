@@ -407,11 +407,6 @@ npm run migration:show
 - 使用方式：`checkPermissions(['user:read', 'user:write'])`
 - 未授权返回 403
 
-### DTO 验证中间件 (`dto-validation.middleware.ts`)
-- 自动验证请求体数据
-- 基于 class-validator 进行数据校验
-- 验证失败返回 400 错误及详细错误信息
-
 ### 分页中间件
 - `paginationQuery()`: 解析分页查询参数（page, limit, sort_by, sort_order, filters）
 - `paginationResponse`: 格式化分页响应数据

@@ -1,7 +1,10 @@
 import { MaterialTagService } from './material-tag.service';
 import { NextFunction, Request, Response } from 'express';
-import { ApiResponse, FindByIdDto, PaginatedResponse } from '@/modules/common/common.dto';
-import { CreateMaterialTagDTO, MaterialTagDTO } from './material-tag.dto';
+import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
+import { MaterialTagDTO } from './material-tag.dto';
+import { createMaterialTagSchema, updateMaterialTagSchema } from '@skeleton/shared-types';
+import { idParamSchema } from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 
 export class MaterialTagController {
     private materialTagService: MaterialTagService;
@@ -29,7 +32,7 @@ export class MaterialTagController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const tag = await this.materialTagService.findMaterialTagById(id);
             res.json({
                 code: 0,
@@ -47,7 +50,7 @@ export class MaterialTagController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const tagData = await req.validate(CreateMaterialTagDTO, 'body');
+            const tagData = validateData(createMaterialTagSchema, req.body);
             const tag = await this.materialTagService.createMaterialTag(tagData);
             res.json({
                 code: 0,
@@ -65,8 +68,9 @@ export class MaterialTagController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
-            const tag = await this.materialTagService.updateMaterialTag(id, req.body);
+            const { id } = validateData(idParamSchema, req.params);
+            const tagData = validateData(updateMaterialTagSchema, req.body);
+            const tag = await this.materialTagService.updateMaterialTag(id, tagData);
             res.json({
                 code: 0,
                 message: 'success',
@@ -83,7 +87,7 @@ export class MaterialTagController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             await this.materialTagService.deleteMaterialTag(id);
             res.json({
                 code: 0,

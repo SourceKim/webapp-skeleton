@@ -1,12 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { PermissionService } from '@/modules/permission/permission.service';
-import { ApiResponse, FindByIdDto, PaginatedResponse } from '@/modules/common/common.dto';
-import { 
-    CreatePermissionDto,
-    UpdatePermissionDto,
-} from '@/modules/permission/permission.dto';
-import { HttpException } from '@/exceptions/http.exception';
+import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
 import { PermissionDTO } from '@/modules/permission/permission.dto';
+import { HttpException } from '@/exceptions/http.exception';
+import { 
+    createPermissionSchema,
+    updatePermissionSchema
+} from '@skeleton/shared-types';
+import { idParamSchema } from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 
 /**
  * 权限控制器
@@ -48,7 +50,7 @@ export class PermissionController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             const permission = await this.permissionService.findPermissionById(id);
             
             if (!permission) {
@@ -75,7 +77,7 @@ export class PermissionController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const permissionData = await req.validate(CreatePermissionDto, 'body');
+            const permissionData = validateData(createPermissionSchema, req.body);
             const permission = await this.permissionService.createPermission(permissionData);
             res.status(200).json({
                 code: 0,
@@ -97,8 +99,8 @@ export class PermissionController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
-            const permissionData = await req.validate(UpdatePermissionDto, 'body');
+            const { id } = validateData(idParamSchema, req.params);
+            const permissionData = validateData(updatePermissionSchema, req.body);
             const permission = await this.permissionService.updatePermission(id, permissionData);
             
             res.json({
@@ -121,7 +123,7 @@ export class PermissionController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const { id } = await req.validate(FindByIdDto, 'params');
+            const { id } = validateData(idParamSchema, req.params);
             await this.permissionService.deletePermission(id);
             res.json({
                 code: 0,

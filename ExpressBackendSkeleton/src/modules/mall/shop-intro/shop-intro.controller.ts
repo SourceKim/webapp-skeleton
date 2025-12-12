@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { ShopIntroService } from './shop-intro.service';
-import { CreateShopIntroDto, ShopIntroDTO } from './shop-intro.dto';
+import { ShopIntroDTO } from './shop-intro.dto';
 import { ApiResponse } from '../../common/common.dto';
+import { createShopIntroSchema } from '@skeleton/shared-types';
+import { validateData } from '@/utils/zod-validator';
 
 export class ShopIntroController {
     private shopIntroService = new ShopIntroService();
@@ -29,7 +31,7 @@ export class ShopIntroController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const dto = await req.validate(CreateShopIntroDto, 'body');
+            const dto = validateData(createShopIntroSchema, req.body);
             const shopIntro = await this.shopIntroService.createOrUpdateShopIntro(dto);
             res.status(200).json({
                 code: 0,

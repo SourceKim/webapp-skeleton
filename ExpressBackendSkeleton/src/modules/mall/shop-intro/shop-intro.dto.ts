@@ -1,4 +1,3 @@
-import { IsString, IsOptional, IsArray, IsNotEmpty, IsNumber } from 'class-validator';
 import { Expose, Type } from 'class-transformer';
 import { BaseDTO } from '../../common/common.dto';
 import { MaterialDTO } from '../../material/material.dto';
@@ -42,72 +41,5 @@ export class ShopIntroDTO extends BaseDTO {
     banners?: ShopIntroBannerDTO[];
 }
 
-export class CreateShopIntroDto {
-    @IsString()
-    @IsNotEmpty()
-    name!: string;
-
-    @IsString()
-    @IsOptional()
-    introduction?: string;
-
-    @IsString()
-    @IsOptional()
-    detail?: string;
-
-    @IsString()
-    @IsOptional()
-    contact_phone?: string;
-
-    @IsNumber()
-    @IsOptional()
-    longitude?: number;
-
-    @IsNumber()
-    @IsOptional()
-    latitude?: number;
-
-    @IsString()
-    @IsOptional()
-    address?: string;
-
-    @IsArray()
-    @IsString({ each: true })
-    @IsOptional()
-    banner_ids?: string[];
-}
-
-export class UpdateShopIntroDto {
-    @IsString()
-    @IsOptional()
-    name?: string;
-
-    @IsString()
-    @IsOptional()
-    introduction?: string;
-
-    @IsString()
-    @IsOptional()
-    detail?: string;
-
-    @IsString()
-    @IsOptional()
-    contact_phone?: string;
-
-    @IsNumber()
-    @IsOptional()
-    longitude?: number;
-
-    @IsNumber()
-    @IsOptional()
-    latitude?: number;
-
-    @IsString()
-    @IsOptional()
-    address?: string;
-
-    @IsArray()
-    @IsString({ each: true })
-    @IsOptional()
-    banner_ids?: string[];
-}
+// 请求 DTO 已迁移到 @skeleton/shared-types，请使用 type import
+// 例如: import type { CreateShopIntroDto, UpdateShopIntroDto } from '@skeleton/shared-types'

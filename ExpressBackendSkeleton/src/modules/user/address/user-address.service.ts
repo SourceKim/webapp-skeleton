@@ -4,7 +4,8 @@ import { UserAddress, UserAddressStatus } from './user-address.model';
 import { HttpException } from '@/exceptions/http.exception';
 import { nanoid } from 'nanoid';
 import { plainToInstance } from 'class-transformer';
-import { CreateUserAddressDto, UpdateUserAddressDto, UserAddressDTO } from './user-address.dto';
+import { UserAddressDTO } from './user-address.dto';
+import type { CreateUserAddressDto, UpdateUserAddressDto } from '@skeleton/shared-types';
 
 export class UserAddressService {
     private repo: Repository<UserAddress>;
@@ -34,7 +35,7 @@ export class UserAddressService {
 
         const entity = this.repo.create({
             id: nanoid(16),
-            user: { id: userId } as any,
+            user_id: userId,
             name: data.name,
             phone: data.phone,
             province: data.province,
@@ -44,7 +45,7 @@ export class UserAddressService {
             detail: data.detail,
             postal_code: data.postal_code,
             is_default: Boolean(data.is_default),
-            tag: data.tag,
+            tag: data.tag as any,
             status: UserAddressStatus.ACTIVE,
         });
         const saved = await this.repo.save(entity);
@@ -72,8 +73,8 @@ export class UserAddressService {
         entity.detail = data.detail ?? entity.detail;
         entity.postal_code = data.postal_code ?? entity.postal_code;
         entity.is_default = data.is_default ?? entity.is_default;
-        entity.tag = data.tag ?? entity.tag;
-        entity.status = data.status ?? entity.status;
+        if (data.tag !== undefined) entity.tag = data.tag as any;
+        if (data.status !== undefined) entity.status = data.status as any;
 
         await this.repo.save(entity);
         return this.toDto(entity);
@@ -125,8 +126,8 @@ export class UserAddressService {
         entity.detail = data.detail ?? entity.detail;
         entity.postal_code = data.postal_code ?? entity.postal_code;
         entity.is_default = data.is_default ?? entity.is_default;
-        entity.tag = data.tag ?? entity.tag;
-        entity.status = data.status ?? entity.status;
+        if (data.tag !== undefined) entity.tag = data.tag as any;
+        if (data.status !== undefined) entity.status = data.status as any;
         await this.repo.save(entity);
         return this.toDto(entity);
     }

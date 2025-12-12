@@ -11,6 +11,9 @@ importers:
       dotenv:
         specifier: ^16.4.7
         version: 16.6.1
+      zod:
+        specifier: ^4.1.13
+        version: 4.1.13
     devDependencies:
       typescript:
         specifier: ^5.8.2
@@ -36,9 +39,6 @@ importers:
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
-      class-validator:
-        specifier: ^0.14.1
-        version: 0.14.3
       compression:
         specifier: ^1.8.0
         version: 1.8.1
@@ -184,9 +184,6 @@ importers:
       vue:
         specifier: ^3.5.22
         version: 3.5.25(typescript@5.8.2)
-      zod:
-        specifier: ^4.1.13
-        version: 4.1.13
     devDependencies:
       '@babel/core':
         specifier: ^7.24.4
@@ -2681,9 +2678,6 @@ packages:
   '@types/uuid@10.0.0':
     resolution: {integrity: sha512-7gqG38EyHgyP1S+7+xomFtL+ZNHcKv6DwNaCZmJmo1vgMugyF3TCnXVg4t1uk89mLNwnLtnY3TpOpCOyp1/xHQ==}
 
-  '@types/validator@13.15.10':
-    resolution: {integrity: sha512-T8L6i7wCuyoK8A/ZeLYt1+q0ty3Zb9+qbSSvrIVitzT3YjZqkTZ40IbRsPanlB4h1QB3JVL1SYCdR6ngtFYcuA==}
-
   '@types/web-bluetooth@0.0.16':
     resolution: {integrity: sha512-oh8q2Zc32S6gd/j50GowEjKLoOVOwHP/bWVjKJInBwQqdOYMdPrf1oVlelTlyfFK3CKxL1uahMDAr+vy8T7yMQ==}
 
@@ -3357,9 +3351,6 @@ packages:
 
   class-transformer@0.5.1:
     resolution: {integrity: sha512-SQa1Ws6hUbfC98vKGxZH3KFY0Y1lm5Zm0SY8XX9zbK7FJCyVEac3ATW0RIpwzW+oOfmHE5PMPufDG9hCfoEOMw==}
-
-  class-validator@0.14.3:
-    resolution: {integrity: sha512-rXXekcjofVN1LTOSw+u4u9WXVEUvNBVjORW154q/IdmYWy1nMbOU9aNtZB0t8m+FJQ9q91jlr2f9CwwUFdFMRA==}
 
   classnames@2.5.1:
     resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
@@ -4779,9 +4770,6 @@ packages:
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
-
-  libphonenumber-js@1.12.31:
-    resolution: {integrity: sha512-Z3IhgVgrqO1S5xPYM3K5XwbkDasU67/Vys4heW+lfSBALcUZjeIIzI8zCLifY+OCzSq+fpDdywMDa7z+4srJPQ==}
 
   lie@3.3.0:
     resolution: {integrity: sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==}
@@ -9155,8 +9143,6 @@ snapshots:
 
   '@types/uuid@10.0.0': {}
 
-  '@types/validator@13.15.10': {}
-
   '@types/web-bluetooth@0.0.16': {}
 
   '@types/winston@2.4.4':
@@ -10058,12 +10044,6 @@ snapshots:
   chrome-trace-event@1.0.4: {}
 
   class-transformer@0.5.1: {}
-
-  class-validator@0.14.3:
-    dependencies:
-      '@types/validator': 13.15.10
-      libphonenumber-js: 1.12.31
-      validator: 13.15.23
 
   classnames@2.5.1: {}
 
@@ -11797,8 +11777,6 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
       type-check: 0.4.0
-
-  libphonenumber-js@1.12.31: {}
 
   lie@3.3.0:
     dependencies:

@@ -2,7 +2,7 @@
  * 商城相关 DTO 类型定义
  */
 import type { Cart, MallOrder, MallOrderItem, UserAddress } from './index'
-import type { PaymentMethod, PaymentStatus, DeliveryStatus, OrderStatus } from './enums'
+import type { PaymentMethod, PaymentStatus, DeliveryStatus, OrderStatus, UserAddressTag, UserAddressStatus } from './enums'
 
 /**
  * 创建购物车项请求参数
@@ -88,7 +88,7 @@ export interface CreateUserAddressDto {
   detail: string
   postal_code?: string
   is_default?: boolean
-  tag?: string
+  tag?: UserAddressTag
 }
 
 /**
@@ -104,8 +104,8 @@ export interface UpdateUserAddressDto {
   detail?: string
   postal_code?: string
   is_default?: boolean
-  tag?: string
-  status?: string
+  tag?: UserAddressTag
+  status?: UserAddressStatus
 }
 
 /**
@@ -117,4 +117,54 @@ export interface UserAddressQueryDto {
   user_id?: string
   is_default?: boolean
   status?: string
+}
+
+/**
+ * 创建轮播图请求参数
+ */
+export interface CreateCarouselDto {
+  title?: string
+  material_id: string
+  spu_id?: string
+  sort_order?: number
+  is_active?: boolean
+}
+
+/**
+ * 更新轮播图请求参数
+ */
+export interface UpdateCarouselDto {
+  title?: string
+  material_id?: string
+  spu_id?: string
+  sort_order?: number
+  is_active?: boolean
+}
+
+/**
+ * 创建店铺介绍请求参数
+ */
+export interface CreateShopIntroDto {
+  name: string
+  introduction?: string
+  detail?: string
+  contact_phone?: string
+  longitude?: number
+  latitude?: number
+  address?: string
+  banner_ids?: string[]
+}
+
+/**
+ * 更新店铺介绍请求参数
+ */
+export interface UpdateShopIntroDto {
+  name?: string
+  introduction?: string
+  detail?: string
+  contact_phone?: string
+  longitude?: number
+  latitude?: number
+  address?: string
+  banner_ids?: string[]
 }

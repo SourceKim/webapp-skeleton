@@ -4,7 +4,7 @@ import { AppDataSource } from '@/configs/database.config';
 import { HttpException } from '@/exceptions/http.exception';
 import * as jwt from 'jsonwebtoken';
 import type { StringValue } from 'ms';
-import { RegisterDto, LoginDto } from '@/modules/auth/auth.dto';
+import type { RegisterDto, LoginDto } from '@skeleton/shared-types';
 import { logDebug, logError } from '@/utils/logger';
 import { customAlphabet } from 'nanoid';
 import { ENV } from '@/configs/env.config';
