@@ -1,99 +1,33 @@
-import winston from 'winston';
-import path from 'path';
-import fs from 'fs';
+import { createLogger, type LoggerOptions } from '@skeleton/shared-utils/logger';
 import { ENV } from './env.config';
 
-// 使用 process.cwd() 获取项目根目录
-const logDir = path.join(process.cwd(), 'logs/app');
-
-// 确保日志目录存在
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir, { recursive: true });
-}
-
-// 定义日志级别
-const levels = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  http: 3,
-  debug: 4,
-};
-
 // 验证日志级别是否有效
-const logLevel = ENV.LOG_LEVEL;
-if (!Object.keys(levels).includes(logLevel)) {
-  throw new Error(`环境变量 LOG_LEVEL 值无效: "${logLevel}"，必须是以下之一: ${Object.keys(levels).join(', ')}`);
+// ENV.LOG_LEVEL 通过 getEnv 获取，保证不会是 undefined
+const logLevel: string = ENV.LOG_LEVEL;
+const validLevels = ['error', 'warn', 'info', 'http', 'debug'] as const;
+type ValidLogLevel = typeof validLevels[number];
+
+// 类型守卫函数
+function isValidLogLevel(level: string): level is ValidLogLevel {
+  return validLevels.includes(level as ValidLogLevel);
 }
 
-// 自定义序列化函数，确保显示 undefined 值
-const customStringify = (obj: any): string => {
-  return JSON.stringify(obj, (key, value) => {
-    if (value === undefined) {
-      return 'undefined';
-    }
-    return value;
-  }, 2);
-};
+if (!isValidLogLevel(logLevel)) {
+  throw new Error(`环境变量 LOG_LEVEL 值无效: "${logLevel}"，必须是以下之一: ${validLevels.join(', ')}`);
+}
 
-// 自定义日志格式
-const format = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  winston.format.errors({ stack: true }),
-  winston.format.splat(),
-  winston.format.json()
-);
+// 此时 TypeScript 知道 logLevel 是有效的日志级别
+const validatedLogLevel: LoggerOptions['level'] = logLevel;
 
-// 修改控制台输出格式
-const consoleFormat = winston.format.combine(
-  winston.format.colorize(),
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  winston.format.printf((info) => {
-    // 提取基本字段
-    const { timestamp, level, message, stack, ...meta } = info;
-    
-    // 构建基本日志信息
-    let log = `${timestamp} ${level}: ${message}`;
-    
-    // 如果有堆栈信息，添加堆栈
-    if (stack) {
-      log += '\n' + stack;
-    }
-    
-    // 使用自定义序列化，确保显示所有字段
-    if (Object.keys(meta).length > 0) {
-      log += '\n' + customStringify(meta);
-    }
-    
-    return log;
-  })
-);
-
-// 定义日志传输目标
-const transports = [
-  // 控制台
-  new winston.transports.Console({
-    format: consoleFormat,
-  }),
-  // 错误日志文件
-  new winston.transports.File({
-    filename: path.join(logDir, 'error.log'),
-    level: 'error',
-    maxsize: 5242880, // 5MB
-    maxFiles: 5,
-  }),
-  // 所有日志文件
-  new winston.transports.File({
-    filename: path.join(logDir, 'combined.log'),
-    maxsize: 5242880, // 5MB
-    maxFiles: 10,
-  }),
-];
-
-// 导出日志配置
-export const loggerConfig = {
-  level: logLevel,
-  levels,
-  format,
-  transports,
-}; 
+// 使用共享的 logger 工具创建 logger 实例
+export const loggerConfig = createLogger({
+  level: validatedLogLevel,
+  logDir: 'logs/app',
+  enableConsole: true,
+  enableFile: true,
+  errorLogFile: 'error.log',
+  combinedLogFile: 'combined.log',
+  maxFileSize: 5242880, // 5MB
+  maxErrorFiles: 5,
+  maxCombinedFiles: 10,
+}); 

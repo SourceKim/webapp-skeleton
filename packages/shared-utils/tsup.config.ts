@@ -6,6 +6,8 @@ export default defineConfig({
     env: 'src/env/index.ts',
     'env/vite': 'src/env/vite.ts',
     'env/taro': 'src/env/taro.ts',
+    logger: 'src/logger/index.ts',
+    'logger/vite': 'src/logger/vite.ts',
     validation: 'src/validation/index.ts'
   },
   format: ['cjs', 'esm'],
@@ -14,5 +16,5 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   treeshake: true,
-  external: ['dotenv', 'fs', 'path']
+  external: ['dotenv', 'fs', 'path', 'winston']
 })

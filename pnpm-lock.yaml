@@ -324,10 +324,16 @@ importers:
       dotenv:
         specifier: ^16.4.7
         version: 16.6.1
+      winston:
+        specifier: ^3.0.0
+        version: 3.19.0
     devDependencies:
       '@types/node':
         specifier: ^22.13.1
         version: 22.19.2
+      '@types/winston':
+        specifier: ^2.4.4
+        version: 2.4.4
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(@swc/core@1.3.96)(postcss@8.5.6)(typescript@5.8.2)(yaml@2.8.2)
@@ -2670,6 +2676,10 @@ packages:
 
   '@types/web-bluetooth@0.0.16':
     resolution: {integrity: sha512-oh8q2Zc32S6gd/j50GowEjKLoOVOwHP/bWVjKJInBwQqdOYMdPrf1oVlelTlyfFK3CKxL1uahMDAr+vy8T7yMQ==}
+
+  '@types/winston@2.4.4':
+    resolution: {integrity: sha512-BVGCztsypW8EYwJ+Hq+QNYiT/MUyCif0ouBH+flrY66O5W+KIXAMML6E/0fJpm7VjIzgangahl5S03bJJQGrZw==}
+    deprecated: This is a stub types definition. winston provides its own type definitions, so you do not need this installed.
 
   '@typescript-eslint/eslint-plugin@6.21.0':
     resolution: {integrity: sha512-oy9+hTPCUFpngkEZUSzbf9MxI65wbKFoQYsgPdILTfbUldp5ovUuphZVe4i30emU9M/kP+T64Di0mxl7dSw3MA==}
@@ -9135,6 +9145,10 @@ snapshots:
   '@types/validator@13.15.10': {}
 
   '@types/web-bluetooth@0.0.16': {}
+
+  '@types/winston@2.4.4':
+    dependencies:
+      winston: 3.19.0
 
   '@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.8.2))(eslint@8.57.1)(typescript@5.8.2)':
     dependencies:

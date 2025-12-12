@@ -8,6 +8,7 @@ import type { NavTab } from '@/interface/navTab'
 import { useNavTabStore } from './navTab'
 import { useTitle } from '@vueuse/core'
 import { ENV } from '@/utils/env'
+import { logDebug, logError } from '@/utils/logger'
 
 export const useRouterStore = defineStore('router', () => {
 
@@ -17,17 +18,17 @@ export const useRouterStore = defineStore('router', () => {
     const navTabs = useNavTabStore().navTabs
 
     router.beforeEach(async (to, from, next) => {
-        console.log("路由守卫触发 - 目标路径:", to.path, "来源路径:", from.path)
+        logDebug("路由守卫触发 - 目标路径:", undefined, { targetPath: to.path, fromPath: from.path })
         let loginState = useAuthStore().loginState
         let token = useAuthStore().token
         
-        console.log("导航状态 - 登录状态:", loginState, "Token:", token)
+        logDebug("导航状态", undefined, { loginState, hasToken: !!token })
 
         // 如果是刷新页面，确保路由已经初始化
         if (token && !loginState) {
-            console.log("检测到页面刷新，确保路由已初始化")
+            logDebug("检测到页面刷新，确保路由已初始化")
             const res = await useAuthStore().tokenLogin()
-            console.log("Token 登录结果:", res)
+            logDebug("Token 登录结果", undefined, { success: res })
             loginState = useAuthStore().loginState
             next(to.fullPath)
             return
@@ -37,7 +38,7 @@ export const useRouterStore = defineStore('router', () => {
         
         // 登录失败，跳转登录页
         if (loginState != 'success') {
-            console.log("登录失败，跳转登录页")
+            logDebug("登录失败，跳转登录页")
             path = '/login'
         } else { // 登录成功的 cases
             // 如果目标页为根目录或登录页，则跳转至首个菜单路由
@@ -52,7 +53,7 @@ export const useRouterStore = defineStore('router', () => {
         }
 
         // 确定最终要导航的路径
-        console.log("最终导航路径:", path, "当前请求路径:", to.path)
+        logDebug("最终导航路径", undefined, { finalPath: path, currentPath: to.path })
         if (!path) {
             next()
             return
@@ -66,7 +67,7 @@ export const useRouterStore = defineStore('router', () => {
 
       // 路由跳转成功后钩子，设置当前路由信息，navTabs等，浏览器标题等
     router.afterEach((guard: RouteLocationNormalized) => {
-        console.log('路由跳转成功后钩子', guard)
+        logDebug('路由跳转成功后钩子', undefined, { path: guard.path, fullPath: guard.fullPath })
         const fullPath = guard.fullPath
         const tab = navTabs.find((i: NavTab) => i.fullPath === fullPath)
         // 如果不存在，则添加tab
@@ -89,7 +90,7 @@ export const useRouterStore = defineStore('router', () => {
     }
 
     function initDynamicRoutes() {
-        console.log('初始化动态路由')
+        logDebug('初始化动态路由')
         const viewsComponents = import.meta.glob('@/views/**/*.vue')
 
             // 检查布局路由是否已存在
@@ -104,7 +105,7 @@ export const useRouterStore = defineStore('router', () => {
         // 处理菜单的 fullPath，但不重复添加已存在的路由
         const menus = useMenuStore().menus
         menus.forEach((i: Menu) => {
-            console.log('菜单:', i)
+            logDebug('处理菜单', undefined, { menuId: i.id, menuName: i.name })
             const levelArr = useMenuStore().getMenuLevelArr(i.id)
             const path = levelArr.map(i => i.path).join('/')
             const fullPath = `/${layoutRouteName}/${path}`
@@ -115,7 +116,7 @@ export const useRouterStore = defineStore('router', () => {
                 const name = levelArr.map(i => i.name).join('')
                 // 如果路由已存在，则不添加
                 if (router.hasRoute(name)) { 
-                    console.error(`路由已存在: ${name}`)
+                    logError(`路由已存在: ${name}`, undefined, { routeName: name, fullPath })
                     return
                 }
                 const componentName = camelCase(fullPath)
@@ -129,7 +130,7 @@ export const useRouterStore = defineStore('router', () => {
                             throw new Error(`组件不存在: ${i.component}`)
                         }
                         const component = viewsComponents[i.component]
-                        console.log('组件:', component)
+                        logDebug('加载组件', undefined, { component: i.component, componentName })
                         if (!component) {
                             throw new Error(`组件不存在: ${i.component}`)
                         }
@@ -146,9 +147,9 @@ export const useRouterStore = defineStore('router', () => {
                         component: i.component
                     }
                 }
-                console.log('添加动态路由', dynamicRoute)
+                logDebug('添加动态路由', undefined, { routeName: name, fullPath })
                 router.addRoute(layoutRouteName, dynamicRoute)
-                console.log('路由列表:', router.getRoutes())
+                logDebug('路由列表', undefined, { routes: router.getRoutes().map(r => r.path) })
             }
         })
     }

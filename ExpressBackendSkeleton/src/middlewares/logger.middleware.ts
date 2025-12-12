@@ -47,6 +47,7 @@ export const requestTracingMiddleware = (
 /**
  * HTTP 请求日志中间件
  * 记录请求的详细信息
+ * 根据环境变量控制日志详细程度
  */
 export const httpLoggerMiddleware = (
   req: Request,
@@ -55,13 +56,16 @@ export const httpLoggerMiddleware = (
 ): void => {
   const requestId = (req as any).requestId;
   const start = Date.now();
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
-  // 请求开始日志
-  logHttp(`${req.method} ${req.originalUrl} - 请求开始`, requestId, {
-    headers: req.headers,
-    query: req.query,
-    body: req.body,
-  });
+  // 请求开始日志（仅在开发环境记录详细信息）
+  if (isDevelopment) {
+    logHttp(`${req.method} ${req.originalUrl} - 请求开始`, requestId, {
+      headers: req.headers,
+      query: req.query,
+      body: req.body,
+    });
+  }
 
   // 监听响应完成事件
   res.on('finish', () => {
@@ -69,16 +73,24 @@ export const httpLoggerMiddleware = (
     const level = res.statusCode >= 400 ? 'warn' : 'http';
 
     // 请求完成日志
-    logger.log(level, `${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms`, {
+    // 开发环境：记录详细信息
+    // 生产环境：只记录基本信息
+    const logData: any = {
       requestId,
       method: req.method,
       url: req.originalUrl,
       statusCode: res.statusCode,
       duration,
-      ip: req.ip,
-      userAgent: req.get('user-agent'),
-      userId: (req as any).user?.id,
-    });
+    };
+
+    // 仅在开发环境或错误情况下记录详细信息
+    if (isDevelopment || res.statusCode >= 400) {
+      logData.ip = req.ip;
+      logData.userAgent = req.get('user-agent');
+      logData.userId = (req as any).user?.id;
+    }
+
+    logger.log(level, `${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms`, logData);
   });
 
   next();

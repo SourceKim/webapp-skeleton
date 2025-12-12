@@ -11,6 +11,8 @@
  * 5. .env.${NODE_ENV}.local (本地开发环境特定配置，不提交到版本控制)
  */
 
+import * as path from 'path';
+import * as fs from 'fs';
 import {
   loadEnv,
   getEnv,
@@ -21,7 +23,35 @@ import {
 } from '@skeleton/shared-utils/env'
 
 // 加载环境变量文件
-const loadedFiles = loadEnv()
+// 优先从项目根目录加载公共环境变量，然后从当前目录加载特定配置
+
+/**
+ * 获取项目根目录
+ * 通过查找 pnpm-workspace.yaml 文件来确定项目根目录
+ */
+function findProjectRoot(startDir: string): string {
+  let currentDir = startDir;
+  while (currentDir !== path.dirname(currentDir)) {
+    const workspaceFile = path.join(currentDir, 'pnpm-workspace.yaml');
+    if (fs.existsSync(workspaceFile)) {
+      return currentDir;
+    }
+    currentDir = path.dirname(currentDir);
+  }
+  // 如果找不到，返回当前工作目录的父目录（假设项目根目录在 ExpressBackendSkeleton 的上一级）
+  return path.resolve(startDir, '..');
+}
+
+const currentDir = process.cwd(); // 当前工作目录（ExpressBackendSkeleton）
+const rootDir = findProjectRoot(currentDir); // 项目根目录
+
+// 先加载根目录的环境变量（公共配置，override=false，不覆盖已存在的环境变量）
+const rootEnvFiles = loadEnv({ cwd: rootDir, override: false });
+// 再加载当前目录的环境变量（特定配置，override=true，会覆盖公共配置）
+const currentEnvFiles = loadEnv({ cwd: currentDir, override: true });
+
+const loadedFiles = [...rootEnvFiles, ...currentEnvFiles]
+
 if (process.env.NODE_ENV === 'development') {
   console.log('已加载的环境文件:', loadedFiles)
   // 开发环境打印所有环境变量（隐藏敏感信息）
@@ -112,6 +142,7 @@ export const ENV = {
   MYSQL_USER: getEnv('MYSQL_USER', 'MySQL 数据库用户名'),
   MYSQL_PASSWORD: getEnv('MYSQL_PASSWORD', 'MySQL 数据库密码', undefined, true), // 允许空密码
   MYSQL_DATABASE: getEnv('MYSQL_DATABASE', 'MySQL 数据库名称'),
+  DB_LOGGING: getEnvOptional('DB_LOGGING') === 'false' ? false : true, // 数据库日志开关，默认开启
 
   // JWT配置
   JWT_SECRET: getEnv('JWT_SECRET', 'JWT 密钥，用于签名 token'),
