@@ -107,12 +107,28 @@ export class Material extends BaseEntity implements IMaterial {
     upload_dir?: string;
 
     /**
+     * 素材所属用户ID
+     * 通过外键关联到用户表
+     */
+    @Column({ type: 'varchar', length: 36, nullable: true, name: 'user_id' })
+    @IsOptional()
+    user_id?: string;
+
+    /**
      * 素材所属用户
      * 通过外键关联到用户表
      */
     @ManyToOne(() => User, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
-    user!: User;
+    user?: User;
+
+    /**
+     * 素材分类ID
+     * 通过外键关联到分类表
+     */
+    @Column({ type: 'varchar', length: 36, nullable: true, name: 'material_category_id' })
+    @IsOptional()
+    material_category_id?: string;
 
     /**
      * 素材分类关联
