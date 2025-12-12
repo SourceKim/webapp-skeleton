@@ -13,7 +13,7 @@ import {
     loginSchema, 
     registerSchema
 } from '@skeleton/shared-types';
-import type { z } from 'zod';
+import { z } from 'zod';
 import { validateData } from '@/utils/zod-validator';
 import { logInfo, logError, logDebug } from '@/utils/logger';
 
@@ -103,7 +103,7 @@ export class AuthController {
     ): Promise<void> => {
         try {
             // 使用 Zod Schema 验证请求体
-            const loginData = validateData<LoginDto>(loginSchema, req.body);
+            const loginData = validateData<z.infer<typeof loginSchema>>(loginSchema, req.body);
             const { username, password } = loginData;
             
             logInfo('用户登录请求', (req as any).requestId, { username });
