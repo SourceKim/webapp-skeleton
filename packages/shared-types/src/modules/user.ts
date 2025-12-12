@@ -1,8 +1,8 @@
 /**
  * 用户相关类型定义
  */
-import { BaseEntity } from './base'
-import { UserStatus, UserGender } from './enums'
+import { BaseEntity } from '../base'
+import { UserStatus, UserGender } from '../enums'
 
 /**
  * 权限实体接口（前向声明，避免循环引用）

@@ -11,11 +11,8 @@ export * from './base'
 // 枚举类型
 export * from './enums'
 
-// 用户相关类型
-export * from './user'
-
-// 素材相关类型
-export * from './material'
+// 业务模块类型
+export * from './modules'
 
 // API 相关类型
 export * from './api'

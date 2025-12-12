@@ -1,8 +1,8 @@
 /**
  * 素材相关类型定义
  */
-import { BaseEntity } from './base'
-import { MaterialType } from './enums'
+import { BaseEntity } from '../base'
+import { MaterialType } from '../enums'
 import type { User } from './user'
 
 /**
