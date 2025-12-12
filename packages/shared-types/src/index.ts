@@ -19,3 +19,6 @@ export * from './modules'
 
 // API 相关类型
 export * from './api'
+
+// 验证工具函数
+export * from './validation'

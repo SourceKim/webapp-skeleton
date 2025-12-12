@@ -19,7 +19,7 @@ export const createMaterialSchema = z.object({
   description: z.string().optional(),
   is_public: z.boolean().optional(),
   tags: z.array(z.string()).optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
   parent_id: z.string()
     .max(36, '父素材ID长度不能超过36个字符')
     .optional()

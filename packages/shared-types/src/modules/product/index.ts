@@ -22,3 +22,6 @@ export * from './sku'
 
 // DTO 类型
 export * from './dto'
+
+// 验证规则
+export * from './validation'
