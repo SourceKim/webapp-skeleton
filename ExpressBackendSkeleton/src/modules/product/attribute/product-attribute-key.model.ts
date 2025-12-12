@@ -7,6 +7,9 @@ import type { ProductAttributeKey as IProductAttributeKey } from '@skeleton/shar
 
 @Entity('product_attribute_keys')
 export class ProductAttributeKey extends BaseEntity implements IProductAttributeKey {
+    @Column({ type: 'varchar', length: 36, name: 'spu_id' })
+    spu_id!: string;
+
     @ManyToOne(() => ProductSpu, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'spu_id' })
     spu!: ProductSpu;
