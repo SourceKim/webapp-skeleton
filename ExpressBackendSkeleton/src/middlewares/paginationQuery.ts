@@ -13,8 +13,11 @@ export const paginationQuery = () => {
 
         // 获取筛选参数 - Express 已自动解析嵌套对象
         const rawFilters = req.query.filters;
-        const filters = (typeof rawFilters === 'object' && rawFilters !== null && !Array.isArray(rawFilters)) 
-            ? rawFilters as Record<string, any> 
+        // 使用与 query-filter.util.ts 相同的类型定义，避免循环引用
+        type FilterValue = string | number | boolean | null | undefined | unknown[] | Record<string, unknown>;
+        type FilterParams = Record<string, FilterValue>;
+        const filters: FilterParams = (typeof rawFilters === 'object' && rawFilters !== null && !Array.isArray(rawFilters)) 
+            ? rawFilters as FilterParams
             : {};
         
         // 清理筛选参数，移除空值

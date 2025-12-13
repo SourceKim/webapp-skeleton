@@ -6,7 +6,7 @@ import { ENV } from '@/configs/env.config';
 interface ErrorResponse {
     code: number;
     message: string;
-    error?: any;
+    error?: unknown;
 }
 
 export const errorMiddleware = (
@@ -15,8 +15,8 @@ export const errorMiddleware = (
     res: Response,
     next: NextFunction
 ): void => {
-    // 使用类型断言
-    const requestId = (req as any).requestId;
+    // 使用已定义的 Request 类型扩展
+    const requestId = req.requestId;
     
     // 处理数据库唯一约束错误
     if (err.message && err.message.includes('Duplicate entry')) {

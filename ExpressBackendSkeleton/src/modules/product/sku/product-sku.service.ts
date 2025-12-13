@@ -32,8 +32,8 @@ export class ProductSkuService {
         const [items, total] = await qb.getManyAndCount();
         const dtos = items.map(s => transformToCamelCase({
             ...s,
-            spu_id: (s as any)?.spu?.id,
-            attributes: ((s as any).sku_attributes || []).map((a: any) => ({
+            spu_id: s.spu?.id,
+            attributes: (s.sku_attributes || []).map(a => ({
                 key_id: a.attribute_key?.id,
                 value_id: a.attribute_value?.id,
                 key_name: a.attribute_key?.key || a.attribute_key?.name,
@@ -48,8 +48,8 @@ export class ProductSkuService {
         if (!s) throw new HttpException(404, 'SKU不存在');
         return transformToCamelCase({ 
             ...s, 
-            spu_id: (s as any)?.spu?.id,
-            attributes: ((s as any).sku_attributes || []).map((a: any) => ({
+            spu_id: s.spu?.id,
+            attributes: (s.sku_attributes || []).map(a => ({
                 key_id: a.attribute_key?.id,
                 value_id: a.attribute_value?.id,
                 key_name: a.attribute_key?.key || a.attribute_key?.name,
@@ -69,8 +69,8 @@ export class ProductSkuService {
             stock: data.stock,
             status: data.status ?? ProductSkuStatus.ON_SHELF,
             is_default: data.is_default ?? false,
+            spu_id: data.spu_id
         });
-        (s as any).spu = { id: data.spu_id } as any;
         const saved = await this.repository.save(s);
         return await this.findById(saved.id);
     }

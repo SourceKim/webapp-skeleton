@@ -101,7 +101,7 @@ export class UserController {
      */
     getStats = async (
         req: Request,
-        res: Response<ApiResponse<any>>,
+        res: Response<ApiResponse<Record<string, unknown>>>,
         next: NextFunction
     ): Promise<void> => {
         try {

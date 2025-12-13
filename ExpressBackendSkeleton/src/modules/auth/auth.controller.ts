@@ -45,7 +45,7 @@ export class AuthController {
             const registerData = validateData<z.infer<typeof registerSchema>>(registerSchema, req.body);
             const { username, password, email, phone, nickname, gender, birthdate, avatar, bio } = registerData;
             
-            logInfo('用户注册请求', (req as any).requestId, { username, email, phone, nickname });
+            logInfo('用户注册请求', req.requestId, { username, email, phone, nickname });
 
             // Zod Schema 已经完成所有验证，直接使用验证后的数据
             const result = await this.authService.register({
@@ -60,7 +60,7 @@ export class AuthController {
                 bio
             });
             
-            logInfo('用户注册成功', (req as any).requestId, { userId: result.user.id, username });
+            logInfo('用户注册成功', req.requestId, { userId: result.user.id, username });
             
             res.status(200).json({
                 code: 0,
@@ -68,7 +68,7 @@ export class AuthController {
                 data: transformToCamelCase(result.user) as RegisterResponseDto
             });
         } catch (error) {
-            logError('用户注册失败', (req as any).requestId, { error, body: req.body });
+            logError('用户注册失败', req.requestId, { error, body: req.body });
             next(error);
         }
     };
@@ -87,11 +87,11 @@ export class AuthController {
             const loginData = validateData<z.infer<typeof loginSchema>>(loginSchema, req.body);
             const { username, password } = loginData;
             
-            logInfo('用户登录请求', (req as any).requestId, { username });
+            logInfo('用户登录请求', req.requestId, { username });
 
             const result = await this.authService.login(username, password);
             
-            logInfo('用户登录成功', (req as any).requestId, { userId: result.user.id, username });
+            logInfo('用户登录成功', req.requestId, { userId: result.user.id, username });
             
             res.json({
                 code: 0,
@@ -102,7 +102,7 @@ export class AuthController {
                 }
             });
         } catch (error) {
-            logError('用户登录失败', (req as any).requestId, { error, username: req.body.username });
+            logError('用户登录失败', req.requestId, { error, username: req.body.username });
             next(error);
         }
     };
@@ -117,12 +117,12 @@ export class AuthController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            // 使用类型断言访问 user
-            if (!(req as any).user) {
+            // 使用已定义的 Request 类型扩展访问 user
+            if (!req.user) {
                 throw new HttpException(401, '用户未认证');
             }
             
-            const user = await this.authService.getProfile((req as any).user.id);
+            const user = await this.authService.getProfile(req.user.id);
             
             res.json({
                 code: 0,
@@ -145,17 +145,17 @@ export class AuthController {
     ): Promise<void> => {
         try {
             const authHeader = req.headers.authorization;
-            logInfo('用户令牌登录请求', (req as any).requestId);
+            logInfo('用户令牌登录请求', req.requestId);
 
             if (!authHeader) {
-                logError('令牌登录失败 - 未提供认证令牌', (req as any).requestId);
+                logError('令牌登录失败 - 未提供认证令牌', req.requestId);
                 throw new HttpException(401, '未提供认证令牌');
             }
 
             const token = authHeader.split(' ')[1];
             const result = await this.authService.loginWithToken(token);
             
-            logInfo('用户令牌登录成功', (req as any).requestId, { userId: result.user.id, username: result.user.username });
+            logInfo('用户令牌登录成功', req.requestId, { userId: result.user.id, username: result.user.username });
             
             res.json({
                 code: 0,
@@ -166,7 +166,7 @@ export class AuthController {
                 }
             });
         } catch (error) {
-            logError('用户令牌登录失败', (req as any).requestId, { error });
+            logError('用户令牌登录失败', req.requestId, { error });
             next(error);
         }
     };

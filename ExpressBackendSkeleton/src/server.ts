@@ -26,7 +26,7 @@ AppDataSource.initialize()
             name: error.name,
             message: error.message,
             stack: error.stack,
-            cause: (error as any).cause
+            cause: error.cause
         });
         process.exit(1);
     }); 

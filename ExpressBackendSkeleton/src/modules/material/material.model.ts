@@ -137,7 +137,7 @@ export class Material extends BaseEntity implements IMaterial {
      * 例如：图片的宽高、视频的时长、音频的比特率等
      */
     @Column({ type: 'json', nullable: true })
-    metadata?: Record<string, any>;
+    metadata?: Record<string, string | number | boolean | null | undefined>;
 
     /**
      * 父素材ID

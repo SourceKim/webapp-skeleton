@@ -13,6 +13,54 @@ import {
 // 重新导出枚举，保持向后兼容
 export { PaymentStatus, DeliveryStatus, OrderStatus, PaymentMethod };
 
+/**
+ * 订单地址快照类型
+ * 保存下单时的地址信息快照
+ */
+export interface OrderAddressSnapshot {
+  name: string;
+  phone: string;
+  province: string;
+  city: string;
+  country: string;
+  town?: string | null;
+  detail: string;
+  postal_code?: string | null;
+}
+
+/**
+ * SKU 属性值快照
+ */
+export interface SkuAttributeSnapshot {
+  key_id: string;
+  key_name: string;
+  value_id: string;
+  value: string;
+}
+
+/**
+ * SPU 快照
+ */
+export interface SpuSnapshot {
+  id: string;
+  name: string;
+  sub_title?: string | null;
+  main_material?: {
+    file_path?: string;
+  } | null;
+}
+
+/**
+ * 订单 SKU 快照类型
+ * 保存下单时的 SKU 信息快照
+ */
+export interface OrderSkuSnapshot {
+  id: string;
+  price: number;
+  attributes: SkuAttributeSnapshot[];
+  spu: SpuSnapshot;
+}
+
 @Entity('mall_orders')
 export class MallOrder extends BaseEntity implements IMallOrder {
     @Column({ type: 'varchar', length: 36, name: 'user_id' })
@@ -59,7 +107,7 @@ export class MallOrder extends BaseEntity implements IMallOrder {
     address_id!: string;
 
     @Column({ type: 'json' })
-    address_snapshot!: Record<string, any>;
+    address_snapshot!: OrderAddressSnapshot;
 
     @Column({ type: 'varchar', length: 500, nullable: true })
     remark?: string | null;
@@ -81,7 +129,7 @@ export class MallOrderItem extends BaseEntity implements IMallOrderItem {
     sku_id!: string;
 
     @Column({ type: 'json' })
-    sku_snapshot!: Record<string, any>;
+    sku_snapshot!: OrderSkuSnapshot;
 
     @Column({ type: 'int' })
     quantity!: number;

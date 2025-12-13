@@ -2,6 +2,18 @@ import { SelectQueryBuilder, Brackets, ObjectLiteral } from 'typeorm';
 import { FilterOperator, FilterCondition } from '@skeleton/shared-types';
 
 /**
+ * 筛选参数值类型
+ * 可以是基本类型、数组或包含操作符的对象
+ * 使用 unknown 避免循环引用，运行时进行类型检查
+ */
+type FilterValue = string | number | boolean | null | undefined | unknown[] | Record<string, unknown>;
+
+/**
+ * 筛选参数对象类型
+ */
+type FilterParams = Record<string, FilterValue>;
+
+/**
  * 查询筛选构建器
  * 用于将筛选参数转换为 TypeORM 查询条件
  */
@@ -12,7 +24,7 @@ export class QueryFilterBuilder {
      * @param entityAlias 实体别名（用于 TypeORM 查询）
      * @returns 筛选条件数组
      */
-    static parseFilters(filters: Record<string, any>, entityAlias: string = ''): FilterCondition[] {
+    static parseFilters(filters: FilterParams, entityAlias: string = ''): FilterCondition[] {
         const conditions: FilterCondition[] = [];
         
         if (!filters || typeof filters !== 'object') {
@@ -175,8 +187,8 @@ export class QueryFilterBuilder {
      * @param filters 原始筛选参数
      * @returns 清理后的筛选参数
      */
-    static cleanFilters(filters: Record<string, any>): Record<string, any> {
-        const cleaned: Record<string, any> = {};
+    static cleanFilters(filters: FilterParams): FilterParams {
+        const cleaned: FilterParams = {};
 
         for (const [key, value] of Object.entries(filters)) {
             if (value === null || value === undefined || value === '') {
@@ -184,10 +196,11 @@ export class QueryFilterBuilder {
             }
 
             if (typeof value === 'object' && !Array.isArray(value)) {
-                const cleanedNestedObject: Record<string, any> = {};
-                for (const [nestedKey, nestedValue] of Object.entries(value)) {
+                const cleanedNestedObject: FilterParams = {};
+                const valueRecord = value as Record<string, unknown>;
+                for (const [nestedKey, nestedValue] of Object.entries(valueRecord)) {
                     if (nestedValue !== null && nestedValue !== undefined && nestedValue !== '') {
-                        cleanedNestedObject[nestedKey] = nestedValue;
+                        cleanedNestedObject[nestedKey] = nestedValue as FilterValue;
                     }
                 }
                 if (Object.keys(cleanedNestedObject).length > 0) {

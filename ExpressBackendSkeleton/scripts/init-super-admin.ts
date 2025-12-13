@@ -62,9 +62,10 @@ async function checkAndCreateDatabase() {
         } finally {
             await connection.end();
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const err = error as Error;
         console.error('数据库连接或创建失败:', error);
-        throw new Error(`无法连接到数据库服务器或创建数据库: ${error.message}`);
+        throw new Error(`无法连接到数据库服务器或创建数据库: ${err.message}`);
     }
 }
 
@@ -82,9 +83,9 @@ async function initSuperAdmin() {
             
             // 创建一个新的 DataSource，使用与 AppDataSource 相同的配置，但将 host 改为 127.0.0.1
             customDataSource = new DataSource({
-                ...AppDataSource.options as any,
+                ...AppDataSource.options,
                 host: '127.0.0.1'
-            });
+            } as typeof AppDataSource.options);
             
             dataSourceToUse = customDataSource;
         }
@@ -112,12 +113,13 @@ async function initSuperAdmin() {
                 });
                 
                 if (!permission) {
-                    permission = new Permission();
-                    (permission as any).id = nanoid(16);
-                    permission.name = permissionName;
-                    permission.resource = resource;
-                    permission.action = action;
-                    permission.description = `允许${action}操作${resource}资源`;
+                    permission = permissionRepository.create({
+                        id: nanoid(16),
+                        name: permissionName,
+                        resource: resource,
+                        action: action,
+                        description: `允许${action}操作${resource}资源`
+                    });
                     permission = await permissionRepository.save(permission);
                     console.log(`创建权限: ${permissionName}`);
                 } else {
@@ -135,11 +137,12 @@ async function initSuperAdmin() {
         });
 
         if (!role) {
-            role = new Role();
-            (role as any).id = nanoid(16);
-            role.name = ROLE_NAMES.SUPER_ADMIN;
-            role.description = '超级管理员，拥有所有权限';
-            role.permissions = permissions;
+            role = roleRepository.create({
+                id: nanoid(16),
+                name: ROLE_NAMES.SUPER_ADMIN,
+                description: '超级管理员，拥有所有权限',
+                permissions: permissions
+            });
             role = await roleRepository.save(role);
             console.log('创建了超级管理员角色');
         } else {
@@ -196,7 +199,7 @@ async function initSuperAdmin() {
             // 插入用户角色关系
             await dataSourceToUse.query(
                 `INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)`,
-                [userId, (role as any).id]
+                [userId, role.id]
             );
             
             console.log(`创建了超级管理员用户: ${adminUsername}`);
@@ -223,8 +226,9 @@ async function initSuperAdmin() {
         console.log(`超级管理员账号：${adminUsername}`);
         console.log(`超级管理员密码：${adminPassword}`);
 
-    } catch (error: any) {
-        console.error('初始化失败：', error);
+    } catch (error: unknown) {
+        const err = error as Error;
+        console.error('初始化失败：', err);
     } finally {
         // 关闭数据源连接
         if (customDataSource && customDataSource.isInitialized) {

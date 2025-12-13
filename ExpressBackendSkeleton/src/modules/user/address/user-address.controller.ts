@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import type { ApiResponse } from '@skeleton/shared-types';
+import type { ApiResponse, PaginatedResponse } from '@skeleton/shared-types';
 import type { UserAddressResponseDto } from '@skeleton/shared-types';
 import { UserAddressService } from './user-address.service';
 import { createUserAddressSchema, updateUserAddressSchema } from '@skeleton/shared-types';
@@ -102,7 +102,7 @@ export class UserAddressController {
     // Admin
     public adminList = async (
         req: Request,
-        res: Response<any>,
+        res: Response<ApiResponse<PaginatedResponse<UserAddressResponseDto>>>,
         next: NextFunction
     ): Promise<void> => {
         try {

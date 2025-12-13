@@ -139,7 +139,7 @@ export const decodeLatin1ToUtf8 = (name: string | undefined | null): string => {
  * @param tags 标签数据
  * @returns 标签数组或undefined
  */
-export const parseTags = (tags: any): string[] | undefined => {
+export const parseTags = (tags: unknown): string[] | undefined => {
     if (!tags) return undefined;
     
     if (typeof tags === 'string') {
@@ -154,7 +154,7 @@ export const parseTags = (tags: any): string[] | undefined => {
     }
     
     if (Array.isArray(tags)) {
-        return tags.filter((tag: any) => typeof tag === 'string' && tag.trim());
+        return tags.filter((tag: unknown) => typeof tag === 'string' && tag.trim());
     }
     
     return undefined;
@@ -166,7 +166,7 @@ export const parseTags = (tags: any): string[] | undefined => {
  * @param metadata 元数据
  * @returns 元数据对象或undefined
  */
-export const parseMetadata = (metadata: any): Record<string, any> | undefined => {
+export const parseMetadata = (metadata: unknown): Record<string, string | number | boolean | null | undefined> | undefined => {
     if (!metadata) return undefined;
     
     if (typeof metadata === 'string') {
@@ -177,8 +177,8 @@ export const parseMetadata = (metadata: any): Record<string, any> | undefined =>
         }
     }
     
-    if (typeof metadata === 'object' && metadata !== null) {
-        return metadata;
+    if (typeof metadata === 'object' && metadata !== null && !Array.isArray(metadata)) {
+        return metadata as Record<string, string | number | boolean | null | undefined>;
     }
     
     return undefined;

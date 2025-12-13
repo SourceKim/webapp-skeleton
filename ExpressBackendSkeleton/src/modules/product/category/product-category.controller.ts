@@ -16,7 +16,7 @@ export class ProductCategoryController {
     ): Promise<void> => {
         try {
             const parentIdParam = (req.query.parent_id as string | undefined);
-            const parentId = parentIdParam === undefined ? undefined : (parentIdParam === 'null' ? (null as any) : parentIdParam);
+            const parentId: string | null | undefined = parentIdParam === undefined ? undefined : (parentIdParam === 'null' ? null : parentIdParam);
             const level = req.query.level ? parseInt(req.query.level as string) : undefined;
             const { items, total } = await this.service.findAll(req.pagination, parentId, level);
             return res.pagination(items, total);

@@ -16,7 +16,7 @@ export class CartService {
 
     async listByUser(userId: string): Promise<Cart[]> {
         return this.cartRepo.find({
-            where: { user: { id: userId } },
+            where: { user_id: userId },
             relations: ['sku'],
             order: { created_at: 'DESC' }
         });
@@ -27,7 +27,7 @@ export class CartService {
      */
     async listUserView(userId: string): Promise<Array<{ id: string; quantity: number; selected: boolean; created_at: Date; updated_at: Date; sku: { id: string; sku_name?: string | null; price: number; original_price?: number | null; attributes?: Array<{ key_id?: string; key_name?: string; value_id?: string; value?: string }> }; spu: { id: string; name: string; sub_title?: string | null } }>> {
         const items = await this.cartRepo.find({
-            where: { user: { id: userId } },
+            where: { user_id: userId },
             relations: [
                 'sku',
                 'sku.spu',
@@ -46,23 +46,23 @@ export class CartService {
             created_at: c.created_at,
             updated_at: c.updated_at,
             sku: {
-                id: (c as any).sku?.id,
-                sku_name: (c as any).sku?.sku_name ?? null,
-                price: Number((c as any).sku?.price ?? 0),
-                original_price: (c as any).sku?.original_price != null ? Number((c as any).sku?.original_price) : null,
-                attributes: ((c as any).sku?.sku_attributes || []).map((a: any) => ({
-                    key_id: a?.attribute_key?.id,
-                    key_name: a?.attribute_key?.name,
-                    value_id: a?.attribute_value?.value_id || a?.attribute_value?.id,
-                    value: a?.attribute_value?.value,
+                id: c.sku?.id || '',
+                sku_name: c.sku?.sku_name ?? null,
+                price: Number(c.sku?.price ?? 0),
+                original_price: c.sku?.original_price != null ? Number(c.sku.original_price) : null,
+                attributes: (c.sku?.sku_attributes || []).map(a => ({
+                    key_id: a.attribute_key?.id,
+                    key_name: a.attribute_key?.name,
+                    value_id: a.attribute_value?.value_id || a.attribute_value?.id,
+                    value: a.attribute_value?.value,
                 }))
             },
             spu: {
-                id: (c as any).sku?.spu?.id,
-                name: (c as any).sku?.spu?.name,
-                sub_title: (c as any).sku?.spu?.sub_title ?? null,
-                main_material: (c as any).sku?.spu?.main_material ? {
-                    file_path: (c as any).sku?.spu?.main_material?.file_path
+                id: c.sku?.spu?.id || '',
+                name: c.sku?.spu?.name || '',
+                sub_title: c.sku?.spu?.sub_title ?? null,
+                main_material: c.sku?.spu?.main_material ? {
+                    file_path: c.sku.spu.main_material.file_path
                 } : null
             }
         }));
@@ -72,7 +72,7 @@ export class CartService {
         const sku = await this.skuRepo.findOne({ where: { id: skuId } });
         if (!sku) throw new HttpException(404, 'SKU 不存在');
 
-        const existed = await this.cartRepo.findOne({ where: { user: { id: userId }, sku: { id: skuId } }, relations: ['sku'] });
+        const existed = await this.cartRepo.findOne({ where: { user_id: userId, sku_id: skuId }, relations: ['sku'] });
         if (existed) {
             existed.quantity = Math.max(1, existed.quantity + quantity);
             return this.cartRepo.save(existed);
@@ -80,8 +80,8 @@ export class CartService {
 
         const entity = this.cartRepo.create({
             id: nanoid(16),
-            user: { id: userId } as any,
-            sku: { id: skuId } as any,
+            user_id: userId,
+            sku_id: skuId,
             quantity,
             selected: true
         });
@@ -89,7 +89,7 @@ export class CartService {
     }
 
     async updateQuantity(userId: string, cartId: string, quantity: number): Promise<Cart> {
-        const entity = await this.cartRepo.findOne({ where: { id: cartId, user: { id: userId } }, relations: ['sku'] });
+        const entity = await this.cartRepo.findOne({ where: { id: cartId, user_id: userId }, relations: ['sku'] });
         if (!entity) throw new HttpException(404, '购物车项不存在');
 
         if (quantity <= 0) {
@@ -101,7 +101,7 @@ export class CartService {
     }
 
     async remove(userId: string, cartId: string): Promise<void> {
-        const entity = await this.cartRepo.findOne({ where: { id: cartId, user: { id: userId } } });
+        const entity = await this.cartRepo.findOne({ where: { id: cartId, user_id: userId } });
         if (!entity) return;
         await this.cartRepo.remove(entity);
     }

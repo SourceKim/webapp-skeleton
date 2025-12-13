@@ -1,6 +1,7 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '@/configs/database.config';
 import { ProductBrand, ProductBrandStatus } from './product-brand.model';
+import { Material } from '@/modules/material/material.model';
 import { HttpException } from '@/exceptions/http.exception';
 import { nanoid } from 'nanoid';
 import type { PaginationQueryDto } from '@skeleton/shared-types';
@@ -31,7 +32,7 @@ export class ProductBrandService {
         const [items, total] = await qb.getManyAndCount();
         const dtos = items.map(b => transformToCamelCase({
             ...b,
-            material_id: (b as any)?.material?.id,
+            material_id: b.material?.id,
         }) as ProductBrandResponseDto);
         return { items: dtos, total };
     }
@@ -41,7 +42,7 @@ export class ProductBrandService {
         if (!brand) throw new HttpException(404, '品牌不存在');
         return transformToCamelCase({ 
             ...brand, 
-            material_id: (brand as any)?.material?.id,
+            material_id: brand.material?.id,
         }) as ProductBrandResponseDto;
     }
 
@@ -57,16 +58,16 @@ export class ProductBrandService {
             status: data.status ?? ProductBrandStatus.ENABLED,
         });
 
+        // 设置 material 关系（如果提供了 material_id）
         if (data.material_id) {
-            // 仅通过外键 ID 绑定，避免额外查询
-            (brand as any).material = { id: data.material_id } as any;
+            brand.material = { id: data.material_id } as Material;
         }
 
         const saved = await this.brandRepository.save(brand);
         const reloaded = await this.brandRepository.findOne({ where: { id: saved.id }, relations: ['material'] });
         return transformToCamelCase({ 
             ...reloaded!, 
-            material_id: (reloaded as any)?.material?.id,
+            material_id: reloaded?.material?.id,
         }) as ProductBrandResponseDto;
     }
 
@@ -84,14 +85,14 @@ export class ProductBrandService {
         brand.website = data.website ?? brand.website;
         brand.status = data.status ?? brand.status;
         if (data.material_id !== undefined) {
-            (brand as any).material = data.material_id ? ({ id: data.material_id } as any) : null;
+            brand.material = data.material_id ? ({ id: data.material_id } as Material) : null;
         }
 
         await this.brandRepository.save(brand);
         const reloaded = await this.brandRepository.findOne({ where: { id }, relations: ['material'] });
         return transformToCamelCase({ 
             ...reloaded!, 
-            material_id: (reloaded as any)?.material?.id,
+            material_id: reloaded?.material?.id,
         }) as ProductBrandResponseDto;
     }
 

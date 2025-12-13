@@ -82,12 +82,12 @@ export class UserService {
         // 但为了兼容性或管理员修改，这里暂时保留，但前端应避免使用
         if (rest.password !== undefined) user.password = rest.password;
         if (rest.email !== undefined) user.email = rest.email;
-        if (rest.nickname !== undefined) user.nickname = rest.nickname as any;
+        if (rest.nickname !== undefined) user.nickname = rest.nickname;
         if (rest.phone !== undefined) user.phone = rest.phone;
-        if (rest.avatar !== undefined) user.avatar = rest.avatar as any;
-        if (rest.bio !== undefined) user.bio = rest.bio as any;
-        if ((rest as any).gender !== undefined) (user as any).gender = (rest as any).gender;
-        if ((rest as any).birthdate !== undefined) (user as any).birthdate = (rest as any).birthdate;
+        if (rest.avatar !== undefined) user.avatar = rest.avatar;
+        if (rest.bio !== undefined) user.bio = rest.bio;
+        if (rest.gender !== undefined) user.gender = rest.gender;
+        if (rest.birthdate !== undefined) user.birthdate = rest.birthdate;
 
         // 保存用户
         const savedUser = await this.userRepository.save(user);

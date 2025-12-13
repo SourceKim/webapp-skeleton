@@ -82,7 +82,7 @@ export class MaterialController {
      * @param res - 返回上传成功的素材信息
      * @param next - 错误处理中间件
      */
-    public uploadMaterial = async (req: any, res: Response<ApiResponse<MaterialResponseDto>>, next: NextFunction): Promise<void> => {
+    public uploadMaterial = async (req: Request, res: Response<ApiResponse<MaterialResponseDto>>, next: NextFunction): Promise<void> => {
         try {
             // 使用multer中间件处理文件上传
             this.upload.single('file')(req, res, async (err) => {

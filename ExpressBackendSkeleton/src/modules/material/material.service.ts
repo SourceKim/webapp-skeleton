@@ -64,7 +64,7 @@ export class MaterialService {
      * @param options 上传选项
      * @returns 创建的素材对象
      */
-    public async uploadFile(file: Express.Multer.File, user?: any, options?: CreateMaterialDto): Promise<Material> {
+    public async uploadFile(file: Express.Multer.File, user?: { id: string }, options?: CreateMaterialDto): Promise<Material> {
         try {
             const type = getMaterialTypeFromMimetype(file.mimetype);
             const subDir = getSubDirByType(type);

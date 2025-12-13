@@ -13,12 +13,12 @@ export class UserAddressService {
     }
 
     async listByUser(userId: string): Promise<UserAddressResponseDto[]> {
-        const items = await this.repo.find({ where: { user: { id: userId } as any }, order: { is_default: 'DESC', created_at: 'DESC' } as any });
+        const items = await this.repo.find({ where: { user_id: userId }, order: { is_default: 'DESC', created_at: 'DESC' } });
         return items.map(it => this.toDto(it));
     }
 
     async findByIdForUser(id: string, userId: string): Promise<UserAddressResponseDto> {
-        const entity = await this.repo.findOne({ where: { id, user: { id: userId } as any } });
+        const entity = await this.repo.findOne({ where: { id, user_id: userId } });
         if (!entity) throw new HttpException(404, '地址不存在');
         return this.toDto(entity);
     }
@@ -44,7 +44,7 @@ export class UserAddressService {
             detail: data.detail,
             postal_code: data.postal_code,
             is_default: Boolean(data.is_default),
-            tag: data.tag as any,
+            tag: data.tag,
             status: UserAddressStatus.ACTIVE,
         });
         const saved = await this.repo.save(entity);
@@ -52,7 +52,7 @@ export class UserAddressService {
     }
 
     async updateForUser(id: string, userId: string, data: UpdateUserAddressDto): Promise<UserAddressResponseDto> {
-        const entity = await this.repo.findOne({ where: { id, user: { id: userId } as any } });
+        const entity = await this.repo.findOne({ where: { id, user_id: userId } });
         if (!entity) throw new HttpException(404, '地址不存在');
 
         if (data.is_default === true) {
@@ -72,21 +72,21 @@ export class UserAddressService {
         entity.detail = data.detail ?? entity.detail;
         entity.postal_code = data.postal_code ?? entity.postal_code;
         entity.is_default = data.is_default ?? entity.is_default;
-        if (data.tag !== undefined) entity.tag = data.tag as any;
-        if (data.status !== undefined) entity.status = data.status as any;
+        if (data.tag !== undefined) entity.tag = data.tag;
+        if (data.status !== undefined) entity.status = data.status;
 
         await this.repo.save(entity);
         return this.toDto(entity);
     }
 
     async deleteForUser(id: string, userId: string): Promise<void> {
-        const entity = await this.repo.findOne({ where: { id, user: { id: userId } as any } });
+        const entity = await this.repo.findOne({ where: { id, user_id: userId } });
         if (!entity) throw new HttpException(404, '地址不存在');
         await this.repo.remove(entity);
     }
 
     async setDefaultForUser(id: string, userId: string): Promise<void> {
-        const entity = await this.repo.findOne({ where: { id, user: { id: userId } as any } });
+        const entity = await this.repo.findOne({ where: { id, user_id: userId } });
         if (!entity) throw new HttpException(404, '地址不存在');
         await this.repo.createQueryBuilder()
             .update(UserAddress)
@@ -100,7 +100,7 @@ export class UserAddressService {
     // Admin
     async adminList(page: number, limit: number): Promise<{ items: UserAddressResponseDto[]; total: number }> {
         const [items, total] = await this.repo.findAndCount({
-            order: { created_at: 'DESC' } as any,
+            order: { created_at: 'DESC' },
             skip: (page - 1) * limit,
             take: limit,
         });
@@ -125,8 +125,8 @@ export class UserAddressService {
         entity.detail = data.detail ?? entity.detail;
         entity.postal_code = data.postal_code ?? entity.postal_code;
         entity.is_default = data.is_default ?? entity.is_default;
-        if (data.tag !== undefined) entity.tag = data.tag as any;
-        if (data.status !== undefined) entity.status = data.status as any;
+        if (data.tag !== undefined) entity.tag = data.tag;
+        if (data.status !== undefined) entity.status = data.status;
         await this.repo.save(entity);
         return this.toDto(entity);
     }
@@ -140,7 +140,7 @@ export class UserAddressService {
     private toDto(entity: UserAddress): UserAddressResponseDto {
         return transformToCamelCase({
             ...entity,
-            user_id: (entity as any)?.user?.id,
+            user_id: entity.user_id,
         }) as UserAddressResponseDto;
     }
 }

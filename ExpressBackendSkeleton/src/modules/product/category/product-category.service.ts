@@ -1,6 +1,8 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '@/configs/database.config';
 import { ProductCategory, ProductCategoryStatus } from './product-category.model';
+import { Material } from '@/modules/material/material.model';
+import { ProductBrand } from '@/modules/product/brand/product-brand.model';
 import { HttpException } from '@/exceptions/http.exception';
 import { nanoid } from 'nanoid';
 import type { PaginationQueryDto } from '@skeleton/shared-types';
@@ -14,14 +16,14 @@ export class ProductCategoryService {
         this.repository = AppDataSource.getRepository(ProductCategory);
     }
 
-    async findAll(query: PaginationQueryDto, parentId?: string, level?: number): Promise<{ items: ProductCategoryResponseDto[]; total: number }> {
+    async findAll(query: PaginationQueryDto, parentId?: string | null, level?: number): Promise<{ items: ProductCategoryResponseDto[]; total: number }> {
         const qb = this.repository.createQueryBuilder('category')
             .leftJoinAndSelect('category.parent', 'parent')
             .leftJoinAndSelect('category.material', 'material')
             .leftJoinAndSelect('category.brand', 'brand');
 
         if (parentId !== undefined) {
-            if (parentId === null as any) qb.andWhere('category.parent_id IS NULL');
+            if (parentId === null) qb.andWhere('category.parent_id IS NULL');
             else qb.andWhere('category.parent_id = :pid', { pid: parentId });
         }
         if (level !== undefined) qb.andWhere('category.level = :lvl', { lvl: level });
@@ -43,10 +45,10 @@ export class ProductCategoryService {
         const [items, total] = await qb.getManyAndCount();
         const dtos = items.map(c => transformToCamelCase({
             ...c,
-            parent_id: (c as any)?.parent?.id,
-            material_id: (c as any)?.material?.id,
-            brand_id: (c as any)?.brand?.id,
-            brand_name: (c as any)?.brand?.name
+            parent_id: c.parent?.id,
+            material_id: c.material?.id,
+            brand_id: c.brand?.id,
+            brand_name: c.brand?.name
         }) as ProductCategoryResponseDto);
         return { items: dtos, total };
     }
@@ -56,10 +58,10 @@ export class ProductCategoryService {
         if (!c) throw new HttpException(404, '分类不存在');
         return transformToCamelCase({
             ...c,
-            parent_id: (c as any)?.parent?.id,
-            material_id: (c as any)?.material?.id,
-            brand_id: (c as any)?.brand?.id,
-            brand_name: (c as any)?.brand?.name
+            parent_id: c.parent?.id,
+            material_id: c.material?.id,
+            brand_id: c.brand?.id,
+            brand_name: c.brand?.name
         }) as ProductCategoryResponseDto;
     }
 
@@ -79,9 +81,17 @@ export class ProductCategoryService {
             description: data.description,
             status: data.status ?? ProductCategoryStatus.ENABLED,
         });
-        if (data.parent_id) (entity as any).parent = { id: data.parent_id } as any;
-        if (data.material_id) (entity as any).material = { id: data.material_id } as any;
-        if (data.brand_id) (entity as any).brand = { id: data.brand_id } as any;
+
+        // 设置关系对象
+        if (data.parent_id) {
+            entity.parent = { id: data.parent_id } as ProductCategory;
+        }
+        if (data.material_id) {
+            entity.material = { id: data.material_id } as Material;
+        }
+        if (data.brand_id) {
+            entity.brand = { id: data.brand_id } as ProductBrand;
+        }
 
         // 计算层级
         if (data.parent_id) {
@@ -92,7 +102,9 @@ export class ProductCategoryService {
         }
 
         const saved = await this.repository.save(entity);
-        return await this.findById(saved.id);
+        // save 方法返回单个实体时，返回类型是 ProductCategory，不是数组
+        const savedEntity = Array.isArray(saved) ? saved[0] : saved;
+        return await this.findById(savedEntity.id);
     }
 
     async update(id: string, data: UpdateProductCategoryDto): Promise<ProductCategoryResponseDto> {
@@ -101,7 +113,7 @@ export class ProductCategoryService {
 
         // 如果名称或父级发生变化，进行同级重名校验
         const targetName = data.name ?? c.name;
-        const targetParentId = data.parent_id === undefined ? (c as any)?.parent?.id : data.parent_id;
+        const targetParentId = data.parent_id === undefined ? c.parent?.id : data.parent_id;
         {
             const qb = this.repository.createQueryBuilder('c');
             qb.where('c.name = :name', { name: targetName })
@@ -117,7 +129,7 @@ export class ProductCategoryService {
         c.status = data.status ?? c.status;
 
         if (data.parent_id !== undefined) {
-            (c as any).parent = data.parent_id ? ({ id: data.parent_id } as any) : null;
+            c.parent = data.parent_id ? ({ id: data.parent_id } as ProductCategory) : null;
             if (data.parent_id) {
                 const parent = await this.repository.findOne({ where: { id: data.parent_id } });
                 c.level = (parent?.level ?? -1) + 1;
@@ -125,8 +137,12 @@ export class ProductCategoryService {
                 c.level = 0;
             }
         }
-        if (data.material_id !== undefined) (c as any).material = data.material_id ? ({ id: data.material_id } as any) : null;
-        if (data.brand_id !== undefined) (c as any).brand = data.brand_id ? ({ id: data.brand_id } as any) : null;
+        if (data.material_id !== undefined) {
+            c.material = data.material_id ? ({ id: data.material_id } as Material) : null;
+        }
+        if (data.brand_id !== undefined) {
+            c.brand = data.brand_id ? ({ id: data.brand_id } as ProductBrand) : null;
+        }
 
         await this.repository.save(c);
         return await this.findById(id);

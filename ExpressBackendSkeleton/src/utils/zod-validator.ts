@@ -13,7 +13,7 @@ import { z } from 'zod'
  * @param schema Zod Schema
  * @returns Express 中间件
  */
-export function validateBody<T>(schema: any) {
+export function validateBody<T>(schema: z.ZodSchema<T>) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const result: ValidationResult<T> = validate<T>(schema, req.body)
@@ -44,7 +44,7 @@ export function validateBody<T>(schema: any) {
  * @param schema Zod Schema
  * @returns Express 中间件
  */
-export function validateQuery<T>(schema: any) {
+export function validateQuery<T>(schema: z.ZodSchema<T>) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const result: ValidationResult<T> = validate<T>(schema, req.query)
@@ -56,7 +56,7 @@ export function validateQuery<T>(schema: any) {
       
       // 将验证后的数据赋值回 req.query
       if (result.data) {
-        req.query = result.data as any
+        req.query = result.data as Record<string, string | string[] | undefined>
       }
       
       next()
@@ -75,7 +75,7 @@ export function validateQuery<T>(schema: any) {
  * @param schema Zod Schema
  * @returns Express 中间件
  */
-export function validateParams<T>(schema: any) {
+export function validateParams<T>(schema: z.ZodSchema<T>) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const result: ValidationResult<T> = validate<T>(schema, req.params)
@@ -87,7 +87,7 @@ export function validateParams<T>(schema: any) {
       
       // 将验证后的数据赋值回 req.params
       if (result.data) {
-        req.params = result.data as any
+        req.params = result.data as Record<string, string>
       }
       
       next()

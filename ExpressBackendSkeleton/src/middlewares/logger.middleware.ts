@@ -22,8 +22,8 @@ export const requestTracingMiddleware = (
   next: NextFunction
 ): void => {
   const requestId = generateRequestId();
-  // 使用类型断言
-  (req as any).requestId = requestId;
+  // 使用已定义的 Request 类型扩展
+  req.requestId = requestId;
 
   // 添加请求 ID 到响应头
   res.setHeader('X-Request-ID', requestId);
@@ -33,7 +33,7 @@ export const requestTracingMiddleware = (
     requestId,
     ip: req.ip,
     userAgent: req.get('user-agent'),
-    userId: (req as any).user?.id,
+    userId: req.user?.id,
   });
 
   // 请求结束时清除上下文
@@ -54,7 +54,7 @@ export const httpLoggerMiddleware = (
   res: Response,
   next: NextFunction
 ): void => {
-  const requestId = (req as any).requestId;
+  const requestId = req.requestId;
   const start = Date.now();
   const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -75,8 +75,19 @@ export const httpLoggerMiddleware = (
     // 请求完成日志
     // 开发环境：记录详细信息
     // 生产环境：只记录基本信息
-    const logData: any = {
-      requestId,
+    interface LogData {
+      requestId?: string;
+      method: string;
+      url: string;
+      statusCode: number;
+      duration: number;
+      ip?: string;
+      userAgent?: string | undefined;
+      userId?: string;
+    }
+    
+    const logData: LogData = {
+      requestId: requestId || undefined,
       method: req.method,
       url: req.originalUrl,
       statusCode: res.statusCode,
@@ -87,7 +98,7 @@ export const httpLoggerMiddleware = (
     if (isDevelopment || res.statusCode >= 400) {
       logData.ip = req.ip;
       logData.userAgent = req.get('user-agent');
-      logData.userId = (req as any).user?.id;
+      logData.userId = req.user?.id;
     }
 
     logger.log(level, `${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms`, logData);

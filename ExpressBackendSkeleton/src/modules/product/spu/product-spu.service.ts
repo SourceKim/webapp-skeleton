@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Repository, FindOptionsWhere } from 'typeorm';
 import { AppDataSource } from '@/configs/database.config';
 import { ProductSpu, ProductSpuStatus } from './product-spu.model';
 import { HttpException } from '@/exceptions/http.exception';
@@ -8,9 +8,10 @@ import type { CreateProductSpuDto, UpdateProductSpuDto, ProductSpuResponseDto } 
 import { transformToCamelCase } from '@/utils/dto-transform.util';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 import { ENV } from '@/configs/env.config';
-import { ProductSku } from '@/modules/product/sku/product-sku.model';
+import { ProductSku, ProductSkuStatus } from '@/modules/product/sku/product-sku.model';
 import { ProductSkuAttribute } from '@/modules/product/attribute/product-sku-attribute.model';
 import { ProductAttributeValue } from '@/modules/product/attribute/product-attribute-value.model';
+import { Material } from '@/modules/material/material.model';
 
 export class ProductSpuService {
     private repository: Repository<ProductSpu>;
@@ -39,9 +40,9 @@ export class ProductSpuService {
         const [items, total] = await qb.getManyAndCount();
         const dtos = items.map(s => transformToCamelCase({
             ...s,
-            category_id: (s as any)?.category?.id,
-            brand_id: (s as any)?.brand?.id,
-            main_material_id: (s as any)?.main_material?.id,
+            category_id: s.category?.id,
+            brand_id: s.brand?.id,
+            main_material_id: s.main_material?.id,
         }) as ProductSpuResponseDto);
 
         if (dtos.length > 0) {
@@ -69,9 +70,9 @@ export class ProductSpuService {
         if (!s) throw new HttpException(404, 'SPU不存在');
         return transformToCamelCase({
             ...s,
-            category_id: (s as any)?.category?.id,
-            brand_id: (s as any)?.brand?.id,
-            main_material_id: (s as any)?.main_material?.id,
+            category_id: s.category?.id,
+            brand_id: s.brand?.id,
+            main_material_id: s.main_material?.id,
         }) as ProductSpuResponseDto;
     }
 
@@ -82,14 +83,19 @@ export class ProductSpuService {
             sub_title: data.sub_title,
             description: data.description,
             status: data.status ?? ProductSpuStatus.DRAFT,
-            
+            category_id: data.category_id || undefined,
+            brand_id: data.brand_id || undefined,
+            main_material_id: data.main_material_id || undefined,
             detail_content: data.detail_content
         });
-        if (data.category_id) (s as any).category = { id: data.category_id } as any;
-        if (data.brand_id) (s as any).brand = { id: data.brand_id } as any;
-        if (data.main_material_id) (s as any).main_material = { id: data.main_material_id } as any;
+        
+        // 处理多对多关系 sub_materials
         if (data.sub_material_ids && data.sub_material_ids.length > 0) {
-            (s as any).sub_materials = data.sub_material_ids.map(id => ({ id }) as any);
+            const materialRepo = this.repository.manager.getRepository(Material);
+            const materials = await materialRepo.find({ 
+                where: data.sub_material_ids.map(id => ({ id })) as FindOptionsWhere<Material>[]
+            });
+            s.sub_materials = materials;
         }
 
         const saved = await this.repository.save(s);
@@ -104,14 +110,23 @@ export class ProductSpuService {
         s.sub_title = data.sub_title ?? s.sub_title;
         s.description = data.description ?? s.description;
         s.status = data.status ?? s.status;
-        if (data.sub_material_ids !== undefined) {
-            (s as any).sub_materials = data.sub_material_ids ? data.sub_material_ids.map(id => ({ id }) as any) : [];
-        }
         s.detail_content = data.detail_content ?? s.detail_content;
 
-        if (data.category_id !== undefined) (s as any).category = data.category_id ? ({ id: data.category_id } as any) : null;
-        if (data.brand_id !== undefined) (s as any).brand = data.brand_id ? ({ id: data.brand_id } as any) : null;
-        if (data.main_material_id !== undefined) (s as any).main_material = data.main_material_id ? ({ id: data.main_material_id } as any) : null;
+        if (data.sub_material_ids !== undefined) {
+            if (data.sub_material_ids && data.sub_material_ids.length > 0) {
+                const materialRepo = this.repository.manager.getRepository(Material);
+                const materials = await materialRepo.find({ 
+                    where: data.sub_material_ids.map(id => ({ id })) as FindOptionsWhere<Material>[]
+                });
+                s.sub_materials = materials;
+            } else {
+                s.sub_materials = [];
+            }
+        }
+
+        if (data.category_id !== undefined) s.category_id = data.category_id || undefined;
+        if (data.brand_id !== undefined) s.brand_id = data.brand_id || undefined;
+        if (data.main_material_id !== undefined) s.main_material_id = data.main_material_id || undefined;
 
         await this.repository.save(s);
         return await this.findById(id);
@@ -140,18 +155,23 @@ export class ProductSpuService {
                 price: it.price || '0',
                 stock: it.stock ?? 0,
                 is_default: it.is_default ?? false,
-                status: (it.status as any) || 'ON_SHELF'
+                status: (it.status as ProductSkuStatus) || ProductSkuStatus.ON_SHELF,
+                spu_id: spuId
             });
-            (sku as any).spu = { id: spuId } as any;
             await skuRepo.save(sku);
             // 写入 SKU 属性关联（如有）
             if (it.attribute_value_ids && it.attribute_value_ids.length > 0) {
-                const values = await valRepo.find({ where: it.attribute_value_ids.map(id => ({ id })) as any, relations: ['attribute_key'] });
+                const values = await valRepo.find({ 
+                    where: it.attribute_value_ids.map(id => ({ id })) as FindOptionsWhere<ProductAttributeValue>[],
+                    relations: ['attribute_key'] 
+                });
                 for (const v of values) {
-                    const sa = skuAttrRepo.create({ id: nanoid(16) } as any);
-                    (sa as any).sku = { id: sku.id } as any;
-                    (sa as any).attribute_key = { id: (v as any).attribute_key?.id } as any;
-                    (sa as any).attribute_value = { id: v.id } as any;
+                    const sa = skuAttrRepo.create({ 
+                        id: nanoid(16),
+                        sku_id: sku.id,
+                        attribute_key_id: v.attribute_key?.id || '',
+                        attribute_value_id: v.id
+                    });
                     await skuAttrRepo.save(sa);
                 }
             }

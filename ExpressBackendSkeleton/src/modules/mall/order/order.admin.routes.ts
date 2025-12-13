@@ -47,7 +47,8 @@ router.get('/admin/orders/:id', authMiddleware, roleMiddleware(ADMIN_ROLE_NAMES)
   
   if (order.user) {
       const { password, ...u } = order.user;
-      (order as any).user = u;
+      // 创建一个不包含 password 的用户对象
+      order.user = { ...u } as typeof order.user;
   }
   
   res.json({ code: 0, message: 'OK', data: order });
