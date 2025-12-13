@@ -1,7 +1,7 @@
 import { Entity, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 import { BaseEntity } from '@/modules/common/base.model';
 import { Material } from '@/modules/material/material.model';
-import { ProductBrand } from '../brand/product-brand.model';
+import { ProductBrand } from '@/modules/product/brand/product-brand.model';
 import { ProductCategoryStatus, type ProductCategory as IProductCategory } from '@skeleton/shared-types';
 
 // 重新导出枚举，保持向后兼容

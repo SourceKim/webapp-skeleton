@@ -33,7 +33,7 @@ export class ProductAttributeService {
 
     async listKeysBySpu(spuId: string): Promise<ProductAttributeKeyResponseDto[]> {
         const keys = await this.keyRepo.find({ where: { spu: { id: spuId } as any }, relations: ['values'] });
-        return keys.map(k => transformToCamelCase({ ...k, spu_id: (k as any).spu?.id }) as unknown as ProductAttributeKeyResponseDto);
+        return keys.map(k => transformToCamelCase({ ...k, spu_id: (k as any).spu?.id }) as ProductAttributeKeyResponseDto);
     }
 
     async createKey(dto: CreateProductAttributeKeyDto): Promise<ProductAttributeKeyResponseDto> {
@@ -42,7 +42,7 @@ export class ProductAttributeService {
         const k = this.keyRepo.create({ id: nanoid(16), name: dto.name, key, required: dto.required ?? false });
         (k as any).spu = { id: dto.spu_id } as any;
         await this.keyRepo.save(k);
-        return transformToCamelCase({ ...k, spu_id: dto.spu_id }) as unknown as ProductAttributeKeyResponseDto;
+        return transformToCamelCase({ ...k, spu_id: dto.spu_id }) as ProductAttributeKeyResponseDto;
     }
 
     async updateKey(id: string, dto: UpdateProductAttributeKeyDto): Promise<ProductAttributeKeyResponseDto> {
@@ -54,7 +54,7 @@ export class ProductAttributeService {
         }
         Object.assign(k, dto);
         await this.keyRepo.save(k);
-        return transformToCamelCase({ ...k, spu_id: (k as any).spu?.id }) as unknown as ProductAttributeKeyResponseDto;
+        return transformToCamelCase({ ...k, spu_id: (k as any).spu?.id }) as ProductAttributeKeyResponseDto;
     }
 
     async deleteKey(id: string): Promise<void> { await this.keyRepo.delete(id); }
@@ -66,7 +66,7 @@ export class ProductAttributeService {
         (v as any).attribute_key = { id: dto.attribute_key_id } as any;
         if (dto.image_id) (v as any).image = { id: dto.image_id } as any;
         await this.valRepo.save(v);
-        return transformToCamelCase({ ...v, attribute_key_id: dto.attribute_key_id, image_id: dto.image_id }) as unknown as ProductAttributeValueResponseDto;
+        return transformToCamelCase({ ...v, attribute_key_id: dto.attribute_key_id, image_id: dto.image_id }) as ProductAttributeValueResponseDto;
     }
 
     async updateValue(id: string, dto: UpdateProductAttributeValueDto): Promise<ProductAttributeValueResponseDto> {
@@ -75,7 +75,7 @@ export class ProductAttributeService {
         if (dto.image_id !== undefined) (v as any).image = dto.image_id ? ({ id: dto.image_id } as any) : null;
         Object.assign(v, { value: dto.value ?? v.value, value_id: dto.value_id ?? v.value_id });
         await this.valRepo.save(v);
-        return transformToCamelCase({ ...v, attribute_key_id: (v as any).attribute_key?.id, image_id: (v as any).image?.id }) as unknown as ProductAttributeValueResponseDto;
+        return transformToCamelCase({ ...v, attribute_key_id: (v as any).attribute_key?.id, image_id: (v as any).image?.id }) as ProductAttributeValueResponseDto;
     }
 
     async deleteValue(id: string): Promise<void> { await this.valRepo.delete(id); }

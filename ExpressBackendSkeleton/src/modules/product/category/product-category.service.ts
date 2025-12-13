@@ -47,7 +47,7 @@ export class ProductCategoryService {
             material_id: (c as any)?.material?.id,
             brand_id: (c as any)?.brand?.id,
             brand_name: (c as any)?.brand?.name
-        }) as unknown as ProductCategoryResponseDto);
+        }) as ProductCategoryResponseDto);
         return { items: dtos, total };
     }
 
@@ -60,7 +60,7 @@ export class ProductCategoryService {
             material_id: (c as any)?.material?.id,
             brand_id: (c as any)?.brand?.id,
             brand_name: (c as any)?.brand?.name
-        }) as unknown as ProductCategoryResponseDto;
+        }) as ProductCategoryResponseDto;
     }
 
     async create(data: CreateProductCategoryDto): Promise<ProductCategoryResponseDto> {

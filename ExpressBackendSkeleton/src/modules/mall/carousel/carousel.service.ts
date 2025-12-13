@@ -1,14 +1,14 @@
 import { Repository, DataSource } from 'typeorm';
 import { nanoid } from 'nanoid';
-import { AppDataSource } from '../../../configs/database.config';
+import { AppDataSource } from '@/configs/database.config';
 import { Carousel } from './carousel.model';
 import type { CreateCarouselDto, UpdateCarouselDto, CarouselResponseDto } from '@skeleton/shared-types';
 import type { PaginationQueryDto } from '@skeleton/shared-types';
-import { QueryFilterBuilder } from '../../../utils/query-filter.util';
+import { QueryFilterBuilder } from '@/utils/query-filter.util';
 import { transformToCamelCase } from '@/utils/dto-transform.util';
-import { HttpException } from '../../../exceptions/http.exception';
-import { Material } from '../../material/material.model';
-import { ProductSpu } from '../../product/spu/product-spu.model';
+import { HttpException } from '@/exceptions/http.exception';
+import { Material } from '@/modules/material/material.model';
+import { ProductSpu } from '@/modules/product/spu/product-spu.model';
 
 export class CarouselService {
     private carouselRepository: Repository<Carousel>;
@@ -98,7 +98,7 @@ export class CarouselService {
             throw new HttpException(404, '轮播图不存在');
         }
 
-        return transformToCamelCase(carousel) as unknown as CarouselResponseDto;
+        return transformToCamelCase(carousel) as CarouselResponseDto;
     }
 
     public async findAll(query: PaginationQueryDto): Promise<{ items: CarouselResponseDto[]; total: number }> {
@@ -118,7 +118,7 @@ export class CarouselService {
         queryBuilder.skip(skip).take(query.limit);
 
         const [items, total] = await queryBuilder.getManyAndCount();
-        const dtos = items.map(item => transformToCamelCase(item) as unknown as CarouselResponseDto);
+        const dtos = items.map(item => transformToCamelCase(item) as CarouselResponseDto);
 
         return { items: dtos, total };
     }

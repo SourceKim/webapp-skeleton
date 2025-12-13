@@ -42,7 +42,7 @@ export class ProductSpuService {
             category_id: (s as any)?.category?.id,
             brand_id: (s as any)?.brand?.id,
             main_material_id: (s as any)?.main_material?.id,
-        }) as unknown as ProductSpuResponseDto);
+        }) as ProductSpuResponseDto);
 
         if (dtos.length > 0) {
             const spuIds = dtos.map(i => i.id);
@@ -72,7 +72,7 @@ export class ProductSpuService {
             category_id: (s as any)?.category?.id,
             brand_id: (s as any)?.brand?.id,
             main_material_id: (s as any)?.main_material?.id,
-        }) as unknown as ProductSpuResponseDto;
+        }) as ProductSpuResponseDto;
     }
 
     async create(data: CreateProductSpuDto): Promise<ProductSpuResponseDto> {

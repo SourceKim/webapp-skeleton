@@ -32,7 +32,7 @@ export class ProductBrandService {
         const dtos = items.map(b => transformToCamelCase({
             ...b,
             material_id: (b as any)?.material?.id,
-        }) as unknown as ProductBrandResponseDto);
+        }) as ProductBrandResponseDto);
         return { items: dtos, total };
     }
 
@@ -42,7 +42,7 @@ export class ProductBrandService {
         return transformToCamelCase({ 
             ...brand, 
             material_id: (brand as any)?.material?.id,
-        }) as unknown as ProductBrandResponseDto;
+        }) as ProductBrandResponseDto;
     }
 
     async createBrand(data: CreateProductBrandDto): Promise<ProductBrandResponseDto> {
@@ -67,7 +67,7 @@ export class ProductBrandService {
         return transformToCamelCase({ 
             ...reloaded!, 
             material_id: (reloaded as any)?.material?.id,
-        }) as unknown as ProductBrandResponseDto;
+        }) as ProductBrandResponseDto;
     }
 
     async updateBrand(id: string, data: UpdateProductBrandDto): Promise<ProductBrandResponseDto> {
@@ -92,7 +92,7 @@ export class ProductBrandService {
         return transformToCamelCase({ 
             ...reloaded!, 
             material_id: (reloaded as any)?.material?.id,
-        }) as unknown as ProductBrandResponseDto;
+        }) as ProductBrandResponseDto;
     }
 
     async deleteBrand(id: string): Promise<void> {

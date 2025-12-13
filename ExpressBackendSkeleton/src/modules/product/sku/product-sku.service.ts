@@ -39,7 +39,7 @@ export class ProductSkuService {
                 key_name: a.attribute_key?.key || a.attribute_key?.name,
                 value: a.attribute_value?.value_id || a.attribute_value?.value
             }))
-        }) as unknown as ProductSkuResponseDto);
+        }) as ProductSkuResponseDto);
         return { items: dtos, total };
     }
 
@@ -55,7 +55,7 @@ export class ProductSkuService {
                 key_name: a.attribute_key?.key || a.attribute_key?.name,
                 value: a.attribute_value?.value_id || a.attribute_value?.value
             }))
-        }) as unknown as ProductSkuResponseDto;
+        }) as ProductSkuResponseDto;
     }
 
     async create(data: CreateProductSkuDto): Promise<ProductSkuResponseDto> {

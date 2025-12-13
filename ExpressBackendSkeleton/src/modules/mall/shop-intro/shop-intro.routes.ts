@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { ShopIntroController } from './shop-intro.controller';
-import { authMiddleware } from '../../../middlewares/auth.middleware';
-import { roleMiddleware } from '../../../middlewares/role.middleware';
-import { ADMIN_ROLE_NAMES } from '../../../constants/role.constants';
+import { authMiddleware } from '@/middlewares/auth.middleware';
+import { roleMiddleware } from '@/middlewares/role.middleware';
+import { ADMIN_ROLE_NAMES } from '@/constants/role.constants';
 
 const router = Router();
 const controller = new ShopIntroController();

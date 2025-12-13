@@ -1,6 +1,6 @@
 import { Entity, Column, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
-import { BaseEntity } from '../../common/base.model';
-import { Material } from '../../material/material.model';
+import { BaseEntity } from '@/modules/common/base.model';
+import { Material } from '@/modules/material/material.model';
 import type { ShopIntro as IShopIntro, ShopIntroBanner as IShopIntroBanner } from '@skeleton/shared-types';
 
 @Entity('shop_intros')

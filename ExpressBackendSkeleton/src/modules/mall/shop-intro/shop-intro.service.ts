@@ -1,11 +1,11 @@
 import { Repository, DataSource } from 'typeorm';
 import { customAlphabet } from 'nanoid';
-import { AppDataSource } from '../../../configs/database.config';
+import { AppDataSource } from '@/configs/database.config';
 import { ShopIntro, ShopIntroBanner } from './shop-intro.model';
 import type { CreateShopIntroDto, UpdateShopIntroDto, ShopIntroResponseDto } from '@skeleton/shared-types';
 import { transformToCamelCase } from '@/utils/dto-transform.util';
-import { HttpException } from '../../../exceptions/http.exception';
-import { Material } from '../../material/material.model';
+import { HttpException } from '@/exceptions/http.exception';
+import { Material } from '@/modules/material/material.model';
 
 export class ShopIntroService {
     private shopIntroRepository: Repository<ShopIntro>;
@@ -43,7 +43,7 @@ export class ShopIntroService {
             shopIntro.banners.sort((a, b) => a.sort_order - b.sort_order);
         }
 
-        return transformToCamelCase(shopIntro) as unknown as ShopIntroResponseDto;
+        return transformToCamelCase(shopIntro) as ShopIntroResponseDto;
     }
 
     public async createOrUpdateShopIntro(dto: CreateShopIntroDto | UpdateShopIntroDto): Promise<ShopIntroResponseDto> {

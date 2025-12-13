@@ -141,7 +141,7 @@ export class UserAddressService {
         return transformToCamelCase({
             ...entity,
             user_id: (entity as any)?.user?.id,
-        }) as unknown as UserAddressResponseDto;
+        }) as UserAddressResponseDto;
     }
 }
 

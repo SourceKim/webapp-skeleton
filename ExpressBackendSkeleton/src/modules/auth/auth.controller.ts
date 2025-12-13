@@ -32,13 +32,6 @@ export class AuthController {
     }
 
     /**
-     * 将用户实体转换为DTO（使用驼峰命名）
-     */
-    private transformUserToDto(user: any): UserResponseDto {
-        return transformToCamelCase(user) as unknown as UserResponseDto;
-    }
-
-    /**
      * 用户注册
      * POST /api/auth/register
      */
@@ -72,7 +65,7 @@ export class AuthController {
             res.status(200).json({
                 code: 0,
                 message: '注册成功',
-                data: this.transformUserToDto(result.user) as unknown as RegisterResponseDto
+                data: transformToCamelCase(result.user) as RegisterResponseDto
             });
         } catch (error) {
             logError('用户注册失败', (req as any).requestId, { error, body: req.body });
@@ -105,7 +98,7 @@ export class AuthController {
                 message: '登录成功',
                 data: {
                     access_token: result.access_token,
-                    user: this.transformUserToDto(result.user)
+                    user: transformToCamelCase(result.user) as UserResponseDto
                 }
             });
         } catch (error) {
@@ -134,7 +127,7 @@ export class AuthController {
             res.json({
                 code: 0,
                 message: 'success',
-                data: this.transformUserToDto(user)
+                data: transformToCamelCase(user) as ProfileResponseDto
             });
         } catch (error) {
             next(error);
@@ -169,7 +162,7 @@ export class AuthController {
                 message: '登录成功',
                 data: {
                     access_token: result.access_token,
-                    user: this.transformUserToDto(result.user)
+                    user: transformToCamelCase(result.user) as UserResponseDto
                 }
             });
         } catch (error) {

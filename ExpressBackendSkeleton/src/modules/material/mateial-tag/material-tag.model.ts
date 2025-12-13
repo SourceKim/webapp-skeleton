@@ -1,4 +1,4 @@
-import { Material } from '../material.model';
+import { Material } from '@/modules/material/material.model';
 import { Entity, Column, ManyToMany, Index } from 'typeorm';
 import { BaseEntity } from '@/modules/common/base.model';
 import type { MaterialTag as IMaterialTag } from '@skeleton/shared-types';

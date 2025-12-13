@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { CarouselController } from './carousel.controller';
-import { authMiddleware } from '../../../middlewares/auth.middleware';
-import { roleMiddleware } from '../../../middlewares/role.middleware';
-import { ADMIN_ROLE_NAMES } from '../../../constants/role.constants';
-import { paginationQuery } from '../../../middlewares/paginationQuery';
-import { paginationResponse } from '../../../middlewares/paginationResponse';
+import { authMiddleware } from '@/middlewares/auth.middleware';
+import { roleMiddleware } from '@/middlewares/role.middleware';
+import { ADMIN_ROLE_NAMES } from '@/constants/role.constants';
+import { paginationQuery } from '@/middlewares/paginationQuery';
+import { paginationResponse } from '@/middlewares/paginationResponse';
 
 const router = Router();
 const controller = new CarouselController();

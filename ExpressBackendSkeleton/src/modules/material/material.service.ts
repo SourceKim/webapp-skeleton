@@ -232,7 +232,7 @@ export class MaterialService {
 
             // 执行查询，获取结果
             const [items, total] = await queryBuilder.getManyAndCount();
-            const materialDTOs = items.map(item => transformToCamelCase(item) as unknown as MaterialResponseDto);
+            const materialDTOs = items.map(item => transformToCamelCase(item) as MaterialResponseDto);
 
             return {
                 items: materialDTOs,

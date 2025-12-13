@@ -1,7 +1,7 @@
 import { Entity, Column, JoinColumn, ManyToOne } from 'typeorm';
-import { BaseEntity } from '../../common/base.model';
-import { Material } from '../../material/material.model';
-import { ProductSpu } from '../../product/spu/product-spu.model';
+import { BaseEntity } from '@/modules/common/base.model';
+import { Material } from '@/modules/material/material.model';
+import { ProductSpu } from '@/modules/product/spu/product-spu.model';
 import type { Carousel as ICarousel } from '@skeleton/shared-types';
 
 @Entity('carousels')
