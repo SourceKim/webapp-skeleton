@@ -5,6 +5,7 @@ import { authMiddleware } from '@/middlewares/auth.middleware';
 const router = Router();
 const orderController = new OrderController();
 
+// 普通用户 API - 需要认证
 router.use(authMiddleware);
 
 router.post('/preview', orderController.preview); // 预览订单

@@ -5,6 +5,7 @@ import { authMiddleware } from '@/middlewares/auth.middleware';
 const router = Router();
 const cartController = new CartController();
 
+// 普通用户 API - 需要认证
 router.use(authMiddleware);
 
 router.get('/', cartController.list); // 获取购物车列表

@@ -5,6 +5,8 @@ import { validateData } from '@/utils/zod-validator';
 import { HttpException } from '@/exceptions/http.exception';
 import type { AppError } from '@/types/error';
 import type { UpdateSelectedRequestBody } from '@/types/common';
+import { AppDataSource } from '@/configs/database.config';
+import { Cart } from './cart.model';
 
 /**
  * 购物车控制器
@@ -130,6 +132,41 @@ export class CartController {
                 ? { message: e.message, name: e.name, stack: e.stack }
                 : { message: String(e), name: 'Error' };
             res.status(error.status || 500).json({ code: error.status || 500, message: error.message || '删除失败' });
+        }
+    };
+
+    /**
+     * 管理员：获取购物车列表（分页）
+     * GET /api/v1/admin/carts
+     */
+    adminList = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const repo = AppDataSource.getRepository(Cart);
+            const { page, limit, sort_by, sort_order, filters } = req.pagination!;
+
+            const qb = repo.createQueryBuilder('c')
+                .leftJoinAndSelect('c.sku', 'sku')
+                .leftJoinAndSelect('sku.spu', 'spu')
+                .leftJoinAndSelect('spu.main_material', 'mm')
+                .leftJoinAndSelect('sku.sku_attributes', 'attr')
+                .leftJoinAndSelect('attr.attribute_key', 'attr_key')
+                .leftJoinAndSelect('attr.attribute_value', 'attr_val')
+                .leftJoin('c.user', 'u')
+                .addSelect(['u.id', 'u.username', 'u.email', 'u.phone', 'u.avatar'])
+                .where('c.deleted_at IS NULL');
+
+            if (filters?.user_id) qb.andWhere('u.id = :uid', { uid: String(filters.user_id) });
+            if (filters?.sku_id) qb.andWhere('sku.id = :sid', { sid: String(filters.sku_id) });
+            if (filters?.selected !== undefined) qb.andWhere('c.selected = :sel', { sel: String(filters.selected) === 'true' });
+
+            qb.orderBy(`c.${sort_by}`, sort_order as 'ASC' | 'DESC')
+                .skip((page - 1) * limit)
+                .take(limit);
+
+            const [items, total] = await qb.getManyAndCount();
+            res.pagination!(items, total);
+        } catch (e: unknown) {
+            next(e);
         }
     };
 }
