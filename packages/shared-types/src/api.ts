@@ -6,10 +6,10 @@
  * API 响应格式
  */
 export interface ApiResponse<T = any> {
-  code?: number
-  data: T
+  code: number // 0 成功, 1 失败, 2 警告, 3 信息, 401 未授权, 403 禁止访问, 404 未找到, 500 服务器错误
+  data?: T
   message?: string
-  error?: string
+  error?: any
 }
 
 /**
@@ -44,6 +44,18 @@ export interface PaginationQuery {
   limit?: number
   sort_by?: string
   sort_order?: 'ASC' | 'DESC'
+}
+
+/**
+ * 分页查询接口（后端使用）
+ * 用于分页查询的参数验证
+ */
+export interface PaginationQueryDto {
+  page: number
+  limit: number
+  sort_by: string
+  sort_order: 'ASC' | 'DESC'
+  filters?: Record<string, any> // 筛选参数，支持嵌套对象
 }
 
 /**

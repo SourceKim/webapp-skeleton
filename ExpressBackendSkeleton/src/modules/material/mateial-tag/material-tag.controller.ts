@@ -1,7 +1,7 @@
 import { MaterialTagService } from './material-tag.service';
 import { NextFunction, Request, Response } from 'express';
-import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
-import { MaterialTagDTO } from './material-tag.dto';
+import type { ApiResponse, PaginatedResponse } from '@skeleton/shared-types';
+import type { MaterialTagResponseDto } from '@skeleton/shared-types';
 import { createMaterialTagSchema, updateMaterialTagSchema } from '@skeleton/shared-types';
 import { idParamSchema } from '@skeleton/shared-types';
 import { validateData } from '@/utils/zod-validator';
@@ -15,7 +15,7 @@ export class MaterialTagController {
 
     public findAllMaterialTags = async (
         req: Request,
-        res: Response<ApiResponse<PaginatedResponse<MaterialTagDTO>>>,
+        res: Response<ApiResponse<PaginatedResponse<MaterialTagResponseDto>>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -28,7 +28,7 @@ export class MaterialTagController {
 
     public findMaterialTagById = async (
         req: Request,
-        res: Response<ApiResponse<MaterialTagDTO>>,
+        res: Response<ApiResponse<MaterialTagResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -46,7 +46,7 @@ export class MaterialTagController {
 
     public createMaterialTag = async (
         req: Request,
-        res: Response<ApiResponse<MaterialTagDTO>>,
+        res: Response<ApiResponse<MaterialTagResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -64,7 +64,7 @@ export class MaterialTagController {
 
     public updateMaterialTag = async (
         req: Request,
-        res: Response<ApiResponse<MaterialTagDTO>>,
+        res: Response<ApiResponse<MaterialTagResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {

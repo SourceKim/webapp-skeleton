@@ -3,10 +3,9 @@ import { AppDataSource } from '@/configs/database.config';
 import { ProductSku, ProductSkuStatus } from './product-sku.model';
 import { HttpException } from '@/exceptions/http.exception';
 import { nanoid } from 'nanoid';
-import { PaginationQueryDto } from '@/modules/common/common.dto';
-import { plainToInstance } from 'class-transformer';
-import { ProductSkuDTO } from './product-sku.dto';
-import type { CreateProductSkuDto, UpdateProductSkuDto } from '@skeleton/shared-types';
+import type { PaginationQueryDto } from '@skeleton/shared-types';
+import type { CreateProductSkuDto, UpdateProductSkuDto, ProductSkuResponseDto } from '@skeleton/shared-types';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 
 export class ProductSkuService {
@@ -15,7 +14,7 @@ export class ProductSkuService {
         this.repository = AppDataSource.getRepository(ProductSku);
     }
 
-    async findAll(query: PaginationQueryDto): Promise<{ items: ProductSkuDTO[]; total: number }> {
+    async findAll(query: PaginationQueryDto): Promise<{ items: ProductSkuResponseDto[]; total: number }> {
         const qb = this.repository.createQueryBuilder('sku')
             .leftJoinAndSelect('sku.sku_attributes', 'sa')
             .leftJoinAndSelect('sa.attribute_key', 'ak')
@@ -31,7 +30,7 @@ export class ProductSkuService {
           .take(query.limit);
 
         const [items, total] = await qb.getManyAndCount();
-        const dtos = items.map(s => plainToInstance(ProductSkuDTO, {
+        const dtos = items.map(s => transformToCamelCase({
             ...s,
             spu_id: (s as any)?.spu?.id,
             attributes: ((s as any).sku_attributes || []).map((a: any) => ({
@@ -40,14 +39,14 @@ export class ProductSkuService {
                 key_name: a.attribute_key?.key || a.attribute_key?.name,
                 value: a.attribute_value?.value_id || a.attribute_value?.value
             }))
-        }));
+        }) as unknown as ProductSkuResponseDto);
         return { items: dtos, total };
     }
 
-    async findById(id: string): Promise<ProductSkuDTO> {
+    async findById(id: string): Promise<ProductSkuResponseDto> {
         const s = await this.repository.findOne({ where: { id }, relations: ['sku_attributes', 'sku_attributes.attribute_key', 'sku_attributes.attribute_value', 'spu'] });
         if (!s) throw new HttpException(404, 'SKU不存在');
-        return plainToInstance(ProductSkuDTO, { 
+        return transformToCamelCase({ 
             ...s, 
             spu_id: (s as any)?.spu?.id,
             attributes: ((s as any).sku_attributes || []).map((a: any) => ({
@@ -56,10 +55,10 @@ export class ProductSkuService {
                 key_name: a.attribute_key?.key || a.attribute_key?.name,
                 value: a.attribute_value?.value_id || a.attribute_value?.value
             }))
-        });
+        }) as unknown as ProductSkuResponseDto;
     }
 
-    async create(data: CreateProductSkuDto): Promise<ProductSkuDTO> {
+    async create(data: CreateProductSkuDto): Promise<ProductSkuResponseDto> {
         const s = this.repository.create({
             id: nanoid(16),
             sku_code: data.sku_code,
@@ -76,7 +75,7 @@ export class ProductSkuService {
         return await this.findById(saved.id);
     }
 
-    async update(id: string, data: UpdateProductSkuDto): Promise<ProductSkuDTO> {
+    async update(id: string, data: UpdateProductSkuDto): Promise<ProductSkuResponseDto> {
         const s = await this.repository.findOne({ where: { id } });
         if (!s) throw new HttpException(404, 'SKU不存在');
 

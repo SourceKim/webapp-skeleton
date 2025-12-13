@@ -6,9 +6,9 @@ import type {
     UpdatePermissionDto,
 } from '@skeleton/shared-types';
 import { HttpException } from '@/exceptions/http.exception';
-import { PaginationQueryDto } from '@/modules/common/common.dto';
-import { PermissionDTO } from '@/modules/permission/permission.dto';
-import { plainToInstance } from 'class-transformer';
+import type { PaginationQueryDto } from '@skeleton/shared-types';
+import type { PermissionResponseDto } from '@skeleton/shared-types';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 import { nanoid } from 'nanoid';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 
@@ -19,7 +19,7 @@ export class PermissionService {
         this.permissionRepository = AppDataSource.getRepository(Permission);
     }
 
-    async findAllPermissions(query: PaginationQueryDto): Promise<{ permissions: PermissionDTO[]; total: number }> {
+    async findAllPermissions(query: PaginationQueryDto): Promise<{ permissions: PermissionResponseDto[]; total: number }> {
         const queryBuilder = this.permissionRepository.createQueryBuilder('permission');
 
         // 应用筛选条件
@@ -37,7 +37,7 @@ export class PermissionService {
         const [permissions, total] = await queryBuilder.getManyAndCount();
 
         const permissionDTOs = permissions.map(permission => {
-            return plainToInstance(PermissionDTO, permission);
+            return transformToCamelCase(permission) as unknown as PermissionResponseDto;
         });
 
         return {
@@ -46,14 +46,14 @@ export class PermissionService {
         }
     }
 
-    async findPermissionById(id: string): Promise<PermissionDTO> {
+    async findPermissionById(id: string): Promise<PermissionResponseDto> {
         const permission = await this.permissionRepository.findOne({ where: { id } });
         if (!permission) throw new HttpException(404, '权限不存在');
 
-        return plainToInstance(PermissionDTO, permission);
+        return transformToCamelCase(permission) as unknown as PermissionResponseDto;
     }
 
-    async createPermission(createPermissionDto: CreatePermissionDto): Promise<PermissionDTO> {
+    async createPermission(createPermissionDto: CreatePermissionDto): Promise<PermissionResponseDto> {
         // 检查权限名称是否已存在
         const existingPermission = await this.permissionRepository.findOne({
             where: { name: createPermissionDto.name }
@@ -69,10 +69,10 @@ export class PermissionService {
         });
         await this.permissionRepository.save(permission);
 
-        return plainToInstance(PermissionDTO, permission);
+        return transformToCamelCase(permission) as unknown as PermissionResponseDto;
     }
 
-    async updatePermission(id: string, updatePermissionDto: UpdatePermissionDto): Promise<PermissionDTO> {
+    async updatePermission(id: string, updatePermissionDto: UpdatePermissionDto): Promise<PermissionResponseDto> {
         const permission = await this.permissionRepository.findOne({ where: { id } });
         if (!permission) throw new HttpException(404, '权限不存在');
 
@@ -95,7 +95,7 @@ export class PermissionService {
 
         await this.permissionRepository.save(permission);
 
-        return plainToInstance(PermissionDTO, permission);
+        return transformToCamelCase(permission) as unknown as PermissionResponseDto;
     }
 
     async deletePermission(id: string): Promise<void> {

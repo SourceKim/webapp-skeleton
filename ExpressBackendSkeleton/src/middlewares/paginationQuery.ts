@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { PaginationQueryDto } from '@/modules/common/common.dto';
+import type { PaginationQueryDto } from '@skeleton/shared-types';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 
 

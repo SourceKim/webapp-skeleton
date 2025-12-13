@@ -2,11 +2,10 @@ import { Repository, DataSource } from 'typeorm';
 import { nanoid } from 'nanoid';
 import { AppDataSource } from '../../../configs/database.config';
 import { Carousel } from './carousel.model';
-import { CarouselDTO } from './carousel.dto';
-import type { CreateCarouselDto, UpdateCarouselDto } from '@skeleton/shared-types';
-import { PaginationQueryDto } from '../../common/common.dto';
+import type { CreateCarouselDto, UpdateCarouselDto, CarouselResponseDto } from '@skeleton/shared-types';
+import type { PaginationQueryDto } from '@skeleton/shared-types';
 import { QueryFilterBuilder } from '../../../utils/query-filter.util';
-import { plainToInstance } from 'class-transformer';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 import { HttpException } from '../../../exceptions/http.exception';
 import { Material } from '../../material/material.model';
 import { ProductSpu } from '../../product/spu/product-spu.model';
@@ -26,7 +25,7 @@ export class CarouselService {
         return nanoid();
     }
 
-    public async createCarousel(createDto: CreateCarouselDto): Promise<CarouselDTO> {
+    public async createCarousel(createDto: CreateCarouselDto): Promise<CarouselResponseDto> {
         const { material_id, spu_id } = createDto;
 
         // Check if material exists
@@ -52,7 +51,7 @@ export class CarouselService {
         return this.findOne(savedCarousel.id);
     }
 
-    public async updateCarousel(id: string, updateDto: UpdateCarouselDto): Promise<CarouselDTO> {
+    public async updateCarousel(id: string, updateDto: UpdateCarouselDto): Promise<CarouselResponseDto> {
         const carousel = await this.carouselRepository.findOne({ where: { id } });
         if (!carousel) {
             throw new HttpException(404, '轮播图不存在');
@@ -89,7 +88,7 @@ export class CarouselService {
         return true;
     }
 
-    public async findOne(id: string): Promise<CarouselDTO> {
+    public async findOne(id: string): Promise<CarouselResponseDto> {
         const carousel = await this.carouselRepository.findOne({
             where: { id },
             relations: ['material', 'spu']
@@ -99,10 +98,10 @@ export class CarouselService {
             throw new HttpException(404, '轮播图不存在');
         }
 
-        return plainToInstance(CarouselDTO, carousel, { excludeExtraneousValues: true });
+        return transformToCamelCase(carousel) as unknown as CarouselResponseDto;
     }
 
-    public async findAll(query: PaginationQueryDto): Promise<{ items: CarouselDTO[]; total: number }> {
+    public async findAll(query: PaginationQueryDto): Promise<{ items: CarouselResponseDto[]; total: number }> {
         const queryBuilder = this.carouselRepository.createQueryBuilder('carousel')
             .leftJoinAndSelect('carousel.material', 'material')
             .leftJoinAndSelect('carousel.spu', 'spu')
@@ -119,7 +118,7 @@ export class CarouselService {
         queryBuilder.skip(skip).take(query.limit);
 
         const [items, total] = await queryBuilder.getManyAndCount();
-        const dtos = items.map(item => plainToInstance(CarouselDTO, item, { excludeExtraneousValues: true }));
+        const dtos = items.map(item => transformToCamelCase(item) as unknown as CarouselResponseDto);
 
         return { items: dtos, total };
     }

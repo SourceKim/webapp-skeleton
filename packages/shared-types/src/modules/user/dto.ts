@@ -70,9 +70,18 @@ export interface UserQueryDto {
 }
 
 /**
- * 用户响应数据（包含角色信息）
+ * 用户响应数据（包含角色信息，使用驼峰命名）
  */
-export interface UserResponseDto extends User {
+export interface UserResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  username: string
+  email?: string
+  phone?: string
+  avatar?: string
+  status: string
   roles?: Role[]
 }
 
@@ -106,9 +115,19 @@ export interface RegisterDto {
 }
 
 /**
- * 注册响应数据
+ * 注册响应数据（使用驼峰命名，符合前端习惯）
  */
-export interface RegisterResponseDto extends User {}
+export interface RegisterResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  username: string
+  email?: string
+  phone?: string
+  avatar?: string
+  status: string
+}
 
 /**
  * 用户资料响应数据

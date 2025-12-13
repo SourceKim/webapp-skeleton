@@ -4,10 +4,9 @@ import { Role } from '@/modules/role/role.model';
 import { AppDataSource } from '@/configs/database.config';
 import { HttpException } from '@/exceptions/http.exception';
 import { nanoid } from 'nanoid';
-import { PaginationQueryDto } from '@/modules/common/common.dto';
-import { UserDTO } from '@/modules/user/user.dto';
-import type { CreateUserDto, UpdateUserDto, ChangePasswordDto, ChangePhoneDto } from '@skeleton/shared-types';
-import { plainToInstance } from 'class-transformer';
+import type { PaginationQueryDto } from '@skeleton/shared-types';
+import type { CreateUserDto, UpdateUserDto, ChangePasswordDto, ChangePhoneDto, UserResponseDto } from '@skeleton/shared-types';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 import { MallOrder, OrderStatus } from '@/modules/mall/order/order.model';
 import { ENV } from '@/configs/env.config';
@@ -29,7 +28,7 @@ export class UserService {
         return nanoid(16);
     }
 
-    async createUser(userData: CreateUserDto): Promise<UserDTO> {
+    async createUser(userData: CreateUserDto): Promise<UserResponseDto> {
 
         // 检查用户名是否已存在
         const existingUser = await this.userRepository.findOne({ where: { username: userData.username } });
@@ -52,10 +51,10 @@ export class UserService {
         const savedUser = await this.userRepository.save(user);
 
         // 返回用户DTO
-        return plainToInstance(UserDTO, savedUser);
+        return transformToCamelCase(savedUser) as unknown as UserResponseDto;
     }
 
-    async updateUser(userId: string, updateData: UpdateUserDto): Promise<UserDTO> {
+    async updateUser(userId: string, updateData: UpdateUserDto): Promise<UserResponseDto> {
         // 仅允许白名单字段被更新，根除 id 被覆盖的风险
         const { roles: roleIds, ...rest } = updateData;
 
@@ -94,7 +93,7 @@ export class UserService {
         const savedUser = await this.userRepository.save(user);
 
         // 返回用户DTO
-        return plainToInstance(UserDTO, savedUser);
+        return transformToCamelCase(savedUser) as unknown as UserResponseDto;
     }
 
     async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {
@@ -156,7 +155,7 @@ export class UserService {
         await this.userRepository.remove(user);
     }
 
-    async getUser(userId: string): Promise<UserDTO> {
+    async getUser(userId: string): Promise<UserResponseDto> {
 
         const queryBuilder = this.userRepository.createQueryBuilder('user')
             .andWhere('user.id = :userId', { userId })
@@ -169,7 +168,7 @@ export class UserService {
             throw new HttpException(404, '用户不存在');
         }
 
-        return plainToInstance(UserDTO, user);
+        return transformToCamelCase(user) as unknown as UserResponseDto;
     }
 
     async getUserStats(userId: string) {
@@ -186,7 +185,7 @@ export class UserService {
         };
     }
 
-    async getUsers(query: PaginationQueryDto): Promise<{ users: UserDTO[]; total: number }> {
+    async getUsers(query: PaginationQueryDto): Promise<{ users: UserResponseDto[]; total: number }> {
 
         const queryBuilder = this.userRepository.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
@@ -208,7 +207,7 @@ export class UserService {
         const [users, total] = await queryBuilder.getManyAndCount();
 
         const userDTOs = users.map(user => {
-            return plainToInstance(UserDTO, user);
+            return transformToCamelCase(user) as unknown as UserResponseDto;
         });
 
         return { users: userDTOs, total };

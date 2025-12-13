@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { PaginatedResponse, ApiResponse } from '@/modules/common/common.dto';
+import type { PaginatedResponse, ApiResponse } from '@skeleton/shared-types';
 
 export const paginationResponse = (req: Request, res: Response, next: NextFunction) => {
         res.pagination = function<T>(data: T[], total: number) {
@@ -10,14 +10,12 @@ export const paginationResponse = (req: Request, res: Response, next: NextFuncti
             message: 'success',
             data: {
                 items: data,
-                meta: {
-                    total: total,
-                    page: paginationReq.page,
-                    limit: paginationReq.limit,
-                    sort_by: paginationReq.sort_by,
-                    sort_order: paginationReq.sort_order,
-                    pages: totalPages
-                }
+                total: total,
+                page: paginationReq.page,
+                limit: paginationReq.limit,
+                pages: totalPages,
+                sort_by: paginationReq.sort_by,
+                sort_order: paginationReq.sort_order
             }
         };
         res.json(response);

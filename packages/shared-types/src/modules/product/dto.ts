@@ -50,14 +50,26 @@ export interface ProductSpuQueryDto {
 }
 
 /**
- * 商品SPU响应数据
+ * 商品SPU响应数据（使用驼峰命名，符合前端习惯）
  */
-export interface ProductSpuResponseDto extends ProductSpu {
-  price?: string // 最低价格
+export interface ProductSpuResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  name: string
+  subTitle?: string
+  description?: string
+  categoryId?: string | null
   category?: ProductCategory
+  brandId?: string | null
   brand?: ProductBrand
-  main_material?: Material
-  sub_materials?: Material[]
+  status: ProductSpuStatus
+  mainMaterialId?: string | null
+  mainMaterial?: Material | null
+  subMaterials?: Material[] | null
+  detailContent?: string | null
+  price?: string // 最低价格
 }
 
 /**
@@ -125,10 +137,23 @@ export interface ProductSkuQueryDto {
 }
 
 /**
- * 商品SKU响应数据
+ * 商品SKU响应数据（使用驼峰命名，符合前端习惯）
  */
-export interface ProductSkuResponseDto extends ProductSku {
-  attributes?: Array<{ key_id: string; value_id: string; key_name?: string; value?: string }>
+export interface ProductSkuResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  spuId: string
+  skuCode: string
+  skuName?: string
+  price: string
+  originalPrice?: string
+  costPrice?: string
+  stock: number
+  status: ProductSkuStatus
+  isDefault: boolean
+  attributes?: Array<{ keyId: string; valueId: string; keyName?: string; value?: string }>
 }
 
 /**
@@ -169,11 +194,22 @@ export interface ProductCategoryQueryDto {
 }
 
 /**
- * 商品分类响应数据
+ * 商品分类响应数据（使用驼峰命名，符合前端习惯）
  */
-export interface ProductCategoryResponseDto extends ProductCategory {
+export interface ProductCategoryResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  name: string
+  description?: string
+  parentId?: string
+  level: number
+  materialId?: string
   material?: Material
-  brand_name?: string
+  brandId?: string
+  brandName?: string
+  status: ProductCategoryStatus
 }
 
 /**
@@ -213,9 +249,18 @@ export interface ProductBrandQueryDto {
 }
 
 /**
- * 商品品牌响应数据
+ * 商品品牌响应数据（使用驼峰命名，符合前端习惯）
  */
-export interface ProductBrandResponseDto extends ProductBrand {
+export interface ProductBrandResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  name: string
+  description?: string
+  materialId?: string
+  website?: string
+  status: ProductBrandStatus
   logo?: Material
 }
 
@@ -255,4 +300,32 @@ export interface UpdateProductAttributeValueDto {
   value?: string
   value_id?: string
   image_id?: string | null
+}
+
+/**
+ * 商品属性键响应数据（使用驼峰命名，符合前端习惯）
+ */
+export interface ProductAttributeKeyResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  spuId: string
+  name: string
+  key: string
+  required: boolean
+}
+
+/**
+ * 商品属性值响应数据（使用驼峰命名，符合前端习惯）
+ */
+export interface ProductAttributeValueResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  attributeKeyId: string
+  value: string
+  valueId: string
+  imageId?: string
 }

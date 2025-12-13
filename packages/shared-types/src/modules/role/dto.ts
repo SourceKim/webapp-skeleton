@@ -32,9 +32,15 @@ export interface RoleQueryDto {
 }
 
 /**
- * 角色响应数据（包含权限信息）
+ * 角色响应数据（包含权限信息，使用驼峰命名）
  */
-export interface RoleResponseDto extends Role {
+export interface RoleResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  name: string
+  description?: string
   permissions?: Permission[]
 }
 

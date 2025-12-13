@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from '@/modules/user/user.service';
-import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
-import { UserDTO } from '@/modules/user/user.dto';
+import type { ApiResponse, PaginatedResponse } from '@skeleton/shared-types';
+import type { UserResponseDto } from '@skeleton/shared-types';
 import { HttpException } from '@/exceptions/http.exception';
 import {
     createUserSchema,
@@ -30,7 +30,7 @@ export class UserController {
      */
     createUser = async (
         req: Request,
-        res: Response<ApiResponse<UserDTO>>,
+        res: Response<ApiResponse<UserResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -52,7 +52,7 @@ export class UserController {
      */
     updateUser = async (
         req: Request,
-        res: Response<ApiResponse<UserDTO>>,
+        res: Response<ApiResponse<UserResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -76,7 +76,7 @@ export class UserController {
      */
     getProfile = async (
         req: Request,
-        res: Response<ApiResponse<UserDTO>>,
+        res: Response<ApiResponse<UserResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -121,7 +121,7 @@ export class UserController {
      */
     updateProfile = async (
         req: Request,
-        res: Response<ApiResponse<UserDTO>>,
+        res: Response<ApiResponse<UserResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -219,7 +219,7 @@ export class UserController {
      */
     getUser = async (
         req: Request,
-        res: Response<ApiResponse<UserDTO>>,
+        res: Response<ApiResponse<UserResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -241,7 +241,7 @@ export class UserController {
      */
     getUsers = async (
         req: Request,
-        res: Response<ApiResponse<PaginatedResponse<UserDTO>>>,
+        res: Response<ApiResponse<PaginatedResponse<UserResponseDto>>>,
         next: NextFunction
     ): Promise<void> => {
         try {

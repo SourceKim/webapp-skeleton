@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiResponse } from '@/modules/common/common.dto';
-import { UserAddressDTO } from './user-address.dto';
+import type { ApiResponse } from '@skeleton/shared-types';
+import type { UserAddressResponseDto } from '@skeleton/shared-types';
 import { UserAddressService } from './user-address.service';
 import { createUserAddressSchema, updateUserAddressSchema } from '@skeleton/shared-types';
 import { idParamSchema } from '@skeleton/shared-types';
@@ -11,7 +11,7 @@ export class UserAddressController {
 
     public list = async (
         req: Request,
-        res: Response<ApiResponse<UserAddressDTO[]>>,
+        res: Response<ApiResponse<UserAddressResponseDto[]>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -25,7 +25,7 @@ export class UserAddressController {
 
     public detail = async (
         req: Request,
-        res: Response<ApiResponse<UserAddressDTO>>,
+        res: Response<ApiResponse<UserAddressResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -40,7 +40,7 @@ export class UserAddressController {
 
     public create = async (
         req: Request,
-        res: Response<ApiResponse<UserAddressDTO>>,
+        res: Response<ApiResponse<UserAddressResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -55,7 +55,7 @@ export class UserAddressController {
 
     public update = async (
         req: Request,
-        res: Response<ApiResponse<UserAddressDTO>>,
+        res: Response<ApiResponse<UserAddressResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -117,7 +117,7 @@ export class UserAddressController {
 
     public adminDetail = async (
         req: Request,
-        res: Response<ApiResponse<UserAddressDTO>>,
+        res: Response<ApiResponse<UserAddressResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -131,7 +131,7 @@ export class UserAddressController {
 
     public adminUpdate = async (
         req: Request,
-        res: Response<ApiResponse<UserAddressDTO>>,
+        res: Response<ApiResponse<UserAddressResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {

@@ -2,9 +2,8 @@ import { Repository, DataSource } from 'typeorm';
 import { customAlphabet } from 'nanoid';
 import { AppDataSource } from '../../../configs/database.config';
 import { ShopIntro, ShopIntroBanner } from './shop-intro.model';
-import { ShopIntroDTO } from './shop-intro.dto';
-import type { CreateShopIntroDto, UpdateShopIntroDto } from '@skeleton/shared-types';
-import { plainToInstance } from 'class-transformer';
+import type { CreateShopIntroDto, UpdateShopIntroDto, ShopIntroResponseDto } from '@skeleton/shared-types';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 import { HttpException } from '../../../exceptions/http.exception';
 import { Material } from '../../material/material.model';
 
@@ -26,7 +25,7 @@ export class ShopIntroService {
         return nanoid();
     }
 
-    public async getShopIntro(): Promise<ShopIntroDTO | null> {
+    public async getShopIntro(): Promise<ShopIntroResponseDto | null> {
         const shopIntro = await this.shopIntroRepository.findOne({
             where: {},
             relations: ['banners', 'banners.material'],
@@ -44,10 +43,10 @@ export class ShopIntroService {
             shopIntro.banners.sort((a, b) => a.sort_order - b.sort_order);
         }
 
-        return plainToInstance(ShopIntroDTO, shopIntro, { excludeExtraneousValues: true });
+        return transformToCamelCase(shopIntro) as unknown as ShopIntroResponseDto;
     }
 
-    public async createOrUpdateShopIntro(dto: CreateShopIntroDto | UpdateShopIntroDto): Promise<ShopIntroDTO> {
+    public async createOrUpdateShopIntro(dto: CreateShopIntroDto | UpdateShopIntroDto): Promise<ShopIntroResponseDto> {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();

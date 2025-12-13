@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
-import { ProductSpuDTO } from './product-spu.dto';
+import type { ApiResponse, PaginatedResponse } from '@skeleton/shared-types';
+import type { ProductSpuResponseDto } from '@skeleton/shared-types';
 import { ProductSpuService } from './product-spu.service';
 import { createProductSpuSchema, updateProductSpuSchema } from '@skeleton/shared-types';
 import { idParamSchema } from '@skeleton/shared-types';
@@ -11,7 +11,7 @@ export class ProductSpuController {
 
     public list = async (
         req: Request,
-        res: Response<ApiResponse<PaginatedResponse<ProductSpuDTO>>>,
+        res: Response<ApiResponse<PaginatedResponse<ProductSpuResponseDto>>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -40,7 +40,7 @@ export class ProductSpuController {
 
     public detail = async (
         req: Request,
-        res: Response<ApiResponse<ProductSpuDTO>>,
+        res: Response<ApiResponse<ProductSpuResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -54,7 +54,7 @@ export class ProductSpuController {
 
     public create = async (
         req: Request,
-        res: Response<ApiResponse<ProductSpuDTO>>,
+        res: Response<ApiResponse<ProductSpuResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -73,7 +73,7 @@ export class ProductSpuController {
 
     public update = async (
         req: Request,
-        res: Response<ApiResponse<ProductSpuDTO>>,
+        res: Response<ApiResponse<ProductSpuResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {

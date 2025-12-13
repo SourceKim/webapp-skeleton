@@ -3,9 +3,8 @@ import { AppDataSource } from '@/configs/database.config';
 import { UserAddress, UserAddressStatus } from './user-address.model';
 import { HttpException } from '@/exceptions/http.exception';
 import { nanoid } from 'nanoid';
-import { plainToInstance } from 'class-transformer';
-import { UserAddressDTO } from './user-address.dto';
-import type { CreateUserAddressDto, UpdateUserAddressDto } from '@skeleton/shared-types';
+import type { CreateUserAddressDto, UpdateUserAddressDto, UserAddressResponseDto } from '@skeleton/shared-types';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 
 export class UserAddressService {
     private repo: Repository<UserAddress>;
@@ -13,18 +12,18 @@ export class UserAddressService {
         this.repo = AppDataSource.getRepository(UserAddress);
     }
 
-    async listByUser(userId: string): Promise<UserAddressDTO[]> {
+    async listByUser(userId: string): Promise<UserAddressResponseDto[]> {
         const items = await this.repo.find({ where: { user: { id: userId } as any }, order: { is_default: 'DESC', created_at: 'DESC' } as any });
         return items.map(it => this.toDto(it));
     }
 
-    async findByIdForUser(id: string, userId: string): Promise<UserAddressDTO> {
+    async findByIdForUser(id: string, userId: string): Promise<UserAddressResponseDto> {
         const entity = await this.repo.findOne({ where: { id, user: { id: userId } as any } });
         if (!entity) throw new HttpException(404, '地址不存在');
         return this.toDto(entity);
     }
 
-    async createForUser(userId: string, data: CreateUserAddressDto): Promise<UserAddressDTO> {
+    async createForUser(userId: string, data: CreateUserAddressDto): Promise<UserAddressResponseDto> {
         if (data.is_default) {
             await this.repo.createQueryBuilder()
                 .update(UserAddress)
@@ -52,7 +51,7 @@ export class UserAddressService {
         return this.toDto(saved);
     }
 
-    async updateForUser(id: string, userId: string, data: UpdateUserAddressDto): Promise<UserAddressDTO> {
+    async updateForUser(id: string, userId: string, data: UpdateUserAddressDto): Promise<UserAddressResponseDto> {
         const entity = await this.repo.findOne({ where: { id, user: { id: userId } as any } });
         if (!entity) throw new HttpException(404, '地址不存在');
 
@@ -99,7 +98,7 @@ export class UserAddressService {
     }
 
     // Admin
-    async adminList(page: number, limit: number): Promise<{ items: UserAddressDTO[]; total: number }> {
+    async adminList(page: number, limit: number): Promise<{ items: UserAddressResponseDto[]; total: number }> {
         const [items, total] = await this.repo.findAndCount({
             order: { created_at: 'DESC' } as any,
             skip: (page - 1) * limit,
@@ -108,13 +107,13 @@ export class UserAddressService {
         return { items: items.map(it => this.toDto(it)), total };
     }
 
-    async adminFindById(id: string): Promise<UserAddressDTO> {
+    async adminFindById(id: string): Promise<UserAddressResponseDto> {
         const entity = await this.repo.findOne({ where: { id } });
         if (!entity) throw new HttpException(404, '地址不存在');
         return this.toDto(entity);
     }
 
-    async adminUpdate(id: string, data: UpdateUserAddressDto): Promise<UserAddressDTO> {
+    async adminUpdate(id: string, data: UpdateUserAddressDto): Promise<UserAddressResponseDto> {
         const entity = await this.repo.findOne({ where: { id } });
         if (!entity) throw new HttpException(404, '地址不存在');
         entity.name = data.name ?? entity.name;
@@ -138,11 +137,11 @@ export class UserAddressService {
         await this.repo.remove(entity);
     }
 
-    private toDto(entity: UserAddress): UserAddressDTO {
-        return plainToInstance(UserAddressDTO, {
+    private toDto(entity: UserAddress): UserAddressResponseDto {
+        return transformToCamelCase({
             ...entity,
             user_id: (entity as any)?.user?.id,
-        });
+        }) as unknown as UserAddressResponseDto;
     }
 }
 

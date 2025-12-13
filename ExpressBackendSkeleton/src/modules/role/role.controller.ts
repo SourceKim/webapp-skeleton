@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { RoleService } from '@/modules/role/role.service';
-import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
-import { RoleDTO } from '@/modules/role/role.dto';
-import { UserDTO } from '@/modules/user/user.dto';
+import type { ApiResponse, PaginatedResponse } from '@skeleton/shared-types';
+import type { RoleResponseDto, UserResponseDto } from '@skeleton/shared-types';
 import { 
     createRoleSchema,
     updateRoleSchema,
@@ -29,7 +28,7 @@ export class RoleController {
      */
     public findAllRoles = async (
         req: Request, 
-        res: Response<ApiResponse<PaginatedResponse<RoleDTO>>>,
+        res: Response<ApiResponse<PaginatedResponse<RoleResponseDto>>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -47,7 +46,7 @@ export class RoleController {
      */
     public findRoleById = async (
         req: Request, 
-        res: Response<ApiResponse<RoleDTO>>,
+        res: Response<ApiResponse<RoleResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -70,7 +69,7 @@ export class RoleController {
      */
     public createRole = async (
         req: Request, 
-        res: Response<ApiResponse<RoleDTO>>,
+        res: Response<ApiResponse<RoleResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -92,7 +91,7 @@ export class RoleController {
      */
     public updateRole = async (
         req: Request, 
-        res: Response<ApiResponse<RoleDTO>>,
+        res: Response<ApiResponse<RoleResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -138,7 +137,7 @@ export class RoleController {
      */
     public assignPermissionsToRole = async (
         req: Request, 
-        res: Response<ApiResponse<RoleDTO>>,
+        res: Response<ApiResponse<RoleResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -162,7 +161,7 @@ export class RoleController {
      */
     public assignRolesToUser = async (
         req: Request, 
-        res: Response<ApiResponse<UserDTO>>,
+        res: Response<ApiResponse<UserResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {

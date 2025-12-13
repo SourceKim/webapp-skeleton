@@ -3,10 +3,9 @@ import { MaterialTag } from './material-tag.model';
 import { Repository } from 'typeorm';
 import { AppDataSource } from '@/configs/database.config';
 import { HttpException } from '@/exceptions/http.exception';
-import { PaginationQueryDto } from '@/modules/common/common.dto';
-import { plainToInstance } from 'class-transformer';
-import { MaterialTagDTO } from './material-tag.dto';
-import type { CreateMaterialTagDto, UpdateMaterialTagDto } from '@skeleton/shared-types';
+import type { PaginationQueryDto } from '@skeleton/shared-types';
+import type { CreateMaterialTagDto, UpdateMaterialTagDto, MaterialTagResponseDto } from '@skeleton/shared-types';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 
 export class MaterialTagService {
@@ -15,7 +14,7 @@ export class MaterialTagService {
         this.materialTagRepository = AppDataSource.getRepository(MaterialTag);
     }
 
-    async findAllMaterialTags(query: PaginationQueryDto): Promise<{ tags: MaterialTagDTO[]; total: number }> {
+    async findAllMaterialTags(query: PaginationQueryDto): Promise<{ tags: MaterialTagResponseDto[]; total: number }> {
         const queryBuilder = this.materialTagRepository.createQueryBuilder('tag');
 
         // 应用筛选条件
@@ -33,7 +32,7 @@ export class MaterialTagService {
         const [tags, total] = await queryBuilder.getManyAndCount();
 
         const tagDTOs = tags.map(tag => {
-            return plainToInstance(MaterialTagDTO, tag);
+            return transformToCamelCase(tag) as unknown as MaterialTagResponseDto;
         });
 
         return {
@@ -42,14 +41,14 @@ export class MaterialTagService {
         };
     }
 
-    async findMaterialTagById(id: string): Promise<MaterialTagDTO> {
+    async findMaterialTagById(id: string): Promise<MaterialTagResponseDto> {
         const tag = await this.materialTagRepository.findOne({ where: { id } });
         if (!tag) throw new HttpException(404, '标签不存在');
 
-        return plainToInstance(MaterialTagDTO, tag);
+        return transformToCamelCase(tag) as unknown as MaterialTagResponseDto;
     }
 
-    async createMaterialTag(createMaterialTagDto: CreateMaterialTagDto): Promise<MaterialTagDTO> {
+    async createMaterialTag(createMaterialTagDto: CreateMaterialTagDto): Promise<MaterialTagResponseDto> {
         const tag = this.materialTagRepository.create(createMaterialTagDto);
         // 检查标签名称是否已存在
         const existingTag = await this.materialTagRepository.findOne({ where: { name: createMaterialTagDto.name } });
@@ -58,15 +57,15 @@ export class MaterialTagService {
         }
         tag.id = nanoid(16);
         await this.materialTagRepository.save(tag);
-        return plainToInstance(MaterialTagDTO, tag);
+        return transformToCamelCase(tag) as unknown as MaterialTagResponseDto;
     }
 
-    async updateMaterialTag(id: string, updateMaterialTagDto: UpdateMaterialTagDto): Promise<MaterialTagDTO> {
+    async updateMaterialTag(id: string, updateMaterialTagDto: UpdateMaterialTagDto): Promise<MaterialTagResponseDto> {
         const tag = await this.materialTagRepository.findOne({ where: { id } });
         if (!tag) throw new HttpException(404, '标签不存在');
 
         await this.materialTagRepository.update(id, updateMaterialTagDto);
-        return plainToInstance(MaterialTagDTO, tag);
+        return transformToCamelCase(tag) as unknown as MaterialTagResponseDto;
     }
 
     async deleteMaterialTag(id: string): Promise<void> {

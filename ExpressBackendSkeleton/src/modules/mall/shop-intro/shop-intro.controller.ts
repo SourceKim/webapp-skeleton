@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ShopIntroService } from './shop-intro.service';
-import { ShopIntroDTO } from './shop-intro.dto';
-import { ApiResponse } from '../../common/common.dto';
+import type { ShopIntroResponseDto } from '@skeleton/shared-types';
+import type { ApiResponse } from '@skeleton/shared-types';
 import { createShopIntroSchema } from '@skeleton/shared-types';
 import { validateData } from '@/utils/zod-validator';
 
@@ -10,7 +10,7 @@ export class ShopIntroController {
 
     public getShopIntro = async (
         req: Request,
-        res: Response<ApiResponse<ShopIntroDTO>>,
+        res: Response<ApiResponse<ShopIntroResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -27,7 +27,7 @@ export class ShopIntroController {
 
     public updateShopIntro = async (
         req: Request,
-        res: Response<ApiResponse<ShopIntroDTO>>,
+        res: Response<ApiResponse<ShopIntroResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {

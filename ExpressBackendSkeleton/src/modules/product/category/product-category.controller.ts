@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
-import { ProductCategoryDTO } from './product-category.dto';
+import type { ApiResponse, PaginatedResponse } from '@skeleton/shared-types';
+import type { ProductCategoryResponseDto } from '@skeleton/shared-types';
 import { ProductCategoryService } from './product-category.service';
 import { createProductCategorySchema, updateProductCategorySchema } from '@skeleton/shared-types';
 import { idParamSchema } from '@skeleton/shared-types';
@@ -11,7 +11,7 @@ export class ProductCategoryController {
 
     public list = async (
         req: Request,
-        res: Response<ApiResponse<PaginatedResponse<ProductCategoryDTO>>>,
+        res: Response<ApiResponse<PaginatedResponse<ProductCategoryResponseDto>>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -27,7 +27,7 @@ export class ProductCategoryController {
 
     public detail = async (
         req: Request,
-        res: Response<ApiResponse<ProductCategoryDTO>>,
+        res: Response<ApiResponse<ProductCategoryResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -41,7 +41,7 @@ export class ProductCategoryController {
 
     public create = async (
         req: Request,
-        res: Response<ApiResponse<ProductCategoryDTO>>,
+        res: Response<ApiResponse<ProductCategoryResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -55,7 +55,7 @@ export class ProductCategoryController {
 
     public update = async (
         req: Request,
-        res: Response<ApiResponse<ProductCategoryDTO>>,
+        res: Response<ApiResponse<ProductCategoryResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {

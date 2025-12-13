@@ -3,10 +3,9 @@ import { AppDataSource } from '@/configs/database.config';
 import { ProductSpu, ProductSpuStatus } from './product-spu.model';
 import { HttpException } from '@/exceptions/http.exception';
 import { nanoid } from 'nanoid';
-import { PaginationQueryDto } from '@/modules/common/common.dto';
-import { plainToInstance } from 'class-transformer';
-import { ProductSpuDTO } from './product-spu.dto';
-import type { CreateProductSpuDto, UpdateProductSpuDto } from '@skeleton/shared-types';
+import type { PaginationQueryDto } from '@skeleton/shared-types';
+import type { CreateProductSpuDto, UpdateProductSpuDto, ProductSpuResponseDto } from '@skeleton/shared-types';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 import { ENV } from '@/configs/env.config';
 import { ProductSku } from '@/modules/product/sku/product-sku.model';
@@ -21,7 +20,7 @@ export class ProductSpuService {
 
     // 由前端根据 material 的 file_path 组合 URL；后端不再返回 URL
 
-    async findAll(query: PaginationQueryDto): Promise<{ items: ProductSpuDTO[]; total: number }> {
+    async findAll(query: PaginationQueryDto): Promise<{ items: ProductSpuResponseDto[]; total: number }> {
         const qb = this.repository.createQueryBuilder('spu')
             .leftJoinAndSelect('spu.category', 'category')
             .leftJoinAndSelect('spu.brand', 'brand')
@@ -38,12 +37,12 @@ export class ProductSpuService {
           .take(query.limit);
 
         const [items, total] = await qb.getManyAndCount();
-        const dtos = items.map(s => plainToInstance(ProductSpuDTO, {
+        const dtos = items.map(s => transformToCamelCase({
             ...s,
             category_id: (s as any)?.category?.id,
             brand_id: (s as any)?.brand?.id,
             main_material_id: (s as any)?.main_material?.id,
-        }));
+        }) as unknown as ProductSpuResponseDto);
 
         if (dtos.length > 0) {
             const spuIds = dtos.map(i => i.id);
@@ -65,18 +64,18 @@ export class ProductSpuService {
         return { items: dtos, total };
     }
 
-    async findById(id: string): Promise<ProductSpuDTO> {
+    async findById(id: string): Promise<ProductSpuResponseDto> {
         const s = await this.repository.findOne({ where: { id }, relations: ['category', 'brand', 'main_material', 'sub_materials'] });
         if (!s) throw new HttpException(404, 'SPU不存在');
-        return plainToInstance(ProductSpuDTO, {
+        return transformToCamelCase({
             ...s,
             category_id: (s as any)?.category?.id,
             brand_id: (s as any)?.brand?.id,
             main_material_id: (s as any)?.main_material?.id,
-        });
+        }) as unknown as ProductSpuResponseDto;
     }
 
-    async create(data: CreateProductSpuDto): Promise<ProductSpuDTO> {
+    async create(data: CreateProductSpuDto): Promise<ProductSpuResponseDto> {
         const s = this.repository.create({
             id: nanoid(16),
             name: data.name,
@@ -97,7 +96,7 @@ export class ProductSpuService {
         return await this.findById(saved.id);
     }
 
-    async update(id: string, data: UpdateProductSpuDto): Promise<ProductSpuDTO> {
+    async update(id: string, data: UpdateProductSpuDto): Promise<ProductSpuResponseDto> {
         const s = await this.repository.findOne({ where: { id }, relations: ['category', 'brand', 'main_material', 'sub_materials'] });
         if (!s) throw new HttpException(404, 'SPU不存在');
 

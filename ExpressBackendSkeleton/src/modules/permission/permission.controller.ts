@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { PermissionService } from '@/modules/permission/permission.service';
-import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
-import { PermissionDTO } from '@/modules/permission/permission.dto';
+import type { ApiResponse, PaginatedResponse } from '@skeleton/shared-types';
+import type { PermissionResponseDto } from '@skeleton/shared-types';
 import { HttpException } from '@/exceptions/http.exception';
 import { 
     createPermissionSchema,
@@ -27,7 +27,7 @@ export class PermissionController {
      */
     public findAllPermissions = async (
         req: Request, 
-        res: Response<ApiResponse<PaginatedResponse<PermissionDTO>>>,
+        res: Response<ApiResponse<PaginatedResponse<PermissionResponseDto>>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -46,7 +46,7 @@ export class PermissionController {
      */
     public findPermissionById = async (
         req: Request, 
-        res: Response<ApiResponse<PermissionDTO>>,
+        res: Response<ApiResponse<PermissionResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -73,7 +73,7 @@ export class PermissionController {
      */
     public createPermission = async (
         req: Request, 
-        res: Response<ApiResponse<PermissionDTO>>,
+        res: Response<ApiResponse<PermissionResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -95,7 +95,7 @@ export class PermissionController {
      */
     public updatePermission = async (
         req: Request, 
-        res: Response<ApiResponse<PermissionDTO>>,
+        res: Response<ApiResponse<PermissionResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {

@@ -3,10 +3,9 @@ import { AppDataSource } from '@/configs/database.config';
 import { ProductCategory, ProductCategoryStatus } from './product-category.model';
 import { HttpException } from '@/exceptions/http.exception';
 import { nanoid } from 'nanoid';
-import { PaginationQueryDto } from '@/modules/common/common.dto';
-import { plainToInstance } from 'class-transformer';
-import { ProductCategoryDTO } from './product-category.dto';
-import type { CreateProductCategoryDto, UpdateProductCategoryDto } from '@skeleton/shared-types';
+import type { PaginationQueryDto } from '@skeleton/shared-types';
+import type { CreateProductCategoryDto, UpdateProductCategoryDto, ProductCategoryResponseDto } from '@skeleton/shared-types';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 
 export class ProductCategoryService {
@@ -15,7 +14,7 @@ export class ProductCategoryService {
         this.repository = AppDataSource.getRepository(ProductCategory);
     }
 
-    async findAll(query: PaginationQueryDto, parentId?: string, level?: number): Promise<{ items: ProductCategoryDTO[]; total: number }> {
+    async findAll(query: PaginationQueryDto, parentId?: string, level?: number): Promise<{ items: ProductCategoryResponseDto[]; total: number }> {
         const qb = this.repository.createQueryBuilder('category')
             .leftJoinAndSelect('category.parent', 'parent')
             .leftJoinAndSelect('category.material', 'material')
@@ -42,29 +41,29 @@ export class ProductCategoryService {
           .take(query.limit);
 
         const [items, total] = await qb.getManyAndCount();
-        const dtos = items.map(c => plainToInstance(ProductCategoryDTO, {
+        const dtos = items.map(c => transformToCamelCase({
             ...c,
             parent_id: (c as any)?.parent?.id,
             material_id: (c as any)?.material?.id,
             brand_id: (c as any)?.brand?.id,
             brand_name: (c as any)?.brand?.name
-        }));
+        }) as unknown as ProductCategoryResponseDto);
         return { items: dtos, total };
     }
 
-    async findById(id: string): Promise<ProductCategoryDTO> {
+    async findById(id: string): Promise<ProductCategoryResponseDto> {
         const c = await this.repository.findOne({ where: { id }, relations: ['parent', 'material', 'brand'] });
         if (!c) throw new HttpException(404, '分类不存在');
-        return plainToInstance(ProductCategoryDTO, {
+        return transformToCamelCase({
             ...c,
             parent_id: (c as any)?.parent?.id,
             material_id: (c as any)?.material?.id,
             brand_id: (c as any)?.brand?.id,
             brand_name: (c as any)?.brand?.name
-        });
+        }) as unknown as ProductCategoryResponseDto;
     }
 
-    async create(data: CreateProductCategoryDto): Promise<ProductCategoryDTO> {
+    async create(data: CreateProductCategoryDto): Promise<ProductCategoryResponseDto> {
         // 同名校验（同一父级下不允许重名）
         {
             const qb = this.repository.createQueryBuilder('c');
@@ -96,7 +95,7 @@ export class ProductCategoryService {
         return await this.findById(saved.id);
     }
 
-    async update(id: string, data: UpdateProductCategoryDto): Promise<ProductCategoryDTO> {
+    async update(id: string, data: UpdateProductCategoryDto): Promise<ProductCategoryResponseDto> {
         const c = await this.repository.findOne({ where: { id }, relations: ['parent', 'material', 'brand'] });
         if (!c) throw new HttpException(404, '分类不存在');
 

@@ -10,10 +10,9 @@ import type {
     AssignRolesDto,
 } from '@skeleton/shared-types';
 import { HttpException } from '@/exceptions/http.exception';
-import { PaginationQueryDto } from '@/modules/common/common.dto';
-import { RoleDTO } from '@/modules/role/role.dto';
-import { UserDTO } from '@/modules/user/user.dto';
-import { plainToInstance } from 'class-transformer';
+import type { PaginationQueryDto } from '@skeleton/shared-types';
+import type { RoleResponseDto, UserResponseDto } from '@skeleton/shared-types';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 import { nanoid } from 'nanoid';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 
@@ -28,7 +27,7 @@ export class RoleService {
         this.userRepository = AppDataSource.getRepository(User);
     }
 
-    async findAllRoles(query: PaginationQueryDto): Promise<{ roles: RoleDTO[]; total: number }> {
+    async findAllRoles(query: PaginationQueryDto): Promise<{ roles: RoleResponseDto[]; total: number }> {
         const queryBuilder = this.roleRepository.createQueryBuilder('role')
             .leftJoinAndSelect('role.permissions', 'permission');
         
@@ -47,7 +46,7 @@ export class RoleService {
         const [roles, total] = await queryBuilder.getManyAndCount();
 
         const roleDTOs = roles.map(role => {
-            return plainToInstance(RoleDTO, role);
+            return transformToCamelCase(role) as unknown as RoleResponseDto;
         });
         return {
             roles: roleDTOs,
@@ -55,7 +54,7 @@ export class RoleService {
         };
     }
 
-    async findRoleById(id: string): Promise<RoleDTO> {
+    async findRoleById(id: string): Promise<RoleResponseDto> {
         const role = await this.roleRepository.findOne({
             where: { id },
             relations: ['permissions']
@@ -63,10 +62,10 @@ export class RoleService {
 
         if (!role) throw new HttpException(404, '角色不存在');
 
-        return plainToInstance(RoleDTO, role);
+        return transformToCamelCase(role) as unknown as RoleResponseDto;
     }
 
-    async createRole(createRoleDto: CreateRoleDto): Promise<RoleDTO> {
+    async createRole(createRoleDto: CreateRoleDto): Promise<RoleResponseDto> {
 
         // 检查角色名是否已存在
         const existingRole = await this.roleRepository.findOne({ where: { name: createRoleDto.name } });
@@ -82,10 +81,10 @@ export class RoleService {
 
         await this.roleRepository.save(role);
 
-        return plainToInstance(RoleDTO, role);
+        return transformToCamelCase(role) as unknown as RoleResponseDto;
     }
 
-    async updateRole(id: string, updateRoleDto: UpdateRoleDto): Promise<RoleDTO> {
+    async updateRole(id: string, updateRoleDto: UpdateRoleDto): Promise<RoleResponseDto> {
         const role = await this.roleRepository.findOne({
             where: { id },
             relations: ['permissions']
@@ -99,14 +98,14 @@ export class RoleService {
 
         await this.roleRepository.save(role);
 
-        return plainToInstance(RoleDTO, role);
+        return transformToCamelCase(role) as unknown as RoleResponseDto;
     }
 
     async deleteRole(id: string): Promise<void> {
         await this.roleRepository.delete(id);
     }
 
-    async assignPermissionsToRole(roleId: string, data: AssignPermissionsDto): Promise<RoleDTO> {
+    async assignPermissionsToRole(roleId: string, data: AssignPermissionsDto): Promise<RoleResponseDto> {
         const role = await this.roleRepository.findOne({
             where: { id: roleId }
         });
@@ -126,10 +125,10 @@ export class RoleService {
         role.permissions = permissions;
         await this.roleRepository.save(role);
 
-        return plainToInstance(RoleDTO, role);
+        return transformToCamelCase(role) as unknown as RoleResponseDto;
     }
 
-    async assignRolesToUser(userId: string, data: AssignRolesDto): Promise<UserDTO> {
+    async assignRolesToUser(userId: string, data: AssignRolesDto): Promise<UserResponseDto> {
         // 获取用户
         const user = await this.userRepository.findOne({
             where: { id: userId },
@@ -154,6 +153,6 @@ export class RoleService {
         user.roles = roles;
         await this.userRepository.save(user);
 
-        return plainToInstance(UserDTO, user);
+        return transformToCamelCase(user) as unknown as UserResponseDto;
     }
 } 

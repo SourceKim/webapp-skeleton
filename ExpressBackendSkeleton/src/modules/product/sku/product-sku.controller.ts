@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
-import { ProductSkuDTO } from './product-sku.dto';
+import type { ApiResponse, PaginatedResponse } from '@skeleton/shared-types';
+import type { ProductSkuResponseDto } from '@skeleton/shared-types';
 import { ProductSkuService } from './product-sku.service';
 import { createProductSkuSchema, updateProductSkuSchema } from '@skeleton/shared-types';
 import { idParamSchema } from '@skeleton/shared-types';
@@ -11,7 +11,7 @@ export class ProductSkuController {
 
     public list = async (
         req: Request,
-        res: Response<ApiResponse<PaginatedResponse<ProductSkuDTO>>>,
+        res: Response<ApiResponse<PaginatedResponse<ProductSkuResponseDto>>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -24,7 +24,7 @@ export class ProductSkuController {
 
     public detail = async (
         req: Request,
-        res: Response<ApiResponse<ProductSkuDTO>>,
+        res: Response<ApiResponse<ProductSkuResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -38,7 +38,7 @@ export class ProductSkuController {
 
     public create = async (
         req: Request,
-        res: Response<ApiResponse<ProductSkuDTO>>,
+        res: Response<ApiResponse<ProductSkuResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -52,7 +52,7 @@ export class ProductSkuController {
 
     public update = async (
         req: Request,
-        res: Response<ApiResponse<ProductSkuDTO>>,
+        res: Response<ApiResponse<ProductSkuResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {

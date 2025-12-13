@@ -1,7 +1,7 @@
 import { MaterialCategoryService } from '@/modules/material/mateial-category/material-category.service';
 import { NextFunction, Request, Response } from 'express';
-import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
-import { MaterialCategoryDTO } from './material-category.dto';
+import type { ApiResponse, PaginatedResponse } from '@skeleton/shared-types';
+import type { MaterialCategoryResponseDto } from '@skeleton/shared-types';
 import { createMaterialCategorySchema, updateMaterialCategorySchema } from '@skeleton/shared-types';
 import { idParamSchema } from '@skeleton/shared-types';
 import { validateData } from '@/utils/zod-validator';
@@ -15,7 +15,7 @@ export class MaterialCategoryController {
 
     public findAllMaterialCategories = async (
         req: Request,
-        res: Response<ApiResponse<PaginatedResponse<MaterialCategoryDTO>>>,
+        res: Response<ApiResponse<PaginatedResponse<MaterialCategoryResponseDto>>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -28,7 +28,7 @@ export class MaterialCategoryController {
 
     public findMaterialCategoryById = async (
         req: Request,
-        res: Response<ApiResponse<MaterialCategoryDTO>>,
+        res: Response<ApiResponse<MaterialCategoryResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -46,7 +46,7 @@ export class MaterialCategoryController {
 
     public createMaterialCategory = async (
         req: Request,
-        res: Response<ApiResponse<MaterialCategoryDTO>>,
+        res: Response<ApiResponse<MaterialCategoryResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -64,7 +64,7 @@ export class MaterialCategoryController {
 
     public updateMaterialCategory = async (
         req: Request,
-        res: Response<ApiResponse<MaterialCategoryDTO>>,
+        res: Response<ApiResponse<MaterialCategoryResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {

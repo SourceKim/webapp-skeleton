@@ -1,14 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '@/modules/auth/auth.service';
 import { HttpException } from '@/exceptions/http.exception';
-import { ApiResponse } from '@/modules/common/common.dto';
+import type { ApiResponse } from '@skeleton/shared-types';
 import type { 
     RegisterDto, 
     LoginDto, 
     RegisterResponseDto, 
     LoginResponseDto, 
-    ProfileResponseDto 
+    ProfileResponseDto,
+    UserResponseDto
 } from '@skeleton/shared-types';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 import { 
     loginSchema, 
     registerSchema
@@ -30,24 +32,10 @@ export class AuthController {
     }
 
     /**
-     * 将用户实体转换为DTO
+     * 将用户实体转换为DTO（使用驼峰命名）
      */
-    private transformUserToDto(user: any): RegisterResponseDto {
-        return {
-            id: user.id,
-            username: user.username,
-            gender: user.gender,
-            birthdate: user.birthdate,
-            email: user.email,
-            phone: user.phone,
-            nickname: user.nickname,
-            avatar: user.avatar,
-            bio: user.bio,
-            status: user.status,
-            created_at: user.created_at,
-            updated_at: user.updated_at,
-            roles: user.roles || []
-        };
+    private transformUserToDto(user: any): UserResponseDto {
+        return transformToCamelCase(user) as unknown as UserResponseDto;
     }
 
     /**
@@ -84,7 +72,7 @@ export class AuthController {
             res.status(200).json({
                 code: 0,
                 message: '注册成功',
-                data: this.transformUserToDto(result.user)
+                data: this.transformUserToDto(result.user) as unknown as RegisterResponseDto
             });
         } catch (error) {
             logError('用户注册失败', (req as any).requestId, { error, body: req.body });

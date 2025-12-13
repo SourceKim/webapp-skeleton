@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
+import type { ApiResponse, PaginatedResponse } from '@skeleton/shared-types';
 import { paginationQuery } from '@/middlewares/paginationQuery';
 import { paginationResponse } from '@/middlewares/paginationResponse';
-import { ProductBrandDTO } from './product-brand.dto';
+import type { ProductBrandResponseDto } from '@skeleton/shared-types';
 import { ProductBrandService } from './product-brand.service';
 import { createProductBrandSchema, updateProductBrandSchema } from '@skeleton/shared-types';
 import { idParamSchema } from '@skeleton/shared-types';
@@ -13,7 +13,7 @@ export class ProductBrandController {
 
     public list = async (
         req: Request,
-        res: Response<ApiResponse<PaginatedResponse<ProductBrandDTO>>>,
+        res: Response<ApiResponse<PaginatedResponse<ProductBrandResponseDto>>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -26,7 +26,7 @@ export class ProductBrandController {
 
     public detail = async (
         req: Request,
-        res: Response<ApiResponse<ProductBrandDTO>>,
+        res: Response<ApiResponse<ProductBrandResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -40,7 +40,7 @@ export class ProductBrandController {
 
     public create = async (
         req: Request,
-        res: Response<ApiResponse<ProductBrandDTO>>,
+        res: Response<ApiResponse<ProductBrandResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -54,7 +54,7 @@ export class ProductBrandController {
 
     public update = async (
         req: Request,
-        res: Response<ApiResponse<ProductBrandDTO>>,
+        res: Response<ApiResponse<ProductBrandResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {

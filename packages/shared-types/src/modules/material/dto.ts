@@ -1,7 +1,8 @@
 /**
  * 素材相关 DTO 类型定义
  */
-import type { Material } from './index'
+import type { Material, MaterialCategory, MaterialTag } from './index'
+import type { User } from '../user'
 import { MaterialType } from '../../enums'
 
 /**
@@ -47,9 +48,29 @@ export interface MaterialQueryDto {
 }
 
 /**
- * 素材响应数据（包含额外字段）
+ * 素材响应数据（使用驼峰命名，符合前端习惯）
  */
-export interface MaterialResponseDto extends Material {
+export interface MaterialResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  filename?: string
+  originalName?: string
+  filePath?: string
+  mimeType?: string
+  fileSize?: number
+  type: MaterialType
+  description?: string
+  materialCategory?: MaterialCategory
+  materialTags?: MaterialTag[]
+  user?: User
+  isPublic: boolean
+  uploadDir?: string
+  metadata?: Record<string, any>
+  parentId?: string
+  accessCount: number
+  fileHash?: string
   url?: string // 访问URL（前端计算）
 }
 
@@ -82,5 +103,29 @@ export interface CreateMaterialCategoryDto {
  */
 export interface UpdateMaterialCategoryDto {
   name?: string
+  description?: string
+}
+
+/**
+ * 素材分类响应数据（使用驼峰命名，符合前端习惯）
+ */
+export interface MaterialCategoryResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  name: string
+  description?: string
+}
+
+/**
+ * 素材标签响应数据（使用驼峰命名，符合前端习惯）
+ */
+export interface MaterialTagResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  name: string
   description?: string
 }

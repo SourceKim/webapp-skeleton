@@ -35,3 +35,17 @@ export interface PermissionQueryDto {
   resource?: string
   action?: string
 }
+
+/**
+ * 权限响应数据（使用驼峰命名，符合前端习惯）
+ */
+export interface PermissionResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  name: string
+  description?: string
+  resource: string
+  action: string
+}

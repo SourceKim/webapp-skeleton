@@ -1,8 +1,10 @@
 /**
  * 商城相关 DTO 类型定义
  */
-import type { Cart, MallOrder, MallOrderItem, UserAddress } from './index'
+import type { Cart, MallOrder, MallOrderItem, UserAddress, Carousel, ShopIntroBanner } from './index'
 import type { PaymentMethod, PaymentStatus, DeliveryStatus, OrderStatus, UserAddressTag, UserAddressStatus } from './enums'
+import type { Material } from '../material'
+import type { ProductSpu } from '../product'
 
 /**
  * 创建购物车项请求参数
@@ -28,7 +30,7 @@ export interface UpdateSelectedDto {
 }
 
 /**
- * 购物车项响应数据
+ * 购物车项响应数据（使用驼峰命名，符合前端习惯）
  */
 export interface CartItemDto {
   id: string
@@ -69,9 +71,21 @@ export interface OrderQueryDto {
 }
 
 /**
- * 订单响应数据
+ * 订单响应数据（使用驼峰命名，符合前端习惯）
  */
-export interface OrderResponseDto extends MallOrder {
+export interface OrderResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  orderNo: string
+  userId: string
+  totalAmount: string
+  orderStatus: OrderStatus
+  paymentStatus: PaymentStatus
+  deliveryStatus: DeliveryStatus
+  paymentMethod?: PaymentMethod
+  remark?: string
   items?: MallOrderItem[]
 }
 
@@ -120,6 +134,28 @@ export interface UserAddressQueryDto {
 }
 
 /**
+ * 用户地址响应数据（使用驼峰命名，符合前端习惯）
+ */
+export interface UserAddressResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  userId: string
+  name: string
+  phone: string
+  province: string
+  city: string
+  country: string
+  town?: string
+  detail: string
+  postalCode?: string
+  isDefault: boolean
+  tag?: UserAddressTag
+  status: UserAddressStatus
+}
+
+/**
  * 创建轮播图请求参数
  */
 export interface CreateCarouselDto {
@@ -139,6 +175,23 @@ export interface UpdateCarouselDto {
   spu_id?: string
   sort_order?: number
   is_active?: boolean
+}
+
+/**
+ * 轮播图响应数据（使用驼峰命名，符合前端习惯）
+ */
+export interface CarouselResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  title?: string
+  materialId: string
+  material?: Material
+  spuId?: string
+  spu?: ProductSpu
+  sortOrder: number
+  isActive: boolean
 }
 
 /**
@@ -167,4 +220,35 @@ export interface UpdateShopIntroDto {
   latitude?: number
   address?: string
   banner_ids?: string[]
+}
+
+/**
+ * 店铺介绍响应数据（使用驼峰命名，符合前端习惯）
+ */
+export interface ShopIntroResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  name: string
+  introduction?: string
+  detail?: string
+  contactPhone?: string
+  longitude?: number
+  latitude?: number
+  address?: string
+  banners?: ShopIntroBanner[]
+}
+
+/**
+ * 店铺介绍Banner响应数据（使用驼峰命名，符合前端习惯）
+ */
+export interface ShopIntroBannerResponseDto {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null
+  materialId: string
+  material?: Material
+  sortOrder: number
 }

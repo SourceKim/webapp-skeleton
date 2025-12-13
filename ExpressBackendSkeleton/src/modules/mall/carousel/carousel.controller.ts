@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { CarouselService } from './carousel.service';
-import { CarouselDTO } from './carousel.dto';
-import { ApiResponse, PaginatedResponse } from '../../common/common.dto';
+import type { CarouselResponseDto } from '@skeleton/shared-types';
+import type { ApiResponse, PaginatedResponse } from '@skeleton/shared-types';
 import { createCarouselSchema, updateCarouselSchema } from '@skeleton/shared-types';
 import { idParamSchema } from '@skeleton/shared-types';
 import { validateData } from '@/utils/zod-validator';
@@ -11,7 +11,7 @@ export class CarouselController {
 
     public createCarousel = async (
         req: Request,
-        res: Response<ApiResponse<CarouselDTO>>,
+        res: Response<ApiResponse<CarouselResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -29,7 +29,7 @@ export class CarouselController {
 
     public updateCarousel = async (
         req: Request,
-        res: Response<ApiResponse<CarouselDTO>>,
+        res: Response<ApiResponse<CarouselResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -65,7 +65,7 @@ export class CarouselController {
 
     public getCarousel = async (
         req: Request,
-        res: Response<ApiResponse<CarouselDTO>>,
+        res: Response<ApiResponse<CarouselResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -83,7 +83,7 @@ export class CarouselController {
 
     public getCarousels = async (
         req: Request,
-        res: Response<ApiResponse<PaginatedResponse<CarouselDTO>>>,
+        res: Response<ApiResponse<PaginatedResponse<CarouselResponseDto>>>,
         next: NextFunction
     ): Promise<void> => {
         try {

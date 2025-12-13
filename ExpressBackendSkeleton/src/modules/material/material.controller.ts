@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import path from 'path';
-import { plainToInstance } from 'class-transformer';
 import { MaterialService } from '@/modules/material/material.service';
 import { HttpException } from '@/exceptions/http.exception';
-import { ApiResponse, PaginatedResponse } from '@/modules/common/common.dto';
+import type { ApiResponse, PaginatedResponse } from '@skeleton/shared-types';
 import { createMaterialSchema, updateMaterialSchema } from '@skeleton/shared-types';
+import type { MaterialResponseDto } from '@skeleton/shared-types';
 import { idParamSchema } from '@skeleton/shared-types';
 import { validateData } from '@/utils/zod-validator';
 import { ENV } from '@/configs/env.config';
-import { MaterialDTO } from '@/modules/material/material.dto';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 
 import {
     parseTags,
@@ -82,7 +82,7 @@ export class MaterialController {
      * @param res - 返回上传成功的素材信息
      * @param next - 错误处理中间件
      */
-    public uploadMaterial = async (req: any, res: Response<ApiResponse<MaterialDTO>>, next: NextFunction): Promise<void> => {
+    public uploadMaterial = async (req: any, res: Response<ApiResponse<MaterialResponseDto>>, next: NextFunction): Promise<void> => {
         try {
             // 使用multer中间件处理文件上传
             this.upload.single('file')(req, res, async (err) => {
@@ -154,7 +154,7 @@ export class MaterialController {
                     res.status(200).json({
                         code: 0,
                         message: '素材上传成功',
-                        data: plainToInstance(MaterialDTO, material)
+                        data: transformToCamelCase(material) as unknown as MaterialResponseDto
                     });
                 } catch (error) {
                     // 如果出错且文件已上传，清理文件
@@ -176,7 +176,7 @@ export class MaterialController {
      */
     public getMaterials = async (
         req: Request, 
-        res: Response<ApiResponse<PaginatedResponse<MaterialDTO>>>,
+        res: Response<ApiResponse<PaginatedResponse<MaterialResponseDto>>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -193,7 +193,7 @@ export class MaterialController {
      */
     public getMaterialById = async (
         req: Request, 
-        res: Response<ApiResponse<MaterialDTO>>,
+        res: Response<ApiResponse<MaterialResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -206,7 +206,7 @@ export class MaterialController {
             res.status(200).json({
                 code: 0,
                 message: '获取素材成功',
-                data: plainToInstance(MaterialDTO, material)
+                data: transformToCamelCase(material) as unknown as MaterialResponseDto
             });
         } catch (error) {
             next(error);
@@ -219,7 +219,7 @@ export class MaterialController {
      */
     public updateMaterial = async (
         req: Request, 
-        res: Response<ApiResponse<MaterialDTO>>,
+        res: Response<ApiResponse<MaterialResponseDto>>,
         next: NextFunction
     ): Promise<void> => {
         try {
@@ -233,7 +233,7 @@ export class MaterialController {
             res.status(200).json({
                 code: 0,
                 message: '素材更新成功',
-                data: plainToInstance(MaterialDTO, material)
+                data: transformToCamelCase(material) as unknown as MaterialResponseDto
             });
         } catch (error) {
             next(error);

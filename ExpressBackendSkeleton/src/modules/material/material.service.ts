@@ -16,12 +16,11 @@ import { MaterialTag } from '@/modules/material/mateial-tag/material-tag.model';
 import { HttpException } from '@/exceptions/http.exception';
 import { AppDataSource } from '@/configs/database.config';
 import { ENV } from '@/configs/env.config';
-import { PaginationQueryDto } from '@/modules/common/common.dto';
-import { plainToInstance } from 'class-transformer';
+import type { PaginationQueryDto } from '@skeleton/shared-types';
 import { logError, logDebug } from '@/utils/logger';
 import { MaterialCategory } from '@/modules/material/mateial-category/material-category.model';
-import { MaterialDTO } from '@/modules/material/material.dto';
-import type { CreateMaterialDto } from '@skeleton/shared-types';
+import type { CreateMaterialDto, MaterialResponseDto } from '@skeleton/shared-types';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 
 /**
@@ -209,7 +208,7 @@ export class MaterialService {
         }
     }
 
-    async getMaterials(query: PaginationQueryDto): Promise<{ items: MaterialDTO[]; total: number }> {
+    async getMaterials(query: PaginationQueryDto): Promise<{ items: MaterialResponseDto[]; total: number }> {
         try {
             // 创建查询构建器，确保加载所有需要的关系
             const queryBuilder = this.materialRepository
@@ -233,7 +232,7 @@ export class MaterialService {
 
             // 执行查询，获取结果
             const [items, total] = await queryBuilder.getManyAndCount();
-            const materialDTOs = items.map(item => plainToInstance(MaterialDTO, item));
+            const materialDTOs = items.map(item => transformToCamelCase(item) as unknown as MaterialResponseDto);
 
             return {
                 items: materialDTOs,

@@ -3,10 +3,9 @@ import { AppDataSource } from '@/configs/database.config';
 import { ProductBrand, ProductBrandStatus } from './product-brand.model';
 import { HttpException } from '@/exceptions/http.exception';
 import { nanoid } from 'nanoid';
-import { PaginationQueryDto } from '@/modules/common/common.dto';
-import { plainToInstance } from 'class-transformer';
-import { ProductBrandDTO } from './product-brand.dto';
-import type { CreateProductBrandDto, UpdateProductBrandDto } from '@skeleton/shared-types';
+import type { PaginationQueryDto } from '@skeleton/shared-types';
+import type { CreateProductBrandDto, UpdateProductBrandDto, ProductBrandResponseDto } from '@skeleton/shared-types';
+import { transformToCamelCase } from '@/utils/dto-transform.util';
 import { QueryFilterBuilder } from '@/utils/query-filter.util';
 import { ENV } from '@/configs/env.config';
 
@@ -16,7 +15,7 @@ export class ProductBrandService {
         this.brandRepository = AppDataSource.getRepository(ProductBrand);
     }
 
-    async findAllBrands(query: PaginationQueryDto): Promise<{ items: ProductBrandDTO[]; total: number }> {
+    async findAllBrands(query: PaginationQueryDto): Promise<{ items: ProductBrandResponseDto[]; total: number }> {
         const qb = this.brandRepository.createQueryBuilder('brand')
             .leftJoinAndSelect('brand.material', 'material');
 
@@ -30,23 +29,23 @@ export class ProductBrandService {
           .take(query.limit);
 
         const [items, total] = await qb.getManyAndCount();
-        const dtos = items.map(b => plainToInstance(ProductBrandDTO, {
+        const dtos = items.map(b => transformToCamelCase({
             ...b,
             material_id: (b as any)?.material?.id,
-        }));
+        }) as unknown as ProductBrandResponseDto);
         return { items: dtos, total };
     }
 
-    async findBrandById(id: string): Promise<ProductBrandDTO> {
+    async findBrandById(id: string): Promise<ProductBrandResponseDto> {
         const brand = await this.brandRepository.findOne({ where: { id }, relations: ['material'] });
         if (!brand) throw new HttpException(404, '品牌不存在');
-        return plainToInstance(ProductBrandDTO, { 
+        return transformToCamelCase({ 
             ...brand, 
             material_id: (brand as any)?.material?.id,
-        });
+        }) as unknown as ProductBrandResponseDto;
     }
 
-    async createBrand(data: CreateProductBrandDto): Promise<ProductBrandDTO> {
+    async createBrand(data: CreateProductBrandDto): Promise<ProductBrandResponseDto> {
         const existed = await this.brandRepository.findOne({ where: { name: data.name } });
         if (existed) throw new HttpException(400, '品牌名称已存在');
 
@@ -65,13 +64,13 @@ export class ProductBrandService {
 
         const saved = await this.brandRepository.save(brand);
         const reloaded = await this.brandRepository.findOne({ where: { id: saved.id }, relations: ['material'] });
-        return plainToInstance(ProductBrandDTO, { 
+        return transformToCamelCase({ 
             ...reloaded!, 
             material_id: (reloaded as any)?.material?.id,
-        });
+        }) as unknown as ProductBrandResponseDto;
     }
 
-    async updateBrand(id: string, data: UpdateProductBrandDto): Promise<ProductBrandDTO> {
+    async updateBrand(id: string, data: UpdateProductBrandDto): Promise<ProductBrandResponseDto> {
         const brand = await this.brandRepository.findOne({ where: { id }, relations: ['material'] });
         if (!brand) throw new HttpException(404, '品牌不存在');
 
@@ -90,10 +89,10 @@ export class ProductBrandService {
 
         await this.brandRepository.save(brand);
         const reloaded = await this.brandRepository.findOne({ where: { id }, relations: ['material'] });
-        return plainToInstance(ProductBrandDTO, { 
+        return transformToCamelCase({ 
             ...reloaded!, 
             material_id: (reloaded as any)?.material?.id,
-        });
+        }) as unknown as ProductBrandResponseDto;
     }
 
     async deleteBrand(id: string): Promise<void> {
