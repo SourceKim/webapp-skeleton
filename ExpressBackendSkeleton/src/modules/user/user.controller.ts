@@ -3,6 +3,7 @@ import { UserService } from '@/modules/user/user.service';
 import type { ApiResponse, PaginatedResponse } from '@skeleton/shared-types';
 import type { UserResponseDto } from '@skeleton/shared-types';
 import { HttpException } from '@/exceptions/http.exception';
+import type { UserStats } from '@/types/common';
 import {
     createUserSchema,
     updateUserSchema,
@@ -101,7 +102,7 @@ export class UserController {
      */
     getStats = async (
         req: Request,
-        res: Response<ApiResponse<Record<string, unknown>>>,
+        res: Response<ApiResponse<UserStats>>,
         next: NextFunction
     ): Promise<void> => {
         try {

@@ -171,7 +171,7 @@ export class UserService {
         return transformToCamelCase(user) as UserResponseDto;
     }
 
-    async getUserStats(userId: string) {
+    async getUserStats(userId: string): Promise<{ couponCount: number; pointCount: number; totalConsumption: string }> {
         const result = await this.orderRepository.createQueryBuilder('order')
             .select('SUM(order.payable_amount)', 'total_amount')
             .where('order.user_id = :userId', { userId })

@@ -1,9 +1,11 @@
+import type { ErrorDetail } from '@/types/error';
+
 export class HttpException extends Error {
     status: number;
     message: string;
-    error?: unknown;
+    error?: ErrorDetail;
 
-    constructor(status: number, message: string, error?: unknown) {
+    constructor(status: number, message: string, error?: ErrorDetail) {
         super(message);
         this.status = status;
         this.message = message;

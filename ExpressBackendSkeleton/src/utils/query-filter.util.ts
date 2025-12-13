@@ -1,12 +1,13 @@
 import { SelectQueryBuilder, Brackets, ObjectLiteral } from 'typeorm';
 import { FilterOperator, FilterCondition } from '@skeleton/shared-types';
+import type { JsonValue } from '@/types/common';
 
 /**
  * 筛选参数值类型
  * 可以是基本类型、数组或包含操作符的对象
- * 使用 unknown 避免循环引用，运行时进行类型检查
+ * 使用 JsonValue 避免循环引用，同时保持类型安全
  */
-type FilterValue = string | number | boolean | null | undefined | unknown[] | Record<string, unknown>;
+type FilterValue = JsonValue | FilterValue[];
 
 /**
  * 筛选参数对象类型
@@ -197,7 +198,7 @@ export class QueryFilterBuilder {
 
             if (typeof value === 'object' && !Array.isArray(value)) {
                 const cleanedNestedObject: FilterParams = {};
-                const valueRecord = value as Record<string, unknown>;
+                const valueRecord = value as Record<string, JsonValue>;
                 for (const [nestedKey, nestedValue] of Object.entries(valueRecord)) {
                     if (nestedValue !== null && nestedValue !== undefined && nestedValue !== '') {
                         cleanedNestedObject[nestedKey] = nestedValue as FilterValue;

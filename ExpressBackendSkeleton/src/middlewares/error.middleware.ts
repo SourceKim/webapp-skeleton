@@ -2,11 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import { HttpException } from '@/exceptions/http.exception';
 import { logError } from '@/utils/logger';
 import { ENV } from '@/configs/env.config';
+import type { ErrorDetail } from '@/types/error';
 
 interface ErrorResponse {
     code: number;
     message: string;
-    error?: unknown;
+    error?: ErrorDetail;
 }
 
 export const errorMiddleware = (

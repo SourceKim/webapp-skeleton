@@ -7,6 +7,7 @@ import { Request, Response, NextFunction } from 'express'
 import { HttpException } from '@/exceptions/http.exception'
 import { validate, formatValidationErrors, type ValidationResult } from '@skeleton/shared-types'
 import { z } from 'zod'
+import type { JsonValue } from '@/types/common'
 
 /**
  * 验证请求体的中间件工厂函数
@@ -29,11 +30,14 @@ export function validateBody<T>(schema: z.ZodSchema<T>) {
       }
       
       next()
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof HttpException) {
         next(error)
       } else {
-        next(new HttpException(400, '请求参数验证失败', error))
+        const errorDetail: { message?: string; name?: string; stack?: string } = error instanceof Error
+          ? { message: error.message, name: error.name, stack: error.stack }
+          : { message: String(error), name: 'Error' };
+        next(new HttpException(400, '请求参数验证失败', errorDetail))
       }
     }
   }
@@ -60,11 +64,14 @@ export function validateQuery<T>(schema: z.ZodSchema<T>) {
       }
       
       next()
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof HttpException) {
         next(error)
       } else {
-        next(new HttpException(400, '查询参数验证失败', error))
+        const errorDetail: { message?: string; name?: string; stack?: string } = error instanceof Error
+          ? { message: error.message, name: error.name, stack: error.stack }
+          : { message: String(error), name: 'Error' };
+        next(new HttpException(400, '查询参数验证失败', errorDetail))
       }
     }
   }
@@ -91,11 +98,14 @@ export function validateParams<T>(schema: z.ZodSchema<T>) {
       }
       
       next()
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof HttpException) {
         next(error)
       } else {
-        next(new HttpException(400, '路径参数验证失败', error))
+        const errorDetail: { message?: string; name?: string; stack?: string } = error instanceof Error
+          ? { message: error.message, name: error.name, stack: error.stack }
+          : { message: String(error), name: 'Error' };
+        next(new HttpException(400, '路径参数验证失败', errorDetail))
       }
     }
   }
@@ -104,12 +114,12 @@ export function validateParams<T>(schema: z.ZodSchema<T>) {
 /**
  * 在控制器中直接验证数据（不创建中间件）
  * @param schema Zod Schema
- * @param data 要验证的数据
+ * @param data 要验证的数据（验证前可能是任何类型）
  * @returns 验证后的数据
  * @throws HttpException 如果验证失败
  */
-export function validateData<T>(schema: z.ZodSchema<T>, data: unknown): T {
-  const result: ValidationResult<T> = validate<T>(schema, data)
+export function validateData<T>(schema: z.ZodSchema<T>, data: JsonValue | Record<string, JsonValue> | JsonValue[] | Record<string, unknown> | unknown[] | unknown): T {
+  const result: ValidationResult<T> = validate<T>(schema, data as JsonValue)
   
   if (!result.success && result.errors) {
     const errors = formatValidationErrors(result.errors)

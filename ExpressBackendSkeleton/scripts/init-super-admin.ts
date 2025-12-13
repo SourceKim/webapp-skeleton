@@ -62,8 +62,10 @@ async function checkAndCreateDatabase() {
         } finally {
             await connection.end();
         }
-    } catch (error: unknown) {
-        const err = error as Error;
+    } catch (error: Error | { message?: string; name?: string }) {
+        const err: Error = error instanceof Error 
+            ? error 
+            : { name: error.name || 'Error', message: error.message || '未知错误' } as Error;
         console.error('数据库连接或创建失败:', error);
         throw new Error(`无法连接到数据库服务器或创建数据库: ${err.message}`);
     }
@@ -226,8 +228,10 @@ async function initSuperAdmin() {
         console.log(`超级管理员账号：${adminUsername}`);
         console.log(`超级管理员密码：${adminPassword}`);
 
-    } catch (error: unknown) {
-        const err = error as Error;
+    } catch (error: Error | { message?: string; stack?: string; name?: string }) {
+        const err: Error = error instanceof Error 
+            ? error 
+            : { name: error.name || 'Error', message: error.message || '未知错误', stack: error.stack } as Error;
         console.error('初始化失败：', err);
     } finally {
         // 关闭数据源连接

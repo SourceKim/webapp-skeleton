@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { logError } from '@/utils/logger';
+import type { JsonValue } from '@/types/common';
 
 /**
  * 根据MIME类型确定素材类型
@@ -139,22 +140,33 @@ export const decodeLatin1ToUtf8 = (name: string | undefined | null): string => {
  * @param tags 标签数据
  * @returns 标签数组或undefined
  */
-export const parseTags = (tags: unknown): string[] | undefined => {
+export const parseTags = (tags: string | string[] | JsonValue | null | undefined): string[] | undefined => {
     if (!tags) return undefined;
     
     if (typeof tags === 'string') {
         try {
             // 尝试解析JSON字符串
-            const parsed = JSON.parse(tags);
-            return Array.isArray(parsed) ? parsed : [tags];
+            const parsed: JsonValue = JSON.parse(tags);
+            if (Array.isArray(parsed)) {
+                const stringArray = parsed.filter((item: JsonValue): item is string => typeof item === 'string');
+                return stringArray.length > 0 ? stringArray : undefined;
+            }
+            return [tags];
         } catch {
             // 如果不是JSON，按逗号分割
-            return tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag);
+            const splitTags = tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0);
+            return splitTags.length > 0 ? splitTags : undefined;
         }
     }
     
     if (Array.isArray(tags)) {
-        return tags.filter((tag: unknown) => typeof tag === 'string' && tag.trim());
+        const filtered: string[] = [];
+        for (const tag of tags) {
+            if (typeof tag === 'string' && tag.trim().length > 0) {
+                filtered.push(tag.trim());
+            }
+        }
+        return filtered.length > 0 ? filtered : undefined;
     }
     
     return undefined;
@@ -166,7 +178,7 @@ export const parseTags = (tags: unknown): string[] | undefined => {
  * @param metadata 元数据
  * @returns 元数据对象或undefined
  */
-export const parseMetadata = (metadata: unknown): Record<string, string | number | boolean | null | undefined> | undefined => {
+export const parseMetadata = (metadata: string | Record<string, JsonValue> | JsonValue | null | undefined): Record<string, string | number | boolean | null | undefined> | undefined => {
     if (!metadata) return undefined;
     
     if (typeof metadata === 'string') {
