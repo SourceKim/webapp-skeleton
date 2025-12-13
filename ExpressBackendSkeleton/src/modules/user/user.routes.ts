@@ -1,6 +1,6 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
 import { UserController } from '@/modules/user/user.controller';
-import { authMiddleware } from '@/middlewares/auth.middleware';
+import { authMiddleware, ensureSelf } from '@/middlewares/auth.middleware';
 import { roleMiddleware } from '@/middlewares/role.middleware';
 import { ADMIN_ROLE_NAMES } from '@/constants/role.constants';
 import { paginationQuery } from '@/middlewares/paginationQuery';
@@ -8,16 +8,6 @@ import { paginationResponse } from '@/middlewares/paginationResponse';
 
 const router = Router();
 const userController = new UserController();
-
-// 普通用户 API - 需要认证
-// 仅允许用户访问/修改自己的资料
-const ensureSelf = (req: Request, res: Response, next: NextFunction): void => {
-    if (!req.user || req.user.id !== req.params.id) {
-        res.status(403).json({ code: 403, message: '禁止访问' });
-        return;
-    }
-    next();
-};
 
 router.put('/change-password', authMiddleware, userController.changePassword); // 修改密码
 router.put('/change-phone', authMiddleware, userController.changePhone); // 修改手机号

@@ -40,4 +40,17 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
         res.status(401).json({ message: '认证失败' });
         return;
     }
+}
+
+/**
+ * 确保用户只能访问自己的资源
+ * 验证 req.user.id 是否与 req.params.id 匹配
+ * 必须在 authMiddleware 之后使用
+ */
+export function ensureSelf(req: Request, res: Response, next: NextFunction): void {
+    if (!req.user || req.user.id !== req.params.id) {
+        res.status(403).json({ code: 403, message: '禁止访问' });
+        return;
+    }
+    next();
 } 
