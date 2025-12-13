@@ -46,7 +46,7 @@ export class RoleService {
         const [roles, total] = await queryBuilder.getManyAndCount();
 
         const roleDTOs = roles.map(role => {
-            return transformToCamelCase(role) as RoleResponseDto;
+            return transformToCamelCase(role) as unknown as RoleResponseDto;
         });
         return {
             roles: roleDTOs,
@@ -62,7 +62,7 @@ export class RoleService {
 
         if (!role) throw new HttpException(404, '角色不存在');
 
-        return transformToCamelCase(role) as RoleResponseDto;
+        return transformToCamelCase(role) as unknown as RoleResponseDto;
     }
 
     async createRole(createRoleDto: CreateRoleDto): Promise<RoleResponseDto> {
@@ -81,7 +81,7 @@ export class RoleService {
 
         await this.roleRepository.save(role);
 
-        return transformToCamelCase(role) as RoleResponseDto;
+        return transformToCamelCase(role) as unknown as RoleResponseDto;
     }
 
     async updateRole(id: string, updateRoleDto: UpdateRoleDto): Promise<RoleResponseDto> {
@@ -98,7 +98,7 @@ export class RoleService {
 
         await this.roleRepository.save(role);
 
-        return transformToCamelCase(role) as RoleResponseDto;
+        return transformToCamelCase(role) as unknown as RoleResponseDto;
     }
 
     async deleteRole(id: string): Promise<void> {
@@ -125,7 +125,7 @@ export class RoleService {
         role.permissions = permissions;
         await this.roleRepository.save(role);
 
-        return transformToCamelCase(role) as RoleResponseDto;
+        return transformToCamelCase(role) as unknown as RoleResponseDto;
     }
 
     async assignRolesToUser(userId: string, data: AssignRolesDto): Promise<UserResponseDto> {
@@ -153,6 +153,6 @@ export class RoleService {
         user.roles = roles;
         await this.userRepository.save(user);
 
-        return transformToCamelCase(user) as UserResponseDto;
+        return transformToCamelCase(user) as unknown as UserResponseDto;
     }
 } 

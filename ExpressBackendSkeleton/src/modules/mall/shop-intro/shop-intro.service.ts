@@ -43,7 +43,7 @@ export class ShopIntroService {
             shopIntro.banners.sort((a, b) => a.sort_order - b.sort_order);
         }
 
-        return transformToCamelCase(shopIntro) as ShopIntroResponseDto;
+        return transformToCamelCase(shopIntro) as unknown as ShopIntroResponseDto;
     }
 
     public async createOrUpdateShopIntro(dto: CreateShopIntroDto | UpdateShopIntroDto): Promise<ShopIntroResponseDto> {

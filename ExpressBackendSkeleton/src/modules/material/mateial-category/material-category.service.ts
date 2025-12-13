@@ -32,7 +32,7 @@ export class MaterialCategoryService {
         const [categories, total] = await queryBuilder.getManyAndCount();
 
         const categoryDTOs = categories.map(category => {
-            return transformToCamelCase(category) as MaterialCategoryResponseDto;
+            return transformToCamelCase(category) as unknown as MaterialCategoryResponseDto;
         });
 
         return {
@@ -45,7 +45,7 @@ export class MaterialCategoryService {
         const category = await this.materialCategoryRepository.findOne({ where: { id } });
         if (!category) throw new HttpException(404, '分类不存在');
 
-        return transformToCamelCase(category) as MaterialCategoryResponseDto;
+        return transformToCamelCase(category) as unknown as MaterialCategoryResponseDto;
     }
 
     async createMaterialCategory(createMaterialCategoryDto: CreateMaterialCategoryDto): Promise<MaterialCategoryResponseDto> {
@@ -57,7 +57,7 @@ export class MaterialCategoryService {
         }
         category.id = nanoid(16);
         await this.materialCategoryRepository.save(category);
-        return transformToCamelCase(category) as MaterialCategoryResponseDto;
+        return transformToCamelCase(category) as unknown as MaterialCategoryResponseDto;
     }
 
     async updateMaterialCategory(id: string, updateMaterialCategoryDto: UpdateMaterialCategoryDto): Promise<MaterialCategoryResponseDto> {
@@ -65,7 +65,7 @@ export class MaterialCategoryService {
         if (!category) throw new HttpException(404, '分类不存在');
 
         await this.materialCategoryRepository.update(id, updateMaterialCategoryDto);
-        return transformToCamelCase(category) as MaterialCategoryResponseDto;
+        return transformToCamelCase(category) as unknown as MaterialCategoryResponseDto;
     }
 
     async deleteMaterialCategory(id: string): Promise<void> {

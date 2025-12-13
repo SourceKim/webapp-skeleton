@@ -65,7 +65,7 @@ export class AuthController {
             res.status(200).json({
                 code: 0,
                 message: '注册成功',
-                data: transformToCamelCase(result.user) as RegisterResponseDto
+                data: transformToCamelCase(result.user) as unknown as RegisterResponseDto
             });
         } catch (error) {
             logError('用户注册失败', req.requestId, { error, body: req.body });
@@ -98,7 +98,7 @@ export class AuthController {
                 message: '登录成功',
                 data: {
                     access_token: result.access_token,
-                    user: transformToCamelCase(result.user) as UserResponseDto
+                    user: transformToCamelCase(result.user) as unknown as UserResponseDto
                 }
             });
         } catch (error) {
@@ -127,7 +127,7 @@ export class AuthController {
             res.json({
                 code: 0,
                 message: 'success',
-                data: transformToCamelCase(user) as ProfileResponseDto
+                data: transformToCamelCase(user) as unknown as ProfileResponseDto
             });
         } catch (error) {
             next(error);
@@ -162,7 +162,7 @@ export class AuthController {
                 message: '登录成功',
                 data: {
                     access_token: result.access_token,
-                    user: transformToCamelCase(result.user) as UserResponseDto
+                    user: transformToCamelCase(result.user) as unknown as UserResponseDto
                 }
             });
         } catch (error) {

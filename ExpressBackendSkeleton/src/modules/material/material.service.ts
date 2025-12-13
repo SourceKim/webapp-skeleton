@@ -232,7 +232,7 @@ export class MaterialService {
 
             // 执行查询，获取结果
             const [items, total] = await queryBuilder.getManyAndCount();
-            const materialDTOs = items.map(item => transformToCamelCase(item) as MaterialResponseDto);
+            const materialDTOs = items.map(item => transformToCamelCase(item) as unknown as MaterialResponseDto);
 
             return {
                 items: materialDTOs,
@@ -240,7 +240,10 @@ export class MaterialService {
             };
         } catch (error) {
             logError('获取素材列表失败', undefined, { error });
-            throw new HttpException(500, '获取素材列表失败', error);
+            const errorDetail = error instanceof Error
+                ? { message: error.message, name: error.name, stack: error.stack }
+                : undefined;
+            throw new HttpException(500, '获取素材列表失败', errorDetail);
         }
     }
 

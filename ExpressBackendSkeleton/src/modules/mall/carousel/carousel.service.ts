@@ -98,7 +98,7 @@ export class CarouselService {
             throw new HttpException(404, '轮播图不存在');
         }
 
-        return transformToCamelCase(carousel) as CarouselResponseDto;
+        return transformToCamelCase(carousel) as unknown as CarouselResponseDto;
     }
 
     public async findAll(query: PaginationQueryDto): Promise<{ items: CarouselResponseDto[]; total: number }> {
@@ -118,7 +118,7 @@ export class CarouselService {
         queryBuilder.skip(skip).take(query.limit);
 
         const [items, total] = await queryBuilder.getManyAndCount();
-        const dtos = items.map(item => transformToCamelCase(item) as CarouselResponseDto);
+        const dtos = items.map(item => transformToCamelCase(item) as unknown as CarouselResponseDto);
 
         return { items: dtos, total };
     }

@@ -37,7 +37,7 @@ export class PermissionService {
         const [permissions, total] = await queryBuilder.getManyAndCount();
 
         const permissionDTOs = permissions.map(permission => {
-            return transformToCamelCase(permission) as PermissionResponseDto;
+            return transformToCamelCase(permission) as unknown as PermissionResponseDto;
         });
 
         return {
@@ -50,7 +50,7 @@ export class PermissionService {
         const permission = await this.permissionRepository.findOne({ where: { id } });
         if (!permission) throw new HttpException(404, '权限不存在');
 
-        return transformToCamelCase(permission) as PermissionResponseDto;
+        return transformToCamelCase(permission) as unknown as PermissionResponseDto;
     }
 
     async createPermission(createPermissionDto: CreatePermissionDto): Promise<PermissionResponseDto> {
@@ -69,7 +69,7 @@ export class PermissionService {
         });
         await this.permissionRepository.save(permission);
 
-        return transformToCamelCase(permission) as PermissionResponseDto;
+        return transformToCamelCase(permission) as unknown as PermissionResponseDto;
     }
 
     async updatePermission(id: string, updatePermissionDto: UpdatePermissionDto): Promise<PermissionResponseDto> {
@@ -95,7 +95,7 @@ export class PermissionService {
 
         await this.permissionRepository.save(permission);
 
-        return transformToCamelCase(permission) as PermissionResponseDto;
+        return transformToCamelCase(permission) as unknown as PermissionResponseDto;
     }
 
     async deletePermission(id: string): Promise<void> {

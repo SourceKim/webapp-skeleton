@@ -32,7 +32,7 @@ export class MaterialTagService {
         const [tags, total] = await queryBuilder.getManyAndCount();
 
         const tagDTOs = tags.map(tag => {
-            return transformToCamelCase(tag) as MaterialTagResponseDto;
+            return transformToCamelCase(tag) as unknown as MaterialTagResponseDto;
         });
 
         return {
@@ -45,7 +45,7 @@ export class MaterialTagService {
         const tag = await this.materialTagRepository.findOne({ where: { id } });
         if (!tag) throw new HttpException(404, '标签不存在');
 
-        return transformToCamelCase(tag) as MaterialTagResponseDto;
+        return transformToCamelCase(tag) as unknown as MaterialTagResponseDto;
     }
 
     async createMaterialTag(createMaterialTagDto: CreateMaterialTagDto): Promise<MaterialTagResponseDto> {
@@ -57,7 +57,7 @@ export class MaterialTagService {
         }
         tag.id = nanoid(16);
         await this.materialTagRepository.save(tag);
-        return transformToCamelCase(tag) as MaterialTagResponseDto;
+        return transformToCamelCase(tag) as unknown as MaterialTagResponseDto;
     }
 
     async updateMaterialTag(id: string, updateMaterialTagDto: UpdateMaterialTagDto): Promise<MaterialTagResponseDto> {
@@ -65,7 +65,7 @@ export class MaterialTagService {
         if (!tag) throw new HttpException(404, '标签不存在');
 
         await this.materialTagRepository.update(id, updateMaterialTagDto);
-        return transformToCamelCase(tag) as MaterialTagResponseDto;
+        return transformToCamelCase(tag) as unknown as MaterialTagResponseDto;
     }
 
     async deleteMaterialTag(id: string): Promise<void> {

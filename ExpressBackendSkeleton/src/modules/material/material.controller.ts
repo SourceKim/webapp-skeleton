@@ -154,7 +154,7 @@ export class MaterialController {
                     res.status(200).json({
                         code: 0,
                         message: '素材上传成功',
-                        data: transformToCamelCase(material) as MaterialResponseDto
+                        data: transformToCamelCase(material) as unknown as MaterialResponseDto
                     });
                 } catch (error) {
                     // 如果出错且文件已上传，清理文件
@@ -206,7 +206,7 @@ export class MaterialController {
             res.status(200).json({
                 code: 0,
                 message: '获取素材成功',
-                data: transformToCamelCase(material) as MaterialResponseDto
+                data: transformToCamelCase(material) as unknown as MaterialResponseDto
             });
         } catch (error) {
             next(error);
@@ -233,7 +233,7 @@ export class MaterialController {
             res.status(200).json({
                 code: 0,
                 message: '素材更新成功',
-                data: transformToCamelCase(material) as MaterialResponseDto
+                data: transformToCamelCase(material) as unknown as MaterialResponseDto
             });
         } catch (error) {
             next(error);

@@ -51,7 +51,7 @@ export class UserService {
         const savedUser = await this.userRepository.save(user);
 
         // 返回用户DTO
-        return transformToCamelCase(savedUser) as UserResponseDto;
+        return transformToCamelCase(savedUser) as unknown as UserResponseDto;
     }
 
     async updateUser(userId: string, updateData: UpdateUserDto): Promise<UserResponseDto> {
@@ -93,7 +93,7 @@ export class UserService {
         const savedUser = await this.userRepository.save(user);
 
         // 返回用户DTO
-        return transformToCamelCase(savedUser) as UserResponseDto;
+        return transformToCamelCase(savedUser) as unknown as UserResponseDto;
     }
 
     async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {
@@ -168,7 +168,7 @@ export class UserService {
             throw new HttpException(404, '用户不存在');
         }
 
-        return transformToCamelCase(user) as UserResponseDto;
+        return transformToCamelCase(user) as unknown as UserResponseDto;
     }
 
     async getUserStats(userId: string): Promise<{ couponCount: number; pointCount: number; totalConsumption: string }> {
@@ -207,7 +207,7 @@ export class UserService {
         const [users, total] = await queryBuilder.getManyAndCount();
 
         const userDTOs = users.map(user => {
-            return transformToCamelCase(user) as UserResponseDto;
+            return transformToCamelCase(user) as unknown as UserResponseDto;
         });
 
         return { users: userDTOs, total };

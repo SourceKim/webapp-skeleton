@@ -18,10 +18,12 @@ router.get('/', async (req: Request, res: Response) => {
         const userId = req.user!.id;
         const items = await service.listUserView(userId);
         res.json({ code: 0, message: 'OK', data: items });
-    } catch (e: Error | HttpException) {
+    } catch (e: unknown) {
         const error: AppError = e instanceof HttpException 
             ? { status: e.status, message: e.message, name: e.name }
-            : { message: e.message, name: e.name, stack: e.stack };
+            : e instanceof Error
+            ? { message: e.message, name: e.name, stack: e.stack }
+            : { message: String(e), name: 'Error' };
         res.status(error.status || 500).json({ code: error.status || 500, message: error.message || '获取购物车失败' });
     }
 });
@@ -32,10 +34,12 @@ router.post('/', async (req: Request, res: Response) => {
         const userId = req.user!.id;
         const item = await service.addItem(userId, dto.sku_id, dto.quantity);
         res.json({ code: 0, message: 'OK', data: item });
-    } catch (e: Error | HttpException) {
+    } catch (e: unknown) {
         const error: AppError = e instanceof HttpException 
             ? { status: e.status, message: e.message, name: e.name }
-            : { message: e.message, name: e.name, stack: e.stack };
+            : e instanceof Error
+            ? { message: e.message, name: e.name, stack: e.stack }
+            : { message: String(e), name: 'Error' };
         const status = error.status || 500;
         res.status(status).json({ code: status, message: error.message || '添加失败' });
     }
@@ -53,10 +57,12 @@ router.put('/selected', async (req: Request, res: Response) => {
         const userId = req.user!.id;
         await service.updateSelected(userId, selected, ids);
         res.json({ code: 0, message: 'OK' });
-    } catch (e: Error | HttpException) {
+    } catch (e: unknown) {
         const error: AppError = e instanceof HttpException 
             ? { status: e.status, message: e.message, name: e.name }
-            : { message: e.message, name: e.name, stack: e.stack };
+            : e instanceof Error
+            ? { message: e.message, name: e.name, stack: e.stack }
+            : { message: String(e), name: 'Error' };
         const status = error.status || 500;
         res.status(status).json({ code: status, message: error.message || '批量更新失败' });
     }
@@ -71,10 +77,12 @@ router.put('/:id', async (req: Request, res: Response) => {
         if (!dto.quantity) { res.status(400).json({ code: 400, message: 'quantity 必填' }); return; }
         const item = await service.updateQuantity(userId, id, dto.quantity);
         res.json({ code: 0, message: 'OK', data: item });
-    } catch (e: Error | HttpException) {
+    } catch (e: unknown) {
         const error: AppError = e instanceof HttpException 
             ? { status: e.status, message: e.message, name: e.name }
-            : { message: e.message, name: e.name, stack: e.stack };
+            : e instanceof Error
+            ? { message: e.message, name: e.name, stack: e.stack }
+            : { message: String(e), name: 'Error' };
         const status = error.status || 500;
         res.status(status).json({ code: status, message: error.message || '更新失败' });
     }
@@ -86,10 +94,12 @@ router.delete('/:id', async (req: Request, res: Response) => {
         const id = req.params.id;
         await service.remove(userId, id);
         res.json({ code: 0, message: 'OK' });
-    } catch (e: Error | HttpException) {
+    } catch (e: unknown) {
         const error: AppError = e instanceof HttpException 
             ? { status: e.status, message: e.message, name: e.name }
-            : { message: e.message, name: e.name, stack: e.stack };
+            : e instanceof Error
+            ? { message: e.message, name: e.name, stack: e.stack }
+            : { message: String(e), name: 'Error' };
         res.status(error.status || 500).json({ code: error.status || 500, message: error.message || '删除失败' });
     }
 });

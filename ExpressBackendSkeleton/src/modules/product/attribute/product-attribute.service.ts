@@ -34,7 +34,7 @@ export class ProductAttributeService {
 
     async listKeysBySpu(spuId: string): Promise<ProductAttributeKeyResponseDto[]> {
         const keys = await this.keyRepo.find({ where: { spu_id: spuId }, relations: ['values'] });
-        return keys.map(k => transformToCamelCase({ ...k, spu_id: k.spu_id }) as ProductAttributeKeyResponseDto);
+        return keys.map(k => transformToCamelCase({ ...k, spu_id: k.spu_id }) as unknown as ProductAttributeKeyResponseDto);
     }
 
     async createKey(dto: CreateProductAttributeKeyDto): Promise<ProductAttributeKeyResponseDto> {
@@ -48,7 +48,7 @@ export class ProductAttributeService {
             spu_id: dto.spu_id
         });
         await this.keyRepo.save(k);
-        return transformToCamelCase({ ...k, spu_id: dto.spu_id }) as ProductAttributeKeyResponseDto;
+        return transformToCamelCase({ ...k, spu_id: dto.spu_id }) as unknown as ProductAttributeKeyResponseDto;
     }
 
     async updateKey(id: string, dto: UpdateProductAttributeKeyDto): Promise<ProductAttributeKeyResponseDto> {
@@ -60,7 +60,7 @@ export class ProductAttributeService {
         }
         Object.assign(k, dto);
         await this.keyRepo.save(k);
-        return transformToCamelCase({ ...k, spu_id: k.spu_id }) as ProductAttributeKeyResponseDto;
+        return transformToCamelCase({ ...k, spu_id: k.spu_id }) as unknown as ProductAttributeKeyResponseDto;
     }
 
     async deleteKey(id: string): Promise<void> { await this.keyRepo.delete(id); }
@@ -84,7 +84,7 @@ export class ProductAttributeService {
             ...saved!, 
             attribute_key_id: dto.attribute_key_id, 
             image_id: saved?.image?.id 
-        }) as ProductAttributeValueResponseDto;
+        }) as unknown as ProductAttributeValueResponseDto;
     }
 
     async updateValue(id: string, dto: UpdateProductAttributeValueDto): Promise<ProductAttributeValueResponseDto> {
@@ -100,7 +100,7 @@ export class ProductAttributeService {
             ...updated!, 
             attribute_key_id: updated?.attribute_key_id || '', 
             image_id: updated?.image?.id 
-        }) as ProductAttributeValueResponseDto;
+        }) as unknown as ProductAttributeValueResponseDto;
     }
 
     async deleteValue(id: string): Promise<void> { await this.valRepo.delete(id); }
