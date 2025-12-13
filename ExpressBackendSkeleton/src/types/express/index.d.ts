@@ -20,7 +20,25 @@ declare global {
       ): Promise<T>;
     }
     interface Response {
+      /**
+       * 分页响应方法
+       */
       pagination<T>(data: T[], total: number): void;
+      /**
+       * 成功响应方法
+       * @param data 响应数据
+       * @param message 响应消息，默认为 'success'
+       * @param statusCode HTTP 状态码，默认为 200
+       */
+      success<T>(data: T, message?: string, statusCode?: number): void;
+      /**
+       * 失败响应方法
+       * @param message 错误消息
+       * @param code API 响应码，默认为 FAILURE
+       * @param statusCode HTTP 状态码，默认为 200
+       * @param error 错误详情
+       */
+      error(message: string, code?: number, statusCode?: number, error?: any): void;
     }
   }
 }

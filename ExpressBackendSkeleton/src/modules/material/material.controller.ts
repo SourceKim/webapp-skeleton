@@ -10,6 +10,7 @@ import { idParamSchema } from '@skeleton/shared-types';
 import { validateData } from '@/utils/zod-validator';
 import { ENV } from '@/configs/env.config';
 import { transformToCamelCase } from '@/utils/dto-transform.util';
+import { asyncHandler } from '@/utils/async-handler';
 
 import {
     parseTags,
@@ -174,94 +175,74 @@ export class MaterialController {
      * 获取素材列表
      * GET /api/v1/materials
      */
-    public getMaterials = async (
+    public getMaterials = asyncHandler(async (
         req: Request, 
-        res: Response<ApiResponse<PaginatedResponse<MaterialResponseDto>>>,
-        next: NextFunction
+        res: Response<ApiResponse<PaginatedResponse<MaterialResponseDto>>>
     ): Promise<void> => {
-        try {
-            const { items, total } = await this.materialService.getMaterials(req.pagination);
-            return res.pagination(items, total);
-        } catch (error) {
-            next(error);
-        }
-    };
+        const { items, total } = await this.materialService.getMaterials(req.pagination);
+        return res.pagination(items, total);
+    });
 
     /**
      * 获取素材详情
      * GET /api/v1/materials/:id
      */
-    public getMaterialById = async (
+    public getMaterialById = asyncHandler(async (
         req: Request, 
-        res: Response<ApiResponse<MaterialResponseDto>>,
-        next: NextFunction
+        res: Response<ApiResponse<MaterialResponseDto>>
     ): Promise<void> => {
-        try {
-            const { id } = validateData(idParamSchema, req.params);
-            
-            // 获取素材
-            const material = await this.materialService.getMaterialById(id);
-            
-            // 返回素材信息
-            res.status(200).json({
-                code: 0,
-                message: '获取素材成功',
-                data: transformToCamelCase(material) as unknown as MaterialResponseDto
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
+        const { id } = validateData(idParamSchema, req.params);
+        
+        // 获取素材
+        const material = await this.materialService.getMaterialById(id);
+        
+        // 返回素材信息
+        res.status(200).json({
+            code: 0,
+            message: '获取素材成功',
+            data: transformToCamelCase(material) as unknown as MaterialResponseDto
+        });
+    });
 
     /**
      * 更新素材
      * PUT /api/v1/materials/admin/:id
      */
-    public updateMaterial = async (
+    public updateMaterial = asyncHandler(async (
         req: Request, 
-        res: Response<ApiResponse<MaterialResponseDto>>,
-        next: NextFunction
+        res: Response<ApiResponse<MaterialResponseDto>>
     ): Promise<void> => {
-        try {
-            const { id } = validateData(idParamSchema, req.params);
-            const updateData = validateData(updateMaterialSchema, req.body);
-            
-            // 更新素材
-            const material = await this.materialService.updateMaterial(id, updateData);
-            
-            // 返回更新后的素材信息
-            res.status(200).json({
-                code: 0,
-                message: '素材更新成功',
-                data: transformToCamelCase(material) as unknown as MaterialResponseDto
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
+        const { id } = validateData(idParamSchema, req.params);
+        const updateData = validateData(updateMaterialSchema, req.body);
+        
+        // 更新素材
+        const material = await this.materialService.updateMaterial(id, updateData);
+        
+        // 返回更新后的素材信息
+        res.status(200).json({
+            code: 0,
+            message: '素材更新成功',
+            data: transformToCamelCase(material) as unknown as MaterialResponseDto
+        });
+    });
 
     /**
      * 删除素材
      * DELETE /api/v1/materials/admin/:id
      */
-    public deleteMaterial = async (
+    public deleteMaterial = asyncHandler(async (
         req: Request, 
-        res: Response<ApiResponse<void>>,
-        next: NextFunction
+        res: Response<ApiResponse<void>>
     ): Promise<void> => {
-        try {
-            const { id } = validateData(idParamSchema, req.params);
-            
-            // 删除素材
-            await this.materialService.deleteMaterial(id);
-            
-            // 返回成功信息
-            res.status(200).json({
-                code: 0,
-                message: '素材删除成功'
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
+        const { id } = validateData(idParamSchema, req.params);
+        
+        // 删除素材
+        await this.materialService.deleteMaterial(id);
+        
+        // 返回成功信息
+        res.status(200).json({
+            code: 0,
+            message: '素材删除成功'
+        });
+    });
 } 

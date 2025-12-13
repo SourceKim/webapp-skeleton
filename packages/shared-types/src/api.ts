@@ -3,10 +3,32 @@
  */
 
 /**
+ * API 响应状态码
+ */
+export enum ApiResponseCode {
+  /** 成功 */
+  SUCCESS = 0,
+  /** 失败 */
+  FAILURE = 1,
+  /** 警告 */
+  WARNING = 2,
+  /** 信息 */
+  INFO = 3,
+  /** 未授权 */
+  UNAUTHORIZED = 401,
+  /** 禁止访问 */
+  FORBIDDEN = 403,
+  /** 未找到 */
+  NOT_FOUND = 404,
+  /** 服务器错误 */
+  INTERNAL_ERROR = 500
+}
+
+/**
  * API 响应格式
  */
 export interface ApiResponse<T = any> {
-  code: number // 0 成功, 1 失败, 2 警告, 3 信息, 401 未授权, 403 禁止访问, 404 未找到, 500 服务器错误
+  code: number // 使用 ApiResponseCode 枚举值
   data?: T
   message?: string
   error?: any
